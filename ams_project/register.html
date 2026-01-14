@@ -6,174 +6,261 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sign Up</title>
     <style>
-        /* Page Formatting */
+        /* Page background */
         body {
-            font-family: Arial, sans-serif;
-            background-color: #e9edf3;
+            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+            background-color: #f3f4f6;
             font-size: 14px;
+            color: #374151;
         }
 
-        /* Form container */
-        form {
-            width: 380px;
-            margin: 60px auto;
-            padding: 25px;
+        /* Registration container */
+        .register_container {
+            width: 520px;
             background-color: #ffffff;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.1);
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 28px;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
         }
 
-        /* Form heading */
-        h2 {
+        /* Logo */
+        .logo {
+            display: block;
+            width: 48px;
+            height: 48px;
+            margin: 0 auto 10px;
+            background-color: #1f2933;
+            color: #ffffff;
+            font-weight: 700;
+            font-size: 18px;
+            border-radius: 6px;
             text-align: center;
-            color: #333;
-            margin-bottom: 15px;
+            line-height: 48px;
+        }
+
+        /* Headings */
+        .register_container h2 {
+            text-align: center;
+            font-size: 18px;
+            font-weight: 600;
+            color: #111827;
+        }
+
+        .register_container h3 {
+            text-align: center;
+            font-size: 15px;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 20px;
+        }
+
+        /* Form */
+        form {
+            margin-top: 10px;
         }
 
         /* Labels */
         label {
             display: block;
-            margin-top: 12px;
-            font-weight: bold;
-            color: #444;
+            margin-top: 14px;
+            font-weight: 500;
+            font-size: 13px;
+            color: #374151;
         }
 
-        /* Input fields */
+        /* Inputs & select */
         input[type="text"],
         input[type="password"],
         select {
             width: 100%;
-            padding: 9px;
-            margin-top: 5px;
-            border: 1px solid #bfc5ce;
-            border-radius: 4px;
+            padding: 10px;
+            margin-top: 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
             font-size: 14px;
+            transition: border-color 0.2s ease;
         }
 
-        /* Input focus effect */
         input:focus,
         select:focus {
-            border-color: #2c7be5;
+            border-color: #1f2933;
             outline: none;
         }
 
         /* Submit button */
         input[type="submit"] {
             width: 100%;
-            padding: 11px;
-            margin-top: 20px;
-            background-color: #2c7be5;
+            margin-top: 22px;
+            padding: 12px;
+            background-color: #1f2933;
             color: #ffffff;
             border: none;
-            border-radius: 4px;
+            border-radius: 6px;
             font-size: 15px;
+            font-weight: 500;
             cursor: pointer;
+            transition: background-color 0.2s ease;
         }
 
-        /* Button hover effect */
         input[type="submit"]:hover {
-            background-color: #1a5cb8;
+            background-color: #374151;
         }
 
         /* Error messages */
         .error {
-            color: #c62828;
+            display: block;
             font-size: 12px;
-            margin-top: 3px;
+            color: #dc2626;
+            margin-top: 4px;
+        }
+
+        /* Left decorative panel */
+        .leftdecorate {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 320px;
+            height: 100vh;
+            background-color: #1f2933;
+        }
+
+        /* Make sure form stays visible */
+        .register_container {
+            margin-left: 360px;
+        }
+
+        /* Password text to be disc */
+        .pass_w {
+            -webkit-text-security: disc;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        /* Hide/Show Password inside the password field */
+        .hide_show {
+            position: absolute;
+            margin-left: 440px;
+            margin-top: -28px;
+            font-size: 12px;
+            color: #6b7280;
+            cursor: pointer;
+            user-select: none;
         }
     </style>
 </head>
 
 <body>
-    <form action="handle_register.php" method="post">
-        <label>National ID</label>
-        <input type="text" id="national_id" name="national_id">
-        <span class="error" id="nidErr"></span>
+    
+    <div class="register_container">
+        
+        <h2>Register for AMS</h2>
+        <span class="logo">AMS</span>
+        <h3>Sign Up</h3>
+        <form action="handle_register.php" method="post">
+            <label>National ID</label>
+            <input type="text" id="national_id" name="national_id">
+            <span class="error" id="nidErr"></span>
 
-        <label>Business ID (Optional)</label>
-        <input type="text" name="business_id">
+            <label>Business ID (Optional)</label>
+            <input type="text" name="business_id">
 
-        <label>Role</label>
-        <select id="role_id" name="role_id">
-            <option value="">-- Select Role --</option>
-            <option value="1">Consigner</option>
-            <option value="2">Bidder</option>
+            <label>Role</label>
+            <select id="role_id" name="role_id">
+                <option value="">-- Select Role --</option>
+                <option value="1">Consigner</option>
+                <option value="2">Bidder</option>
 
-        </select>
-        <span class="error" id="roleErr"></span>
+            </select>
+            <span class="error" id="roleErr"></span>
 
-        <label>First Name</label>
-        <input type="text" id="firstname" name="firstname">
-        <span class="error" id="fnameErr"></span>
+            <label>First Name</label>
+            <input type="text" id="firstname" name="firstname">
+            <span class="error" id="fnameErr"></span>
 
-        <label>Second Name (Optional)</label>
-        <input type="text" name="secondname">
+            <label>Second Name (Optional)</label>
+            <input type="text" name="secondname">
 
-        <label>Surname</label>
-        <input type="text" id="surname" name="surname">
-        <span class="error" id="surnameErr"></span>
+            <label>Surname</label>
+            <input type="text" id="surname" name="surname">
+            <span class="error" id="surnameErr"></span>
 
-        <label>Business Name (Optional)</label>
-        <input type="text" name="business_name">
+            <label>Business Name (Optional)</label>
+            <input type="text" name="business_name">
 
-        <label>Phone Number</label>
-        <input type="text" id="phone" name="phone_number">
-        <span class="error" id="phoneErr"></span>
+            <label>Phone Number</label>
+            <input type="text" id="phone" name="phone_number">
+            <span class="error" id="phoneErr"></span>
 
-        <label>Email</label>
-        <input type="text" id="email" name="email">
-        <span class="error" id="emailErr"></span>
+            <label>Email</label>
+            <input type="text" id="email" name="email">
+            <span class="error" id="emailErr"></span>
 
-        <label>Username</label>
-        <input type="text" id="username" name="username">
-        <span class="error" id="userErr"></span>
+            <label>Username</label>
+            <input type="text" id="username" name="username">
+            <span class="error" id="userErr"></span>
 
-        <label>Password</label>
-        <input type="password" id="password" name="password">
-        <span class="error" id="passErr"></span>
+            <label>Password</label>
+            <input type="text" id="password" name="password" class ="pass_w">
+            <span class="hide_show" id="togglePassword">Hide/Show</span>
+            <span class="error" id="passErr"></span>
 
-        <input type="submit" value="Register">
-    </form>
+            <input type="submit" value="Register">
+        </form>
 
-    <script>
-        function validateForm() {
-            var valid = true;
-
-            function error(id, msg) {
-                document.getElementById(id).innerHTML = msg;
-                valid = false;
+        <script>
+            function togglePasswordVisibility() {
+                var passwordField = document.getElementById("password");
+                var toggleText = document.getElementById("togglePassword");
+                if (passwordField.classList.contains("pass_w")) {
+                    passwordField.classList.remove("pass_w");
+                    toggleText.textContent = "Hide";
+                } else {
+                    passwordField.classList.add("pass_w");
+                    toggleText.textContent = "Show";
+                }
             }
+            document.getElementById("togglePassword").addEventListener("click", togglePasswordVisibility);
 
-            // Clear errors
-            var errors = document.getElementsByClassName("error");
-            for (var i = 0; i < errors.length; i++) {
-                errors[i].innerHTML = "";
+            function validateForm() {
+                var valid = true;
+
+                function error(id, msg) {
+                    document.getElementById(id).innerHTML = msg;
+                    valid = false;
+                }
+
+                // Clear errors
+                var errors = document.getElementsByClassName("error");
+                for (var i = 0; i < errors.length; i++) {
+                    errors[i].innerHTML = "";
+                }
+
+
+
+                // Get values
+                var national_id = document.getElementById("national_id").value;
+                var role_id = document.getElementById("role_id").value;
+                var firstname = document.getElementById("firstname").value;
+                var surname = document.getElementById("surname").value;
+                var phone = document.getElementById("phone").value;
+                var email = document.getElementById("email").value;
+                var username = document.getElementById("username").value;
+                var password = document.getElementById("password").value;
+
+                // Validation rules
+                if (national_id == "") error("nidErr", "National ID required");
+                if (role_id == "") error("roleErr", "Select a role");
+                if (firstname == "") error("fnameErr", "First name required");
+                if (surname == "") error("surnameErr", "Surname required");
+                if (phone == "") error("phoneErr", "Phone number required");
+                if (email == "" || email.indexOf("@") == false) error("emailErr", "Valid email required");
+                if (username.length < 4) error("userErr", "Username must be at least 4 characters");
+                if (password.length < 6) error("passErr", "Password must be at least 6 characters");
+
+                return valid;
             }
-
-            // Get values
-            var national_id = document.getElementById("national_id").value;
-            var role_id = document.getElementById("role_id").value;
-            var firstname = document.getElementById("firstname").value;
-            var surname = document.getElementById("surname").value;
-            var phone = document.getElementById("phone").value;
-            var email = document.getElementById("email").value;
-            var username = document.getElementById("username").value;
-            var password = document.getElementById("password").value;
-
-            // Validation rules
-            if (national_id == "") error("nidErr", "National ID required");
-            if (role_id == "") error("roleErr", "Select a role");
-            if (firstname == "") error("fnameErr", "First name required");
-            if (surname == "") error("surnameErr", "Surname required");
-            if (phone == "") error("phoneErr", "Phone number required");
-            if (email == "" || email.indexOf("@") == -1) error("emailErr", "Valid email required");
-            if (username.length < 4) error("userErr", "Username must be at least 4 characters");
-            if (password.length < 6) error("passErr", "Password must be at least 6 characters");
-
-            return valid;
-        }
-    </script>
+        </script>
 
 </body>
 

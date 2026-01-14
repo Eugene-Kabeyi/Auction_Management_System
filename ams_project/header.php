@@ -29,6 +29,6 @@
             <div class="user-avatar" id="userAvatar">JD</div>
             <span id="userName">John Doe</span>
         </div>
-        <button id="loginBtn" class="login-btn">Login</button>
+        <button id="loginBtn" class="login-btn"><a href="login.html">Login</a></button>
     </div>
 </nav>

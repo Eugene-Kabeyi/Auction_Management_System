@@ -39,22 +39,22 @@ include 'config.php';
     <div class="quick-actions">
         <h2 class="section-title">Quick Actions</h2>
         <div class="actions-grid">
-            <div class="action-btn" onclick="createNewAuction()">
+            <div class="action-btn" ">
                 <div class="action-icon">➕</div>
                 <div class="action-label">Create Auction</div>
             </div>
             
-            <div class="action-btn" onclick="manageInventory()">
+            <div class="action-btn" ">
                 <div class="action-icon">📦</div>
                 <div class="action-label">Manage Inventory</div>
             </div>
             
-            <div class="action-btn" onclick="viewReports()">
+            <div class="action-btn" ">
                 <div class="action-icon">📊</div>
                 <div class="action-label">View Reports</div>
             </div>
             
-            <div class="action-btn" onclick="addNewItem()">
+            <div class="action-btn" ">
                 <div class="action-icon">🎯</div>
                 <div class="action-label">Add New Item</div>
             </div>
