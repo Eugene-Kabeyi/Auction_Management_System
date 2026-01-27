@@ -95,6 +95,18 @@
             outline: none;
         }
 
+        .login_form select {
+            width: 100%;
+            padding: 10px;
+            margin-top: 6px;
+            border: 1px solid #d1d5db;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.2s ease;
+            background-color: #ffffff;
+            color: #374151;
+        }
+
         /* Submit button */
         .login_form button {
             width: 100%;
@@ -107,43 +119,77 @@
             font-size: 15px;
             font-weight: 500;
             cursor: pointer;
-            transition: background-color 0.2s ease;
+            transition: background-color 0.4s ease;
         }
 
         .login_form button:hover {
-            background-color: #374151;
+            background-color: #ffffff;
+            color: #1f2933;
+            border: 2px solid #1f2933;
         }
 
-        /* Responsive - hide left decoration on small screens */
-        @media (max-width: 900px) {
+        .hide_show {
+            position: absolute;
+            right: 30px;
+            top: 305px;
+            cursor: pointer;
+            font-size: 12px;
+            color: #1f2933;
+            user-select: none;
+        }   
+        
+        .pass_w{
+            font-family: Arial, sans-serif;
+            -webkit-text-security: disc;
+            letter-spacing: 2px;
 
-            .login_container {
-                width: 90%;
-                margin: auto;
-            }
         }
     </style>
 </head>
 
 <body>
     <div class="login_container">
-        
+        <!-- Logo and Headings -->
         <h2>Welcome to AMS</h2>
         <span class="logo">AMS</span>
-        <h3>Log In</h3>
+        <h3>Staff Log In</h3>
+        <!-- Login Form -->
         <form action="/handle_login.php" method="post" class="login_form">
+           
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
 
             <label for="password">Password:</label>
-            <input type="text" id="password" name="password" required>
+            <span class="hide_show" id="togglePassword">Hide/Show</span>
+            <input type="text" id="password" name="password" class="pass_w" required>
+
+             <!-- Choose between Admin and Staff -->
+            <label for="login_type">Account Type:</label>
+            <select id="login_type" name="login_type" required>
+                <option value="admin">Admin</option>
+                <option value="staff">Staff</option>
+            </select>
 
             <button type="submit">Log In</button>
         </form>
     </div>
     <script>
-        // Validation of password field to ensure it is not empty and making it a password type
-        document.getElementById('password').setAttribute('type', 'password');
+        // Validation of password field to ensure it is not empty and handle show/hide passwordn
+        function togglePasswordVisibility() {
+            const passwordInput = document.getElementById('password');
+            const toggleButton = document.getElementById('togglePassword');
+            toggleButton.addEventListener('click', function () {
+                if (passwordInput.classList.contains('pass_w')) {
+                    passwordInput.classList.remove('pass_w');
+                    toggleButton.textContent = "Hide";
+                } else {
+                    passwordInput.classList.add('pass_w');
+                    toggleButton.textContent = "Show";
+                }
+            });
+        }
+        togglePasswordVisibility();
+        
     </script>
 
 </body>
