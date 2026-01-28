@@ -4,6 +4,9 @@ include 'header.php';
 <body>
     <h2>Approve Item</h2>
     <!-- Form for approve_item.php goes here -->
+     <div class="outer_container">
+        <div class="f_inner_container"></div>
+        <div class="s_inner_container">
     <p>Please review the item details below and approve or reject the item.</p>
     <form action="handle_approve_item.php" method="post">
         <label for="item_id">Item ID:</label>
@@ -24,6 +27,8 @@ include 'header.php';
         <button type="submit" name="action" value="approve">Approve Item</button>
         <button type="submit" name="action" value="reject">Reject Item</button>
     </form>
+    </div>
+    </div>
 
     <script>
         // Make the form read-only for review purposes - later will apply DRY principle

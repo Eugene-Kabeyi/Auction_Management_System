@@ -1,44 +1,61 @@
 <?php
+// Database connection class
 class DatabaseConfig {
-    protected $conn;
-    public $host = "localhost";
-    public $db = "AMS";
-    public $user = "root";
-    public $password = "";
+    
+    // Store the database connection
+    private $conn = null;
+    
+    // Database settings
+    private $config = [
+        'host' => 'localhost',      // Server name
+        'dbname' => 'AMS',          // Database name
+        'user' => 'root',           // Username
+        'password' => '',           // Password
+        'charset' => 'utf8mb4'      // Character set
+    ];
 
-// Establish database connection in a protected method
-protected function connect(){
-    $host = $this->host;
-    $db = $this->db;
-    $user = $this->user;
-    $password = $this->password;
-
-    $conn = "mysql:host=$host;dbname=$db;charset=utf8mb4";
-    try{
-        $conn= new PDO ($conn, $user, $password);
-
-        // Throw exceptions on errors
-        $conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-
-        // Fetch results as associative arrays
-        $conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
-
-        // Use real prepared statements
-        $conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
-        echo "✅ Database connection successful.";
-        return $conn;
-    }catch (PDOException $e){
-        die("❌ Database connection failed: " . $e->getMessage());
+    // Get database connection
+    public function getConnection() {
+        // Create connection only once (lazy loading)
+        if ($this->conn === null) {
+            try {
+                // Create connection string
+                $dsn = "mysql:host={$this->config['host']};dbname={$this->config['dbname']};charset={$this->config['charset']}";
+                
+                // Create PDO connection
+                $this->conn = new PDO($dsn, $this->config['user'], $this->config['password']);
+                
+                // Set PDO options:
+                // 1. Throw exceptions on errors
+                $this->conn->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+                // 2. Return data as associative arrays
+                $this->conn->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+                // 3. Use real prepared statements (security)
+                $this->conn->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+                
+            } catch (PDOException $e) {
+                // Connection failed - throw error
+                throw new Exception("Connection failed: " . $e->getMessage());
+            }
+        }
+        
+        // Return the connection
+        return $this->conn;
     }
 }
-// Get the database connection and  make it accessible
-public function getConnection(){
-    $this->connect();
-    return $this->conn;
-}
-}
-// Create a database connection
-$conn = (new DatabaseConfig())->getConnection();
 
-
+// How to use:
+try {
+    // Create database object
+    $db = new DatabaseConfig();
+    
+    // Get connection
+    $conn = $db->getConnection();
+    
+    // Now you can run queries using $conn
+    
+} catch (Exception $e) {
+    // Show error if connection fails
+    echo $e->getMessage();
+}
 ?>

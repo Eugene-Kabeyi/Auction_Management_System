@@ -9,13 +9,13 @@
             echo "User";
         } ?></h1>
     <!--Display profile photo here-->
-    <div class="verify_container">
-        <div class="profile_photo">
+    <div class="outer_container">
+        <div class="f_inner_container">
             <img src="../images/profile_placeholder.png" alt="Profile Photo" class="profile_img">
-            <button class="change_image">Change Image</button>
+            <button class="change_image"><input type="file" id="profile_image" name="profile_image">Change Image</button>
         </div>
         <!--Form for personal details her and national id document submission-->
-        <div>
+        <div class="s_inner_container">
             <form action="handle_verification" method="post">
                 <label for="first_name">First Name:</label>
                 <input type="text" id="first_name" name="first_name" required>

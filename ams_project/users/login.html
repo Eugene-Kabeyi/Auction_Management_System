@@ -131,6 +131,21 @@
             letter-spacing: 2px;
 
         }
+        /* Registration link */
+        .dont {
+            display: block;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #6b7280;
+            text-align: center;
+        }
+        .dont a {
+            color: #1f2933;
+            text-decoration: none;      
+        }
+        .dont a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
@@ -151,9 +166,10 @@
 
             <button type="submit">Log In</button>
         </form>
+        <span class="dont">Don't have an account? <a href="register.html">Register</a></span>
     </div>
     <script>
-        // Validation of password field to ensure it is not empty and handle show/hide passwordn
+        // Validation of password field to ensure it is not empty and handle show/hide password
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
             const toggleButton = document.getElementById('togglePassword');

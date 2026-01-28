@@ -174,7 +174,7 @@
         </form>
     </div>
     <script>
-        // Validation of password field to ensure it is not empty and handle show/hide passwordn
+        // Validation of password field to ensure it is not empty and handle show/hide password
         function togglePasswordVisibility() {
             const passwordInput = document.getElementById('password');
             const toggleButton = document.getElementById('togglePassword');

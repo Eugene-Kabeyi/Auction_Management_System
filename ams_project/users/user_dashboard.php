@@ -1,7 +1,3 @@
-<?php
-$BASE_URL = "http://localhost/ams_project/";
-?>
-
 <?php include __DIR__ . '/../header.php'; ?>
 
 <main class="dashboard-container">
