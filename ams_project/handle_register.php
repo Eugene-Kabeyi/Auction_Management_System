@@ -5,11 +5,12 @@ class RegisterHandler extends DatabaseConfig
 {
     protected $conn;
 
+    // Initialize connection
     public function __construct()
     {
         $this->conn = $this->getConnection();
     }
-
+     // Handle registration
     public function handleRegistration()
     {
         if ($_SERVER["REQUEST_METHOD"] === "POST") {
@@ -55,7 +56,7 @@ class RegisterHandler extends DatabaseConfig
                 ]);
 
                 // Redirect without echo before header
-                header("Location: login.html");
+                header("Location: ../ams_project/users/login.html");
                 exit();
 
             } catch (PDOException $e) {

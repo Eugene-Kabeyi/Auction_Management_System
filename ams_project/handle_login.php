@@ -33,9 +33,9 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['role_id'] = $user['role_id'];
 
                 if ($user['role_id'] == 3) {
-                    header("Location: admin_dashboard.php");
+                    header("Location: ../ams_project/admin/admin_dashboard.php");
                 } elseif ($user['role_id'] == 2) {
-                    header("Location: staff_dashboard.php");
+                    header("Location: ../ams_project/staff/staff_dashboard.php");
                 } else {
                     header("Location: ../ams_project/users/user_dashboard.php");
                 }
