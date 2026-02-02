@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <html lang="en">
+    <?php
+session_start();
+$_SESSION['error'] = $_SESSION['error'] ?? '';
+?>
 
 <head>
     <meta charset="UTF-8">
@@ -32,7 +36,7 @@
             text-align: center;
         }
 
-        
+
 
         /* Logo */
         .logo {
@@ -113,7 +117,7 @@
         .login_form button:hover {
             background-color: #374151;
         }
-        
+
         /* Hide/Show password */
         .hide_show {
             position: absolute;
@@ -123,14 +127,16 @@
             font-size: 12px;
             color: #1f2933;
             user-select: none;
-        }   
+        }
+
         /*Ensure password is hidden by default*/
-        .pass_w{
+        .pass_w {
             font-family: Arial, sans-serif;
             -webkit-text-security: disc;
             letter-spacing: 2px;
 
         }
+
         /* Registration link */
         .dont {
             display: block;
@@ -139,19 +145,67 @@
             color: #6b7280;
             text-align: center;
         }
+
         .dont a {
             color: #1f2933;
-            text-decoration: none;      
+            text-decoration: none;
         }
+
         .dont a:hover {
             text-decoration: underline;
+        }
+
+        .flash {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            min-width: 260px;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 9999;
+            animation: slideIn 0.4s ease, fadeOut 0.4s ease 4s forwards;
+        }
+
+        /* Flash message styles */
+        .flash.error {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-left: 5px solid #ef4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
         }
     </style>
 </head>
 
 <body>
+
     <div class="login_container">
-        
+
+
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="flash error">
+                <?= $_SESSION['error']; ?>
+            </div>
+            <?php unset($_SESSION['error']); ?>
+        <?php endif; ?>
         <h2>Welcome to AMS</h2>
         <span class="logo">AMS</span>
         <h3>Log In</h3>
@@ -184,7 +238,7 @@
             });
         }
         togglePasswordVisibility();
-        
+
     </script>
 
 </body>

@@ -1,6 +1,36 @@
-<?php include __DIR__ . '/../header.php'; ?>
+<?php
+session_start();
+include __DIR__ . '/../header.php';
+
+
+?>
+
+<head>
+    <style>
+        .action-btn a {
+            text-decoration: none;
+            color: inherit;
+        }
+    </style>
+</head>
 
 <main class="dashboard-container">
+
+    <?php if (!empty($_SESSION['success'])): ?>
+        <div class="flash success">
+            <?= htmlspecialchars($_SESSION['success']); ?>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?= htmlspecialchars($_SESSION['error']); ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
+
+
     <div class="dashboard-header">
         <h1 class="dashboard-title">My Dashboard</h1>
         <p class="dashboard-subtitle">Manage your consignments, bids, and auctions</p>
@@ -29,7 +59,7 @@
         <div class="stat-card">
             <div class="stat-icon icon-users">💰</div>
             <div class="stat-value">$12,450</div>
-            <div class="stat-label">Settlement Amount</div>
+            <div class="stat-label">Payment History</div>
         </div>
     </div>
 
@@ -38,24 +68,28 @@
         <h2 class="section-title">My Actions</h2>
         <div class="actions-grid">
 
-            <div class="action-btn">
-                <div class="action-icon">➕</div>
-                <div class="action-label">Add Item for Consignment</div>
+            <div class="action-btn"><a href="consign_item.php">
+                    <div class="action-icon">➕</div>
+                    <div class="action-label">Add Item for Consignment</div>
+                </a>
             </div>
 
-            <div class="action-btn">
-                <div class="action-icon">📝</div>
-                <div class="action-label">Register for Auctions</div>
+            <div class="action-btn"><a href="register_auction.php">
+                    <div class="action-icon">📝</div>
+                    <div class="action-label">Register for Auctions</div>
+                </a>
             </div>
 
-            <div class="action-btn">
-                <div class="action-icon">🔨</div>
-                <div class="action-label">Participate in Auctions</div>
+            <div class="action-btn"><a href="live_auction.php">
+                    <div class="action-icon">🔨</div>
+                    <div class="action-label">Participate in Auctions</div>
+                </a>
             </div>
 
-            <div class="action-btn">
-                <div class="action-icon">💳</div>
-                <div class="action-label">Pay for Bid Won</div>
+            <div class="action-btn"><a href="payments.php">
+                    <div class="action-icon">💳</div>
+                    <div class="action-label">Pay for Bid Won</div>
+                </a>
             </div>
 
         </div>

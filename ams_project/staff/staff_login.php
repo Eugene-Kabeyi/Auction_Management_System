@@ -1,3 +1,7 @@
+<?php
+session_start();
+$_SESSION['error'] = $_SESSION['error'] ?? '';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -32,7 +36,7 @@
             text-align: center;
         }
 
-        
+
 
         /* Logo */
         .logo {
@@ -136,26 +140,72 @@
             font-size: 12px;
             color: #1f2933;
             user-select: none;
-        }   
-        
-        .pass_w{
+        }
+
+        .pass_w {
             font-family: Arial, sans-serif;
             -webkit-text-security: disc;
             letter-spacing: 2px;
 
         }
+
+        .flash {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            min-width: 260px;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 9999;
+            animation: slideIn 0.4s ease, fadeOut 0.4s ease 4s forwards;
+        }
+
+        /* Flash message styles */
+        .flash.error {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-left: 5px solid #ef4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+        }
     </style>
 </head>
 
 <body>
+
+
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?= $_SESSION['error']; ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
     <div class="login_container">
         <!-- Logo and Headings -->
         <h2>Welcome to AMS</h2>
         <span class="logo">AMS</span>
         <h3>Staff Log In</h3>
         <!-- Login Form -->
-        <form action="/handle_login.php" method="post" class="login_form">
-           
+        <form action="../handle_login.php" method="post" class="login_form">
+
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
 
@@ -163,7 +213,7 @@
             <span class="hide_show" id="togglePassword">Hide/Show</span>
             <input type="text" id="password" name="password" class="pass_w" required>
 
-             <!-- Choose between Admin and Staff -->
+            <!-- Choose between Admin and Staff -->
             <label for="login_type">Account Type:</label>
             <select id="login_type" name="login_type" required>
                 <option value="admin">Admin</option>
@@ -189,7 +239,7 @@
             });
         }
         togglePasswordVisibility();
-        
+
     </script>
 
 </body>

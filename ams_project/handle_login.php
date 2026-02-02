@@ -26,24 +26,52 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             $stmt->execute();
 
             $user = $stmt->fetch();
+            if ($user === false) {
+                $user = null; // No user found
+                $error = "Invalid username.";
+            }
 
-            if ($user && $password === $user['password_hash']) {
-                $_SESSION['user_id'] = $user['id'];
+
+            if ($user !== null && $password !== $user['password_hash']) {
+                $error = "Invalid password.";
+                $_SESSION['error'] = $error;
+            }
+            
+
+            if ($user && $password == $user['password_hash']) {
+                $_SESSION['user_id'] = $user['UID'];
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role_id'] = $user['role_id'];
+                $_SESSION['f_name'] = $user['firstname'];
+                $_SESSION['l_name'] = $user['surname'];
+                $_SESSION['image_path'] = $user['image_path'];
 
-                if ($user['role_id'] == 3) {
+                $_SESSION['success'] = "Login successful! Welcome, " . htmlspecialchars($user['firstname']) . ".";
+                if ($loginType === 'admin') {
                     header("Location: ../ams_project/admin/admin_dashboard.php");
-                } elseif ($user['role_id'] == 2) {
+                } elseif ($loginType === 'staff') {
                     header("Location: ../ams_project/staff/staff_dashboard.php");
                 } else {
                     header("Location: ../ams_project/users/user_dashboard.php");
                 }
                 exit(); // very important
+                
+
             } else {
-                $error = "Invalid username or password.";
+                $_SESSION['error'] = $error;
+                if ($loginType === 'staff') {
+                    header("Location: ../ams_project/staff/staff_login.php?error=1");
+                    exit();
+                } elseif ($loginType === 'admin') {
+                    header("Location: ../ams_project/admin/admin_login.php?error=1");
+
+                    exit();
+                } else {
+                    header("Location: ../ams_project/users/login.php?error=1");
+                    exit();
+                }
             }
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             $error = "Database error: " . $e->getMessage();
         }
     }

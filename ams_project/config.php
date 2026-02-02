@@ -35,7 +35,7 @@ class DatabaseConfig {
                 
             } catch (PDOException $e) {
                 // Connection failed - throw error
-                throw new Exception("Connection failed: " . $e->getMessage());
+                echo"Connection failed: " . $e->getMessage();
             }
         }
         
@@ -51,8 +51,6 @@ try {
     
     // Get connection
     $conn = $db->getConnection();
-    
-    // Now you can run queries using $conn
     
 } catch (Exception $e) {
     // Show error if connection fails

@@ -1,5 +1,6 @@
 <?php 
-include 'header.php';
+
+include __DIR__ . '/../header.php';
 ?>
 <body>
     <h2>Approve Item</h2>
@@ -8,7 +9,7 @@ include 'header.php';
         <div class="f_inner_container"></div>
         <div class="s_inner_container">
     <p>Please review the item details below and approve or reject the item.</p>
-    <form action="handle_approve_item.php" method="post">
+    <form action="" method="post">
         <label for="item_id">Item ID:</label>
         <input type="text" id="item_id" name="item_id" required>
 
@@ -39,3 +40,25 @@ include 'header.php';
         document.getElementById('reserved_price').readOnly = true;
     </script>
 </body>
+<?php include __DIR__ . '/../footer.php'; ?>
+<?php
+require '../config.php';
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $item_id = $_POST['item_id'];
+    $action = $_POST['action']; 
+    
+    if ($action === 'approve') {
+        // Update item status to approved in the database
+        $stmt = $conn->prepare("UPDATE items SET status = 'approved' WHERE item_id = :item_id");
+        $stmt->execute([':item_id' => $item_id]);
+        echo "✅ Item approved successfully!";
+    } elseif ($action === 'reject') {
+        // Update item status to rejected in the database
+        $stmt = $conn->prepare("UPDATE items SET status = 'rejected' WHERE item_id = :item_id");
+        $stmt->execute([':item_id' => $item_id]);
+        echo "❌ Item rejected.";
+    }
+}
+?>  
+    

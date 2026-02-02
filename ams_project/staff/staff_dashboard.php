@@ -1,8 +1,24 @@
-<?php include 'header.php';
-include 'config.php';
+<?php 
+session_start();
+include __DIR__ . '/../header.php';
+
 ?>
 <!-- dashboard.php -->
 <main class="dashboard-container">
+     <?php if (!empty($_SESSION['success'])): ?>
+        <div class="flash success">
+            <?= htmlspecialchars($_SESSION['success']); ?>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?= htmlspecialchars($_SESSION['error']); ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
+
     <div class="dashboard-header">
         <h1 class="dashboard-title">Dashboard Overview</h1>
         <p class="dashboard-subtitle">Welcome to your Auctioneer Management System dashboard</p>
