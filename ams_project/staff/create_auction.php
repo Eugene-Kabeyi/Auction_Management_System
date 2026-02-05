@@ -50,6 +50,7 @@
 </body>
 <?php include __DIR__ . '/../footer.php'; ?>\
 <?php
+
 // Handle create_auction
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve form data
@@ -57,20 +58,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $auction_code = $_POST['auction_code'];
     $auction_type = $_POST['auction_type'];
     $item_id = $_POST['item_id'];
-    $auctioneer_id = $_POST['auctioneer_id'];
+    $auctioneer_id = $_SESSION['user_id'] ?? null;
     $start_time = $_POST['start_time'];
     $end_time = $_POST['end_time'];
     $status = $_POST['status'];
     // Here you would typically insert the data into a database
     // For demonstration, we'll just echo the values
-    echo "Auction Name: " . htmlspecialchars($auction_name) . "<br>";
-    echo "Auction Code: " . htmlspecialchars($auction_code) . "<br>";
-    echo "Auction Type: " . htmlspecialchars($auction_type) . "<br>";
-    echo "Item ID: " . htmlspecialchars($item_id) . "<br>";
-    echo "Auctioneer ID: " . htmlspecialchars($auctioneer_id) . "<br>";
-    echo "Start Time: " . htmlspecialchars($start_time) . "<br>";
-    echo "End Time: " . htmlspecialchars($end_time) . "<br>";
-    echo "Status: " . htmlspecialchars($status) . "<br>";   
+      
     // Redirect or display a success message as needed
 }
 ?>    

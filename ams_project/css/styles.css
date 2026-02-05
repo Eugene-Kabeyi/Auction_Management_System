@@ -357,7 +357,7 @@
 .outer_form_container .form_data input[type="text"],
 .outer_form_container .form_data input[type="number"],
 .outer_form_container .form_data input[type="file"],
-.outer_form_container .form_data select, 
+.outer_form_container .form_data select,
 .outer_form_container .form_data textarea {
     width: 100%;
     padding: 10px;
@@ -369,11 +369,12 @@
 }
 
 .outer_form_container .form_data input:focus,
-.outer_form_container .form_data select:focus, 
+.outer_form_container .form_data select:focus,
 .outer_form_container .form_data textarea:focus {
     border-color: #1f2933;
     outline: none;
 }
+
 .outer_form_container .form_data button {
     width: 100%;
     margin-top: 20px;
@@ -387,11 +388,12 @@
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
+
 .outer_form_container .form_data button:hover {
     background-color: #ffffff;
     color: #1f2933;
     border: 2px solid #1f2933;
-    
+
 }
 
 .flash {
@@ -423,6 +425,7 @@
         transform: translateX(-30px);
         opacity: 0;
     }
+
     to {
         transform: translateX(0);
         opacity: 1;
@@ -434,5 +437,10 @@
         opacity: 0;
         transform: translateX(-30px);
     }
+}
+
+.action-btn a {
+    text-decoration: none;
+    color: inherit;
 }
 

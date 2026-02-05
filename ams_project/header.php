@@ -3,7 +3,6 @@
     if (session_status() == PHP_SESSION_NONE) {
         session_start();
     }
-    $_SESSION['username'] = $_SESSION['username'] ?? '';
     
     ?>
  <!DOCTYPE html>
@@ -13,6 +12,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/styles.css">
     <link rel="stylesheet" href="css/styles.css">
+    <!--favicon-->
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
  </head>
 <nav class="navbar">
     <div class="logo-container">

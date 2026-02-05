@@ -2,6 +2,12 @@
 session_start();
 include __DIR__ . '/../header.php';
 
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    // Redirect to login page if not logged in
+    header('Location: ../staff/staff_login.php');
+    exit();
+}
+
 ?>
 <!-- dashboard.php -->
 <main class="dashboard-container">
@@ -55,22 +61,23 @@ include __DIR__ . '/../header.php';
     <div class="quick-actions">
         <h2 class="section-title">Quick Actions</h2>
         <div class="actions-grid">
-            <div class="action-btn" ">
+            <div class="action-btn" ><a href="create_auction.php">
                 <div class="action-icon">➕</div>
                 <div class="action-label">Create Auction</div>
+                </a>
             </div>
             
-            <div class="action-btn" ">
+            <div class="action-btn" ><a href="list_items.php">
                 <div class="action-icon">📦</div>
                 <div class="action-label">Manage Inventory</div>
-            </div>
+            </a></div>
             
-            <div class="action-btn" ">
+            <div class="action-btn" >
                 <div class="action-icon">📊</div>
                 <div class="action-label">View Reports</div>
             </div>
             
-            <div class="action-btn" ">
+            <div class="action-btn" >
                 <div class="action-icon">🎯</div>
                 <div class="action-label">Add New Item</div>
             </div>

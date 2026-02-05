@@ -6,12 +6,7 @@ include __DIR__ . '/../header.php';
 ?>
 
 <head>
-    <style>
-        .action-btn a {
-            text-decoration: none;
-            color: inherit;
-        }
-    </style>
+    
 </head>
 
 <main class="dashboard-container">

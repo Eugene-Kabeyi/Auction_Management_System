@@ -39,7 +39,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             
 
             if ($user && $password == $user['password_hash']) {
-                $_SESSION['user_id'] = $user['UID'];
+                $_SESSION['user_id'] = $user['UID'] ?? $user['staff_id'] ?? $user['admin_id']; // Adjust based on your database schema
                 $_SESSION['username'] = $user['username'];
                 $_SESSION['role_id'] = $user['role_id'];
                 $_SESSION['f_name'] = $user['firstname'];
