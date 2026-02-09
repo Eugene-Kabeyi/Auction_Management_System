@@ -163,7 +163,8 @@ include __DIR__ . '/../header.php';
                 <label for="reserved_price">Reserved Price:</label>
                 <input type="number" id="reserved_price" name="reserved_price" required>
 
-                <?php include __DIR__ . '/../datepicker.php'; ?>
+                <label for="evaluation_date">Evaluation Date:</label>
+                <?php $input_name = "evaluation_date"; include __DIR__ . '/../datepicker.php'; ?>
 
                 <label for="rating">Rating:</label>
                 <select name="rating" id="rating" required>
@@ -203,7 +204,7 @@ include __DIR__ . '/../header.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $item_id = $_POST['item_id'];
     $action = $_POST['action'];
-    $date = $_POST['date_hidden_input'];
+    $date = $_POST['evaluation_date'];
 
     if ($action === 'approved') {
         // Insert evaluation data into evaluated_items table

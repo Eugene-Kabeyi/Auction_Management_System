@@ -11,9 +11,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="../css/styles.css">
-    <link rel="stylesheet" href="css/styles.css">
+    <link rel="stylesheet" href="/ams_project/css/styles.css">
     <!--favicon-->
     <link rel="icon" type="image/png" href="../uploads/favicon.png">
+    <link rel="icon" type="image/png" href="uploads/favicon.png">
  </head>
 <nav class="navbar">
     <div class="logo-container">
@@ -37,8 +38,10 @@
         <div id="userInfo" class="user-info" style="display: none;">
             <div class="user-avatar" id="userAvatar">JD</div>
             <span id="userName"><?php echo htmlspecialchars($_SESSION['username'] ?? ''); ?></span>
+            
         </div>
-        <button id="loginBtn" class="login-btn"><a href="login.html">Login</a></button>
+        <!--Login by -->
+        <button id="loginBtn" class="login-btn"><a href="../login.html">Login</a></button>
     </div>
 
     <script>
@@ -56,5 +59,6 @@
             } else {
                 document.getElementById("userInfo").style.display = "none";
             }});
+
     </script>
 </nav>

@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .outer_container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 100px;
+        }
+        .login-portal {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+        .login-link {
+            display: block;
+            margin: 10px 0;
+            padding: 10px;
+            background-color: #1f1e1e;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
+        }
+        .login-link:hover {
+            background-color: #ffffff;
+            color: #1d1c1c;
+        }
+            .logo-container {
+                margin-top: -200px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 10px 20px ;
+                border-radius: 5px;
+                background-color: #1f1e1e; 
+                font-size: 24px;
+                font-weight: bold;
+                color: #ffffff;
+            }   
+
+    </style>
+</head>
+<body>
+    <div class="outer_container">
+    <!--AMS LOGO-->
+    <div class="logo-container">
+        <p>AMS</p>
+    </div>
+    <!--Help user choose their loging Portal)-->
+    <div class="login-portal">
+        <h2>Select Login Portal</h2>
+        <a href="staff/staff_login.php" class="login-link">Staff Login</a>
+        <a href="users/user_login.php" class="login-link">User Login</a>
+    </div>
+    </div>
+</body>
+
+</html>

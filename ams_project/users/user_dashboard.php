@@ -69,13 +69,7 @@ include __DIR__ . '/../header.php';
                 </a>
             </div>
 
-            <div class="action-btn"><a href="register_auction.php">
-                    <div class="action-icon">📝</div>
-                    <div class="action-label">Register for Auctions</div>
-                </a>
-            </div>
-
-            <div class="action-btn"><a href="live_auction.php">
+            <div class="action-btn"><a href="auction_list.php">
                     <div class="action-icon">🔨</div>
                     <div class="action-label">Participate in Auctions</div>
                 </a>

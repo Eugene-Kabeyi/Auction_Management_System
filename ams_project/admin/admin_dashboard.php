@@ -1,8 +1,28 @@
 <?php
 include __DIR__ . '/../header.php';
+
+if (isset($_SESSION['user_id']) && $_SESSION['login_type'] === 'admin') {
+    // User is logged in and has the admin role, allow access to the page
+} else {
+    // User is not logged in or does not have the admin role, redirect to login page
+    header("Location: ../staff/staff_login.php");
+    session_destroy();  
+    $_SESSION['error'] = "Please log in as an admin to access this page.";
+    exit();
+}
+
 include __DIR__ . '/../config.php';
 ?>
-
+    <?php if (!empty($_SESSION['success'])): ?>
+        <div class="flash success">
+            <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+        </div>
+    <?php endif; ?> 
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+        </div>
+    <?php endif; ?>
 <main class="dashboard-container">
     <div class="dashboard-header">
         <h1 class="dashboard-title">Admin Dashboard</h1>

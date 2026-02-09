@@ -1,13 +1,174 @@
-<?php include __DIR__ . '/../header.php'; ?>
+<?php include __DIR__ . '/../header.php';
+if (!isset($_SESSION['user_id'])|| empty($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit();
+}
+include __DIR__ . '/../config.php'; ?>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+           
+        }
+        .header_container {
+            text-align: center;
+            margin-bottom: 20px;
+            margin-top: 50px;
+        }
+
+        .outer_container {
+            display: flex;
+            gap: 20px;
+            max-width: 800px;
+            margin: 0 auto;
+            margin-bottom: 200px;
+        }
+
+        .pic_inner_container {
+            flex: 1;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .details_inner_container {
+            flex: 1;
+            border: 1px solid #ccc;
+            padding: 20px;
+            border-radius: 5px;
+        }
+
+        .details_inner_container h3 {
+            margin-top: 0;
+        }
+
+        .details_inner_container p {
+            margin: 10px 0;
+        }
+
+        #bidButton, #exitBidButton {
+            background-color: #1f2933;
+            color: #ffffff;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        #bidButton:hover, #exitBidButton:hover {
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #1f2933;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none; 
+            position: fixed; 
+            z-index: 1; 
+            left: 0;
+            top: 0;
+            width: 100%; 
+            height: 100%; 
+            overflow: auto; 
+            background-color: rgba(0,0,0,0.4); 
+        }
+
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto; 
+            padding: 20px;
+            border: 1px solid #888;
+            width: 300px; 
+            border-radius: 5px;
+            height: auto;   
+        }
+        .modal-content h2 , .modal-content label {
+             margin: 0;
+            margin-top: 0;
+            text-align: center;
+        }
+        .modal-content form {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            margin-top: 20px;
+        }
+        .modal-content input[type="number"] {
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+        .modal-content button {
+            padding: 10px;
+            border: none;
+            border-radius: 4px;
+            background-color: #1f2933;
+            color: #ffffff;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .close {
+            color: #aaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+
+        }
+
+        .close:hover,
+        .close:focus {
+            color: black;
+            text-decoration: none;
+            cursor: pointer;
+        }
+    </style>
+</head>
 <body>
+    <?php
+    // Fetch auction and item details from the database
+    $auction_id = $_GET['auction_id'] ?? null; // Get auction ID from URL
+    if ($auction_id) {
+        $stmt = $conn->prepare("SELECT a.item_id, a.auction_name, a.auction_code, a.start_time, a.end_time, i.item_name, i.item_description, e.reserve_price, i.image_path FROM auctions a JOIN consigner_items i ON a.item_id = i.item_id JOIN evaluated_items e ON i.item_id = e.item_id WHERE a.auction_id = :auction_id");
+        $stmt->execute(['auction_id' => $auction_id]);
+        $auction = $stmt->fetch();  
+        if ($auction) {
+            $auction_name = $auction['auction_name'];
+            $auction_code = $auction['auction_code'];
+            $item_name = $auction['item_name'];
+            $item_description = $auction['item_description'];
+            $starting_bid = $auction['reserve_price'];
+            $item_image_url = $auction['image_path'] ;
+            $start_time = date("F j, Y, g:i a", strtotime($auction['start_time'])); // Format start time for display
+            $end_time = date("F j, Y, g:i a", strtotime($auction['end_time'])); // Format end time for display
+            $minimum_bid = max($starting_bid, $current_highest_bid + 1); // Minimum bid must be at least 1 unit higher than current highest
+        } else {
+            echo "<p>Auction not found.</p>";
+            exit();
+        }
+    } else {
+        echo "<p>No auction specified.</p>";
+        exit();
+    }
+    // Fetch current highest bid
+    $stmt = $conn->prepare("SELECT MAX(amount_bidded) AS highest_bid FROM auction_bids WHERE auction_id = :auction_id");
+    ?>
     <div class = "header_container">
     <h2>Welcome to <?php echo $auction_name; ?></h2>
     <p>Auction Code: <?php echo $auction_code; ?></p>
     </div>
     <div class="outer_container">
         <!--Picture of auctioned item -->
-        <div class="pic_inner_container">
-            <img src="<?php echo $item_image_url; ?>" alt="Auctioned Item Image" style="max-width:100%; height:auto;">
+        <div class="pic_inner_container" >
+            
+            <img src="<?php echo $item_image_url; ?>" alt="Auctioned Item Image" style="max-width:100%; height:auto; ">
         </div>
         <!--Details of auctioned item -->
         <div class="details_inner_container">
@@ -25,12 +186,14 @@
             </div>
         </div>
     </div>  
+
     <!-- Bid Submission Modal -->
     <div id="bidModal" class="modal">
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Place Your Bid</h2>
-            <form action="handle_bid.php" method="post">
+            <form action="" method="post">
+
                 <label for="bid_amount">Bid Amount (Minimum: $<?php echo number_format($minimum_bid, 2); ?>):</label>
                 <input type="number" id="bid_amount" name="bid_amount" step="0.01" min="<?php echo $minimum_bid; ?>" required>
                 <button type="submit">Submit Bid</button>
@@ -38,6 +201,7 @@
         </div>
     </div>
 
+<?php include __DIR__ . '/../footer.php'; ?>    
     <script>
         // Get modal element
         var modal = document.getElementById("bidModal");
@@ -70,3 +234,15 @@
             }
         }
     </script>
+<?php
+// Handle bid submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $bid_amount = $_POST['bid_amount'];
+    $user_id = $_SESSION['user_id']; // Assuming user ID is stored in session   
+    // Insert bid into database
+    $stmt = $conn->prepare("INSERT INTO auction_bids (auction_id, bidder_id, amount_bidded) VALUES (:auction_id, :user_id, :amount_bidded)");
+    $stmt->execute(['auction_id' => $auction_id, 'user_id' => $user_id, 'amount_bidded' => $bid_amount]);
+    // Redirect back to the auction page to see updated bid
+     header("Location: live_auction.php?auction_id=" . $auction_id);
+    exit();
+}

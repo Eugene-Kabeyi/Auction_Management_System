@@ -64,7 +64,7 @@
         }
 
         .dates button {
-            padding: 6px ;
+            padding: 6px;
             border: none;
             background-color: #f0f0f0;
             border-radius: 4px;
@@ -105,6 +105,7 @@
             border-radius: 4px;
             font-size: 10px;
         }
+
         .datepicker_header button {
             background-color: #000000;
             color: #ffffff;
@@ -159,8 +160,9 @@
     </style>
 </head>
 <div class="datepicker_container">
-    <input type="text" class="date_input" placeholder="Select Date">
-    <input type="hidden" class="date_hidden_input" name="date_hidden_input">
+    <input type="text" class="date_input" placeholder="Select Date" readonly>
+    <input type="hidden" class="date_hidden_input" name="<?= $input_name ?? 'date' ?>">
+
     <div class="datepicker_popup" style="display: none;">
         <!-- /.datepicker_header -->
         <div class="datepicker_header">
@@ -245,78 +247,121 @@
     </div>
 </div>
 <script>
-    const dateInput = document.querySelector('.date_input');
-    const datepickerPopup = document.querySelector('.datepicker_popup');
-    const closeBtn = document.querySelector('.close');
-    const applyBtn = document.querySelector('.apply');
-    const datesContainer = document.querySelector('.dates');
-    const monthInput = document.querySelector('.month_input');
-    const yearInput = document.querySelector('.year_input');
-    const prevBtn = document.querySelector('.prev');
-    const nextBtn = document.querySelector('.next');
-    const hiddenDateInput = document.querySelector('.date_hidden_input');
+/*
+  We loop through ALL datepickers on the page.
+  This allows us to reuse the same datepicker.php
+  multiple times (start date, end date, etc.)
+*/
+document.querySelectorAll('.datepicker_container').forEach(datepicker => {
 
+    // ==============================
+    // GET ELEMENTS INSIDE THIS PICKER
+    // ==============================
 
-    let selectedDate = new Date(); // Initialize with current date
-    let year = selectedDate.getFullYear(); // This is because the year input is a number input where the value corresponds to the actual year (e.g., 2024). So we set it to the full year of the selected date.
-    let month = selectedDate.getMonth(); // This is because the month input is a select element where the value corresponds to the month index (0 for January, 1 for February, etc.). So we set it to the month index of the selected date.
+    // Visible input (what the user clicks)
+    const dateInput = datepicker.querySelector('.date_input');
 
-    // Show datepicker
+    // Popup calendar container
+    const datepickerPopup = datepicker.querySelector('.datepicker_popup');
+
+    // Buttons inside the popup
+    const closeBtn = datepicker.querySelector('.close');
+    const applyBtn = datepicker.querySelector('.apply');
+    const prevBtn = datepicker.querySelector('.prev');
+    const nextBtn = datepicker.querySelector('.next');
+
+    // Calendar body where days are rendered
+    const datesContainer = datepicker.querySelector('.dates');
+
+    // Month & year controls
+    const monthInput = datepicker.querySelector('.month_input');
+    const yearInput = datepicker.querySelector('.year_input');
+
+    // Hidden input (actual value sent to PHP)
+    const hiddenDateInput = datepicker.querySelector('.date_hidden_input');
+
+    // Holds the currently selected date
+    let selectedDate = new Date();
+
+    // Extract year and month from the selected date
+    let year = selectedDate.getFullYear();   // e.g. 2026
+    let month = selectedDate.getMonth();     // 0–11 (Jan–Dec)
+
+    // ==============================
+    // SHOW DATEPICKER
+    // ==============================
+
+    // When user clicks the visible input, show popup
     dateInput.addEventListener('click', () => {
-        datepickerPopup.style.display = 'block'; // Show the datepicker popup
+        datepickerPopup.style.display = 'block';
     });
 
-    // Hide datepicker
+    // ==============================
+    // CLOSE DATEPICKER
+    // ==============================
+
+    // Close button hides the popup
     closeBtn.addEventListener('click', () => {
         datepickerPopup.style.display = 'none';
     });
 
-    // Apply selected date
+    // ==============================
+    // APPLY SELECTED DATE
+    // ==============================
+
     applyBtn.addEventListener('click', () => {
-        // DB-friendly format
+
+        // Extract date parts
         const y = selectedDate.getFullYear();
         const m = String(selectedDate.getMonth() + 1).padStart(2, '0');
         const d = String(selectedDate.getDate()).padStart(2, '0');
 
-        hiddenDateInput.value = `${y}-${m}-${d}`; // YYYY-MM-DD
+        // Store database-friendly value (YYYY-MM-DD)
+        hiddenDateInput.value = `${y}-${m}-${d}`;
 
-        dateInput.value = selectedDate.toDateString(); // This sets the value of the date input to a human-readable string representation of the selected date. You can customize this format as needed, for example using toLocaleDateString() for a more localized format.
+        // Store readable date for the user
+        dateInput.value = selectedDate.toDateString();
+
+        // Close the popup
         datepickerPopup.style.display = 'none';
     });
 
-
-
-    // Change month/year
-    monthInput.addEventListener('change', () => {
-        month = parseInt(monthInput.value); //This is because the month input is a select element where the value corresponds to the month index (0 for January, 1 for February, etc.). So we parse it as an integer and set it to the month variable.
-        displayDates();
-    });
-
-    yearInput.addEventListener('change', () => {
-        year = parseInt(yearInput.value);
-        displayDates();
-    });
+    // ==============================
+    // RENDER CALENDAR DATES
+    // ==============================
 
     function displayDates() {
+
+        // Clear old dates
         datesContainer.innerHTML = '';
 
-        const firstDay = new Date(year, month, 1).getDay(); // Gets the first day of the month (0-6, where 0 is Sunday)
-        const lastDate = new Date(year, month + 1, 0).getDate(); //This is because month is 0-indexed, so we get the last day of the current month by asking for the 0th day of the next month.
+        // Get weekday of first day of the month (0 = Sunday)
+        const firstDay = new Date(year, month, 1).getDay();
+
+        // Get number of days in the month
+        const lastDate = new Date(year, month + 1, 0).getDate();
+
+        // Today's date (used for highlighting)
         const today = new Date();
 
-        // Empty slots before first day
+        // --------------------------------
+        // Empty spaces before first date
+        // --------------------------------
         for (let i = 0; i < firstDay; i++) {
-            const btn = document.createElement('button'); // Create a button element for each empty slot before the first day of the month
-            btn.disabled = true; // Disable the button to indicate that it's not a valid date
-            datesContainer.appendChild(btn); // This adds the disabled button to the dates container, creating empty slots before the first day of the month in the calendar grid.
+            const btn = document.createElement('button');
+            btn.disabled = true; // Not clickable
+            datesContainer.appendChild(btn);
         }
 
-        // Actual dates
+        // --------------------------------
+        // Create date buttons
+        // --------------------------------
         for (let day = 1; day <= lastDate; day++) {
+
             const btn = document.createElement('button');
             btn.textContent = day;
 
-            // Mark today
+            // Highlight today
             if (
                 day === today.getDate() &&
                 month === today.getMonth() &&
@@ -325,7 +370,7 @@
                 btn.classList.add('today');
             }
 
-            // Mark selected
+            // Highlight selected date
             if (
                 day === selectedDate.getDate() &&
                 month === selectedDate.getMonth() &&
@@ -334,22 +379,28 @@
                 btn.classList.add('selected');
             }
 
-            // Click handler
+            // When a date is clicked
             btn.addEventListener('click', () => {
                 selectedDate = new Date(year, month, day);
-                displayDates();
+                displayDates(); // Re-render to update highlight
             });
 
             datesContainer.appendChild(btn);
         }
 
+        // Update month & year inputs
         monthInput.value = month;
         yearInput.value = year;
     }
+
+    // ==============================
+    // MONTH NAVIGATION
+    // ==============================
+
     nextBtn.addEventListener('click', () => {
         month++;
 
-        // If month goes after December
+        // If month goes past December
         if (month > 11) {
             month = 0;
             year++;
@@ -357,6 +408,7 @@
 
         displayDates();
     });
+
     prevBtn.addEventListener('click', () => {
         month--;
 
@@ -369,7 +421,10 @@
         displayDates();
     });
 
-
+    // ==============================
+    // INITIAL RENDER
+    // ==============================
 
     displayDates();
+});
 </script>

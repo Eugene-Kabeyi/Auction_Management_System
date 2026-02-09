@@ -122,7 +122,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
         .hide_show {
             position: absolute;
             right: 60px;
-            top: 235px;
+            top: 305px;
             cursor: pointer;
             font-size: 12px;
             color: #1f2933;
