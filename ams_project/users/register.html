@@ -147,17 +147,34 @@
             cursor: pointer;
             user-select: none;
         }
+
+        /* Already have account link */
+        .already {
+            display: block;
+            margin-top: 16px;
+            font-size: 13px;
+            color: #6b7280;
+            text-align: center;
+        }
+        .already a {
+            color: #1f2933;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .already a:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 
 <body>
-    
+
     <div class="register_container">
-        
+
         <h2>Register for AMS</h2>
         <span class="logo">AMS</span>
         <h3>Sign Up</h3>
-        <form action="handle_register.php" method="post">
+        <form action="../handle_register.php" method="post">
             <label>National ID</label>
             <input type="text" id="national_id" name="national_id">
             <span class="error" id="nidErr"></span>
@@ -201,13 +218,13 @@
             <span class="error" id="userErr"></span>
 
             <label>Password</label>
-            <input type="text" id="password" name="password" class ="pass_w">
+            <input type="text" id="password" name="password" class="pass_w">
             <span class="hide_show" id="togglePassword">Hide/Show</span>
             <span class="error" id="passErr"></span>
 
             <input type="submit" value="Register">
         </form>
-
+        <span class="already">Already have an account? <a href="login.html">Login</a></span>
         <script>
             function togglePasswordVisibility() {
                 var passwordField = document.getElementById("password");

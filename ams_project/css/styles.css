@@ -36,8 +36,8 @@
     border-radius: 6px;
 }
 
-.logo-container div > div:first-child {
-    font-size: 15px;
+.logo-container div>div:first-child {
+    font-size: 17px;
     font-weight: 600;
     color: #111827;
 }
@@ -81,6 +81,70 @@
     width: 100%;
 }
 
+/*Landing page*/
+.hero {
+    height: 80vh;
+    background: #f3f4f6;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 20px;
+}
+
+.hero h1 {
+    font-size: 40px;
+    margin-bottom: 15px;
+    color: #111;
+}
+
+.hero p {
+    font-size: 18px;
+    margin-bottom: 25px;
+    color: #555;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 15px;
+}
+
+.hero-buttons .btn {
+    text-decoration: none;
+    padding: 12px 22px;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.primary {
+    background-color: #151618;
+    color: white;
+}
+
+.primary:hover {
+    background-color: #ffffff;
+    color: #151618;
+    border: 2px solid #151618;
+}
+
+.secondary {
+    background-color: #e5e7eb;
+    color: #111;
+}
+
+.secondary:hover {
+    background-color: #151618;
+    color: white;
+    border: 2px solid #151618;
+}
+
+.secondary:hover~.primary {
+    background-color: #ffffff;
+    color: #151618;
+    border: 2px solid #151618;
+}
+
 /* Login / user section */
 .login-container {
     display: flex;
@@ -121,10 +185,11 @@
     cursor: pointer;
     transition: background-color 0.2s ease;
 }
+
 .login-btn a {
     text-decoration: none;
     color: #ffffff;
-}   
+}
 
 .login-btn:hover {
     background-color: #374151;
@@ -149,6 +214,7 @@
     font-size: 13px;
     color: #9ca3af;
 }
+
 /* Dashboard container */
 .dashboard-container {
     padding: 32px;
@@ -261,5 +327,120 @@
 .action-label span {
     font-weight: 600;
     color: #1f2933;
+}
+
+.outer_form_container {
+    width: 600px;
+    background-color: #ffffff;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    padding: 28px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    font-family: "Segoe UI", Tahoma, Arial, sans-serif;
+    margin: 0 auto 40px auto;
+
+}
+
+.outer_form_container .form_data {
+    margin-top: 10px;
+}
+
+.outer_form_container .form_data label {
+    display: block;
+    margin-top: 14px;
+    font-weight: 500;
+    font-size: 13px;
+    color: #374151;
+}
+
+
+.outer_form_container .form_data input[type="text"],
+.outer_form_container .form_data input[type="number"],
+.outer_form_container .form_data input[type="file"],
+.outer_form_container .form_data select,
+.outer_form_container .form_data textarea {
+    width: 100%;
+    padding: 10px;
+    margin-top: 6px;
+    border: 1px solid #d1d5db;
+    border-radius: 6px;
+    font-size: 14px;
+    transition: border-color 0.2s ease;
+}
+
+.outer_form_container .form_data input:focus,
+.outer_form_container .form_data select:focus,
+.outer_form_container .form_data textarea:focus {
+    border-color: #1f2933;
+    outline: none;
+}
+
+.outer_form_container .form_data button {
+    width: 100%;
+    margin-top: 20px;
+    padding: 12px 24px;
+    background-color: #1f2933;
+    color: #ffffff;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+}
+
+.outer_form_container .form_data button:hover {
+    background-color: #ffffff;
+    color: #1f2933;
+    border: 2px solid #1f2933;
+
+}
+
+.flash {
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    min-width: 260px;
+    padding: 14px 18px;
+    border-radius: 6px;
+    font-size: 14px;
+    z-index: 9999;
+    animation: slideIn 0.4s ease, fadeOut 0.4s ease 4s forwards;
+}
+
+.flash.success {
+    background-color: #ecfdf5;
+    color: #065f46;
+    border-left: 5px solid #10b981;
+}
+
+.flash.error {
+    background-color: #fef2f2;
+    color: #991b1b;
+    border-left: 5px solid #ef4444;
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(-30px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes fadeOut {
+    to {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+}
+
+.action-btn a {
+    text-decoration: none;
+    color: inherit;
 }
 

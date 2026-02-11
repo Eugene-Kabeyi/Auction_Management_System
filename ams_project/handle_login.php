@@ -1,59 +1,88 @@
 <?php
-// Start session at the top
 session_start();
+include 'config.php'; // make sure the path is correct
 
-// Include database connection
-include 'config.php';
-
-// Initialize error variable
 $error = '';
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
-    // Get form data
     $username = trim($_POST['username']);
     $password = $_POST['password'];
+    $loginType = $_POST['login_type'];
 
-    // Basic validation
     if (empty($username) || empty($password)) {
-        $error = "Please enter both username and password.";
+        $error = "Username and password are required.";
     } else {
         try {
-            // Prepare SQL to fetch user by username or email
-            $sql = "SELECT * FROM users WHERE username = :username OR email = :username";
+            if ($loginType === 'staff') {
+                $sql = "SELECT * FROM staff WHERE username = :username";
+            } elseif ($loginType === 'admin') {
+                $sql = "SELECT * FROM admin WHERE username = :username";
+            } else {
+                $sql = "SELECT * FROM users WHERE username = :username";
+            }
+
             $stmt = $conn->prepare($sql);
-            $stmt->execute([':username' => $username]);
-            $user = $stmt->fetch(PDO::FETCH_ASSOC);
+            $stmt->bindParam(':username', $username);
+            $stmt->execute();
 
-            if ($user) {
-                // Verify password
-                if (password_verify($password, $user['password_hash'])) {
-                    // Login successful, set session variables
-                    $_SESSION['user_id']   = $user['UID'];
-                    $_SESSION['username']  = $user['username'];
-                    $_SESSION['email']     = $user['email'];
-                    $_SESSION['role_id']   = $user['role_id'];
-                    $_SESSION['firstname'] = $user['firstname'];
-                    $_SESSION['loggedin']  = true;
+            $user = $stmt->fetch();
+            if ($user === false) {
+                $user = null; // No user found
+                $error = "Invalid username.";
+            }
 
-                    // Update last login time (optional)
-                    $update_sql = "UPDATE users SET last_login = NOW() WHERE UID = :uid";
-                    $update_stmt = $conn->prepare($update_sql);
-                    $update_stmt->execute([':uid' => $user['UID']]);
 
-                    // Redirect to dashboard
-                    header("Location: dashboard.php");
+            if ($user !== null && $password !== $user['password_hash']) {
+                $error = "Invalid password.";
+                $_SESSION['error'] = $error;
+            }
+
+
+            if ($user && $password == $user['password_hash']) {
+                if ($loginType === 'admin') {
+                    $_SESSION['user_id'] = $user['admin_id'];
+                    $_SESSION['admin_level'] = $user['admin_level']; // Store admin level in session    
+                } elseif ($loginType === 'staff') {
+                    $_SESSION['user_id'] = $user['staff_id'];
+                } else {
+                    $_SESSION['user_id'] = $user['UID'];
+                }
+
+                $_SESSION['username'] = $user['username'];
+                $_SESSION['role_id'] = $user['role_id'];
+                $_SESSION['f_name'] = $user['firstname'];
+                $_SESSION['l_name'] = $user['surname'];
+                $_SESSION['image_path'] = $user['image_path'];
+                $_SESSION['login_type'] = $loginType; // Store login type in session
+
+                $_SESSION['success'] = "Login successful! Welcome, " . htmlspecialchars($user['firstname']) . ".";
+                if ($loginType === 'admin') {
+                    header("Location: ../ams_project/admin/admin_dashboard.php");
+                } elseif ($loginType === 'staff') {
+                    header("Location: ../ams_project/staff/staff_dashboard.php");
+                } else {
+                    header("Location: ../ams_project/users/user_dashboard.php");
+                }
+                exit(); // very important
+
+
+            } else {
+                $_SESSION['error'] = $error;
+                if ($loginType === 'staff') {
+                    header("Location: ../ams_project/staff/staff_login.php?error=1");
+                    exit();
+                } elseif ($loginType === 'admin') {
+                    header("Location: ../ams_project/staff/staff_login.php?error=1");
+
                     exit();
                 } else {
-                    echo "Invalid password. Please try again.", $e;
+                    header("Location: ../ams_project/users/login.php?error=1");
+                    exit();
                 }
-            } else {
-                echo "Username or Email not found.", $e;
             }
-        } catch (PDOException $e) {
+        } catch (Exception $e) {
             $error = "Database error: " . $e->getMessage();
         }
     }
 }
 ?>
-
-

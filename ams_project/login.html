@@ -1,151 +1,73 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>Login </title>
-
+    <title>Document</title>
     <style>
-        /* Body */
         body {
-            font-family: "Segoe UI", Tahoma, Arial, sans-serif;
-            background-color: #f3f4f6;
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
-            margin: 0;
-            color: #374151;
+            height: 100vh;
         }
-
-        /* Login container */
-        .login_container {
-            position: relative;
-            width: 420px;
-            background-color: #ffffff;
-            border: 1px solid #e5e7eb;
-            border-radius: 8px;
-            padding: 32px;
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
-            text-align: center;
-        }
-
-        
-
-        /* Logo */
-        .logo {
-            display: block;
-            width: 48px;
-            height: 48px;
-            margin: 12px auto;
-            background-color: #1f2933;
-            color: #ffffff;
-            font-weight: 700;
-            font-size: 18px;
-            border-radius: 6px;
-            line-height: 48px;
-            text-align: center;
-        }
-
-        /* Headings */
-        .login_container h2 {
-            font-size: 18px;
-            font-weight: 600;
-            color: #111827;
-        }
-
-        .login_container h3 {
-            font-size: 15px;
-            font-weight: 500;
-            color: #6b7280;
-            margin-bottom: 20px;
-        }
-
-        /* Form */
-        .login_form {
+        .outer_container {
             display: flex;
             flex-direction: column;
-            text-align: left;
+            align-items: center;
+            gap: 100px;
         }
-
-        /* Labels */
-        .login_form label {
-            font-size: 13px;
-            font-weight: 500;
-            margin-top: 14px;
-            color: #374151;
+        .login-portal {
+            background-color: #fff;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
         }
-
-        /* Inputs */
-        .login_form input[type="text"],
-        .login_form input[type="password"] {
-            width: 100%;
+        .login-link {
+            display: block;
+            margin: 10px 0;
             padding: 10px;
-            margin-top: 6px;
-            border: 1px solid #d1d5db;
-            border-radius: 6px;
-            font-size: 14px;
-            transition: border-color 0.2s ease;
+            background-color: #1f1e1e;
+            color: white;
+            text-decoration: none;
+            border-radius: 5px;
+            transition: all 0.3s ease;
         }
-
-        .login_form input:focus {
-            border-color: #1f2933;
-            outline: none;
+        .login-link:hover {
+            background-color: #ffffff;
+            color: #1d1c1c;
         }
+            .logo-container {
+                margin-top: -200px;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                padding: 10px 20px ;
+                border-radius: 5px;
+                background-color: #1f1e1e; 
+                font-size: 24px;
+                font-weight: bold;
+                color: #ffffff;
+            }   
 
-        /* Submit button */
-        .login_form button {
-            width: 100%;
-            margin-top: 22px;
-            padding: 12px;
-            background-color: #1f2933;
-            color: #ffffff;
-            border: none;
-            border-radius: 6px;
-            font-size: 15px;
-            font-weight: 500;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-
-        .login_form button:hover {
-            background-color: #374151;
-        }
-
-        /* Responsive - hide left decoration on small screens */
-        @media (max-width: 900px) {
-
-            .login_container {
-                width: 90%;
-                margin: auto;
-            }
-        }
     </style>
 </head>
-
 <body>
-    <div class="login_container">
-        
-        <h2>Welcome to AMS</h2>
-        <span class="logo">AMS</span>
-        <h3>Log In</h3>
-        <form action="/handle_login.php" method="post" class="login_form">
-            <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
-
-            <label for="password">Password:</label>
-            <input type="text" id="password" name="password" required>
-
-            <button type="submit">Log In</button>
-        </form>
+    <div class="outer_container">
+    <!--AMS LOGO-->
+    <div class="logo-container">
+        <p>AMS</p>
     </div>
-    <script>
-        // Validation of password field to ensure it is not empty and making it a password type
-        document.getElementById('password').setAttribute('type', 'password');
-    </script>
-
+    <!--Help user choose their loging Portal)-->
+    <div class="login-portal">
+        <h2>Select Login Portal</h2>
+        <a href="staff/staff_login.php" class="login-link">Staff Login</a>
+        <a href="users/user_login.php" class="login-link">User Login</a>
+    </div>
+    </div>
 </body>
 
 </html>
