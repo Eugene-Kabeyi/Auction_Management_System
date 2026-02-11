@@ -138,8 +138,8 @@ if (!$admin) {
             </select>
 
             <button type="submit" name="update">Update Admin</button>
-        </form>
-        <form action="admin_delete.php" method="POST">
+
+      
             <input type="hidden" name="admin_id" value="<?php echo htmlspecialchars($admin['admin_id']); ?>">
             <button type="submit" class="delete" name="delete">Delete Admin</button>
         </form>
@@ -152,7 +152,7 @@ include __DIR__ . '/../footer.php';
 <?php
 // Update and delete functionality
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $firstname = $_POST['firstname'];;
+    $firstname = $_POST['firstname'];
     $secondname = $_POST['secondname'];
     $surname = $_POST['surname'];
     $email = $_POST['email'];
@@ -173,12 +173,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $conn->prepare("DELETE FROM admin WHERE admin_id = ?");
         $stmt->execute([$admin_id]);
         $_SESSION['success'] = "Admin deleted successfully.";
-        header("Location: admin_list.php");
+        header("Location: /admin_list.php");
         exit();
     }
      else {
         $_SESSION['error'] = "Invalid form submission.";
-        header("Location: admin_edit.php?id=" . $admin_id);
+        header("Location: /admin_edit.php?id=" . $admin_id);
         exit();     
      }
     

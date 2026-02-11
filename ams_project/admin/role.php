@@ -94,7 +94,7 @@ include __DIR__ . '/../config.php';
                     <td><?php echo htmlspecialchars($role['role_description']); ?></td>
                     <td>
                         <a href="add_role.php">Add Role</a>
-                        <a href="edit_role.php?role_id=<?php echo $role['role_id']; ?>">Edit</a </td>
+                        <a href="edit_role.php?role_id=<?php echo $role['role_id']; ?>">Edit</a ></td>
                 </tr>
             <?php endforeach; ?>
         </table>
