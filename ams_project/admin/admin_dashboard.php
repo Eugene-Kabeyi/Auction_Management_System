@@ -12,6 +12,10 @@ if (isset($_SESSION['user_id']) && $_SESSION['login_type'] === 'admin') {
 }
 
 include __DIR__ . '/../config.php';
+$stmt = $conn->prepare('SELECT COUNT(*) FROM users');
+$stmt -> execute();
+$count = $stmt ->fetchColumn();
+
 ?>
     <?php if (!empty($_SESSION['success'])): ?>
         <div class="flash success">
@@ -43,10 +47,10 @@ include __DIR__ . '/../config.php';
             <div class="stat-label">Active Auctions</div>
         </div>
 
-        <div class="stat-card">
+        <div class="stat-card"><a href="user_list.php" style="text-decoration:none;">
             <div class="stat-icon">👥</div>
-            <div class="stat-value">342</div>
-            <div class="stat-label">Registered Users</div>
+            <div class="stat-value"><?= $count ?> </div>
+            <div class="stat-label">Registered Users</div></a>
         </div>
 
         <div class="stat-card">
@@ -61,24 +65,25 @@ include __DIR__ . '/../config.php';
         <h2 class="section-title">Admin Actions</h2>
         <div class="actions-grid">
 
-            <div class="action-btn">
+            <div class="action-btn"><a href="admin_list.php">
                 <div class="action-icon">➕</div>
-                <div class="action-label">Create Auction</div>
+                <div class="action-label">Admins</div></a>
             </div>
 
-            <div class="action-btn">
+            <div class="action-btn"><a href="role.php">
                 <div class="action-icon">📦</div>
-                <div class="action-label">Approve Consignments</div>
+                <div class="action-label">Roles</div></a>
             </div>
 
-            <div class="action-btn">
+            <div class="action-btn"><a href="staff_list.php">
                 <div class="action-icon">👥</div>
-                <div class="action-label">Manage Users</div>
+                <div class="action-label">Manage Staff</div>
+                </a>
             </div>
 
-            <div class="action-btn">
+            <div class="action-btn"><a href="department_list.php">
                 <div class="action-icon">📊</div>
-                <div class="action-label">View Reports</div>
+                <div class="action-label">Departments</div></a>
             </div>
 
         </div>

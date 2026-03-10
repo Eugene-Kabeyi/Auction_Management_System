@@ -24,24 +24,6 @@ include __DIR__ . '/../config.php';
             justify-content: center;
         }
 
-        .f_inner_container {
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            flex: 1;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .s_inner_container {
-            flex: 1;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
 
         form {
             display: flex;
@@ -60,6 +42,42 @@ include __DIR__ . '/../config.php';
             border: 1px solid #ccc;
             border-radius: 4px;
         }
+
+        form .delete {
+            background-color: #ff4d4d;
+            color: #ffffff;
+        }
+
+        form .delete:hover {
+            background-color: #ffffff;
+            color: #ff4d4d;
+            border: 1px solid #ff4d4d;
+        }
+
+        form button {
+            padding: 10px;
+            background-color: #1f2933;
+            color: #ffffff;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #1f2933;
+        }
+
+        .outer_container .back {
+            border-radius: 5px;
+            color: #ffffff;
+            text-decoration: none;
+            background-color: #1f2933;
+            padding: 6px 0 6px 30px;
+            width: 28%;
+        }
+    </style>
     </style>
 </head> 
 <body>
@@ -85,16 +103,7 @@ include __DIR__ . '/../config.php';
             </form>
         </div>
     </div>
-<script>
-    //show warning before deleting a role
-    const deleteButton = document.querySelector('.delete');
-    deleteButton.addEventListener('click', function(event) {
-        const confirmDelete = confirm("Are you sure you want to delete this role? This action cannot be undone.");
-        if (!confirmDelete) {
-            event.preventDefault(); // Prevent form submission if user cancels
-        }
-    });
-</script>
+
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $role_id = $_POST['role_id'];

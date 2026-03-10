@@ -89,7 +89,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
 <body>
     <div class="outer_container">
         <h2>Add New Department</h2>
-        <a href="admin_list.php" class="back">Back to Department List</a>
+        <a href="department_list.php" class="back">Back to Department List</a>
 
         <form action="" method="POST">
            

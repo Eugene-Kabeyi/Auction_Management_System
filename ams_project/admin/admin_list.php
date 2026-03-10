@@ -80,7 +80,7 @@ include __DIR__ . '/../config.php';
             <th>Email</th>
             <th>Username</th>
             <th>Admin Level</th>
-            <th>Actions</th>
+            <!-- <th>Actions</th> -->
         </tr>
 
         <?php
@@ -99,9 +99,9 @@ include __DIR__ . '/../config.php';
             echo "<td>" . htmlspecialchars($admin['email']) . "</td>";
             echo "<td>" . htmlspecialchars($admin['username']) . "</td>";
             echo "<td>" . htmlspecialchars($admin['admin_level']) . "</td>";
-            echo "<td>
-                    <a href='admin_edit.php?id=" . htmlspecialchars($admin['admin_id']) . "'>Edit</a>
-                  </td>";
+            // echo "<td>
+            //         <a href='admin_edit.php?id=" . htmlspecialchars($admin['admin_id']) . "'>Edit</a>
+            //       </td>";
             echo "</tr>";
         }
         ?>

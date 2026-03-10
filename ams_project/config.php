@@ -44,16 +44,15 @@ class DatabaseConfig {
     }
 }
 
-// How to use:
-try {
+
     // Create database object
     $db = new DatabaseConfig();
     
     // Get connection
     $conn = $db->getConnection();
     
-} catch (Exception $e) {
-    // Show error if connection fails
-    echo $e->getMessage();
-}
+    if(!$conn){
+        $_SESSION ['error'] = "An error occured while trying to connect to the database ";
+    }
+
 ?>

@@ -1,0 +1,124 @@
+<?php
+include __DIR__ . ('/../header.php');
+
+if (empty($_SESSION['user_id']) || $_SESSION['login_type'] !== 'seller') {
+    $_SESSION['error'] = "Please Login as Seller to access the page";
+    header("Location: login.php");
+    exit();
+}
+
+include __DIR__ . ('/../config.php');
+
+$stmt = $conn->prepare("
+    SELECT 
+        s.settlement_id,
+        s.auction_item_id,
+        s.amount_due,
+        s.commission_rate,
+        s.commission_amount,
+        s.net_amount,
+        s.settlement_date,
+        s.status,
+        s.payment_method,
+        s.transaction_reference,
+        s.created_at,
+        s.updated_at,
+        a.title AS item_title
+    FROM settlements s
+    JOIN auction_items a ON s.auction_item_id = a.auction_item_id
+    WHERE a.seller_id = :seller_id
+    ORDER BY s.created_at DESC
+");
+
+$stmt->execute([
+    ':seller_id' => $_SESSION['user_id']
+]);
+
+$settlements = $stmt->fetchAll();
+?>
+
+<head>
+    <style>
+        .outer_container {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            max-width: 95%;
+            margin: 0 auto;
+        }
+
+        h2 {
+            text-align: center;
+            margin: 20px 0;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 8px 12px;
+            border: 1px solid #ccc;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f4f4f4;
+        }
+
+        .status-pending { color: orange; font-weight: bold; }
+        .status-processing { color: blue; font-weight: bold; }
+        .status-completed { color: green; font-weight: bold; }
+        .status-cancelled { color: red; font-weight: bold; }
+    </style>
+</head>
+
+<body>
+    <h2>My Settlements</h2>
+
+    <div class="outer_container">
+        <table>
+            <tr>
+                <th>ID</th>
+                <th>Item</th>
+                <th>Amount Due</th>
+                <th>Commission (%)</th>
+                <th>Commission Amount</th>
+                <th>Net Amount</th>
+                <th>Status</th>
+                <th>Payment Method</th>
+                <th>Transaction Ref</th>
+                <th>Settlement Date</th>
+            </tr>
+
+            <?php 
+            if (empty($settlements)) {
+                echo "<tr><td colspan='10'>No settlements found.</td></tr>";
+            }
+
+            foreach ($settlements as $settlement): 
+                $statusClass = "status-" . htmlspecialchars($settlement['status']);
+            ?>
+                <tr>
+                    <td><?= htmlspecialchars($settlement['settlement_id']) ?></td>
+                    <td><?= htmlspecialchars($settlement['item_title']) ?></td>
+                    <td>$<?= htmlspecialchars($settlement['amount_due']) ?></td>
+                    <td><?= htmlspecialchars($settlement['commission_rate']) ?>%</td>
+                    <td>$<?= htmlspecialchars($settlement['commission_amount']) ?></td>
+                    <td><strong>$<?= htmlspecialchars($settlement['net_amount']) ?></strong></td>
+                    <td class="<?= $statusClass ?>">
+                        <?= htmlspecialchars($settlement['status']) ?>
+                    </td>
+                    <td><?= htmlspecialchars($settlement['payment_method'] ?? '-') ?></td>
+                    <td><?= htmlspecialchars($settlement['transaction_reference'] ?? '-') ?></td>
+                    <td><?= htmlspecialchars($settlement['settlement_date'] ?? '-') ?></td>
+                </tr>
+            <?php endforeach; ?>
+        </table>
+    </div>
+</body>
+
+<?php
+include __DIR__ . ("/../footer.php");
+?>

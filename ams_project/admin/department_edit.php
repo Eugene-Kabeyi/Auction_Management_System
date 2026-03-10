@@ -2,17 +2,14 @@
 include __DIR__ . '/../header.php';
 include __DIR__ . '/../config.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin' && $_SESSION['admin_level'] !== 'super_admin') {
+if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
     header('Location: ../staff/staff_login.php');
     session_destroy();
     $_SESSION['error'] = "Please log in as an admin to access this page.";
     exit();
 }
 
-if (!isset($_GET['department_id']) || empty($_GET['department_id'])) {
-    header('Location: admin_list.php');
-    exit();
-}
+
 
 $dept_id = $_GET['department_id'];
 
@@ -21,10 +18,7 @@ $stmt = $conn->prepare("SELECT * FROM department WHERE department_id = ?");
 $stmt->execute([$department_id]);
 $dept = $stmt->fetch(PDO::FETCH_ASSOC);
 
-if (!$admin) {
-    header('Location: admin_list.php');
-    exit();
-}
+
 ?>
 
 <head>
@@ -97,7 +91,8 @@ if (!$admin) {
 
 <body>
     <h2>Edit Departments</h2>
-    <a href="department_list">Back to department List:</a>
+    <div class= "outer_container">
+    <a href="department_list" class= "back">Back to department List:</a>
     <form action="" method="post">
         <input type="hidden" name="department_id" value="<?php echo htmlspecialchars($dept['department_id']) ?>">
 
@@ -114,6 +109,7 @@ if (!$admin) {
 
 
     </form>
+    </div>
 </body>
 <?php include __DIR__ . '/../footer.php'
     ?>

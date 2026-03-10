@@ -1,8 +1,8 @@
 <?php
 include __DIR__ . '/../header.php';
-if (isset($_SESSION['user_id']) && $_SESSION['login_type'] === 'admin') {
+if (!isset($_SESSION['user_id']) && $_SESSION['login_type'] !== 'admin') {
     // User is logged in and has the admin role, allow access to the page
-} else {
+
     // User is not logged in or does not have the admin role, redirect to login page
     header("Location: ../staff/staff_login.php");
     session_destroy();
@@ -56,6 +56,20 @@ include __DIR__ . '/../config.php';
             color: #000000;
             border: 1px solid #1f2933;
         }
+        .back{
+            color: #ffffff;
+            background-color: #000000;
+            padding: 5px 5px 5px 100px;
+            border-radius: 5px;
+            width: 20%;
+            text-decoration: none;
+            font-weight: 500;
+        }
+        .back:hover{
+              background-color: #ffffff;
+            color: #000000;
+            border: 1px solid #1f2933;
+        }
     </style>
 </head>
 
@@ -82,20 +96,23 @@ include __DIR__ . '/../config.php';
     ?>
     <div class="outer_container">
         <h2>Roles List</h2>
+         <a href="add_role.php" class = "back">Add Role</a>
         <table>
             <tr>
                 <th>Role ID</th>
+                <th>Role Name</th>
                 <th>Role Description</th>
                 <th>Actions</th>
             </tr>
             <?php foreach ($roles as $role): ?>
                 <tr>
                     <td><?php echo htmlspecialchars($role['role_id']); ?></td>
+                    <td><?php echo htmlspecialchars($role['role_name'])?></td>
                     <td><?php echo htmlspecialchars($role['role_description']); ?></td>
-                    <td>
-                        <a href="add_role.php">Add Role</a>
+                    <!-- <td>
+                       
                         <a href="edit_role.php?role_id=<?php echo $role['role_id']; ?>">Edit</a ></td>
-                </tr>
+                </tr> -->
             <?php endforeach; ?>
         </table>
     </div>
