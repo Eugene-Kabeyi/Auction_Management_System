@@ -1,9 +1,12 @@
-<!DOCTYPE html>
-<html lang="en">
-    <?php
-session_start();
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 $_SESSION['error'] = $_SESSION['error'] ?? '';
 ?>
+<!DOCTYPE html>
+<html lang="en">
+
 
 <head>
     <meta charset="UTF-8">
@@ -200,7 +203,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
     <div class="login_container">
 
 
-        <?php if (isset($_SESSION['error'])): ?>
+        <?php if (!empty($_SESSION['error'])): ?>
             <div class="flash error">
                 <?= $_SESSION['error']; ?>
             </div>

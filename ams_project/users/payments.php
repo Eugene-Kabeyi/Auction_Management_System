@@ -1,159 +1,306 @@
 <?php
+// This file lets a user start a new payment
+
 include __DIR__ . '/../header.php';
 include __DIR__ . '/../config.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
-    header('Location: ../staff/staff_login.php');
-    session_destroy();
-    $_SESSION['error'] = "Please log in as an admin to access this page.";
+// Check if user is logged in
+if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'user') {
+    $_SESSION['error'] = "Please log in first.";
+    header('Location: ../login.php');
     exit();
 }
+
+$user_id = $_SESSION['user_id'];
+
+// Get all auctions where this user won but hasn't paid yet
+$stmt = $conn->prepare("
+    SELECT ab.bid_id, ab.auction_id, ab.amount_bidded, a.auction_name
+    FROM auction_bids ab
+    JOIN auctions a ON ab.auction_id = a.auction_id
+    WHERE ab.bidder_id = ? 
+    AND ab.result = 'won'
+    AND NOT EXISTS (
+        SELECT 1 FROM payment p 
+        WHERE p.bid_id = ab.bid_id 
+        AND p.payment_status IN ('pending', 'completed')
+    )
+");
+$stmt->execute([$user_id]);
+$winning_bids = $stmt->fetchAll();
 ?>
 
+<!DOCTYPE html>
+<html>
+
 <head>
+    <title>Start Payment</title>
     <style>
-        .outer_container {
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+        }
+
+        .container {
+        
+            margin: 20px 200px;
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
             display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 640px;
-            margin: 0 auto;
             justify-content: center;
-        }
-
-        form {
-            display: flex;
             flex-direction: column;
-            gap: 15px;
+           
+            
         }
 
-        form label {
+        h2 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
             font-weight: bold;
+            margin-bottom: 5px;
+            color: #555;
         }
 
-        form input,
-        form select {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        form button {
+        select,
+        input {
+            width: 100%;
             padding: 10px;
-            background-color: #1f2933;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 16px;
+            box-sizing: border-box;
         }
 
-        .back {
-            border-radius: 5px;
-            color: #ffffff;
+        input[readonly] {
+            background: #f8f9fa;
+        }
+
+        .btn {
+            background: #1f2933;
+            color: white;
+            padding: 12px 20px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            width: 100%;
+        }
+
+        .btn:hover {
+            background: #2c3e50;
+        }
+
+        .back-btn {
+            display: inline-block;
+            margin-top: 15px;
+            color: #666;
             text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 0 6px 30px;
-            width: 30%;
+        }
+
+        .back-btn:hover {
+            color: #333;
+        }
+
+        .alert {
+            padding: 10px;
+            border-radius: 4px;
+            margin-bottom: 15px;
+        }
+
+        .alert-error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+
+        .alert-info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+        }
+
+        .info-box {
+            background: #e7f3ff;
+            padding: 10px;
+            border-radius: 4px;
+            margin: 10px 0;
+            font-size: 14px;
+            color: #004085;
         }
     </style>
 </head>
 
 <body>
-    <div class="outer_container">
-        <h2>Add New Payment</h2>
-        <a href="payment_list.php" class="back">Back to Payment List</a>
+    <div class="container">
+        <h2>Start a New Payment</h2>
 
-        <form action="" method="POST">
+        <!-- Show error message if any -->
+        <?php if (!empty($_SESSION['error'])): ?>
+            <div class="alert alert-error"><?php echo $_SESSION['error'];
+            unset($_SESSION['error']); ?></div>
+        <?php endif; ?>
 
-            <label>Bid ID:</label>
-            <select name="bid_id" required>
-                <option value="">Select Bid</option>
-                <input type="text" name="bid_id">
-            </select>
+        <!-- Check if user has any unpaid winning bids -->
+        <?php if (empty($winning_bids)): ?>
+            <div class="alert alert-info">
+                You don't have any winning bids that need payment.
+            </div>
+            <a href="payment_history.php" class="back-btn">← Back to My Payments</a>
+        <?php else: ?>
 
-            <label>Bidder ID:</label>
-            <select name="bidder_id" required>
-                <option value="">Select Bidder</option>
-                <input type="text" name="bidder_id" id="">
-            </select>
+            <!-- Payment Form -->
+            <form method="POST" action="" onsubmit="return validateForm()">
 
-            <label>Amount:</label>
-            <input type="number" step="0.01" name="amount" required>
+                <!-- Select which auction to pay for -->
+                <div class="form-group">
+                    <label>Select Auction to Pay For:</label>
+                    <select name="bid_id" id="bid_id" required onchange="updateAmount()">
+                        <option value="">-- Choose an auction --</option>
+                        <?php foreach ($winning_bids as $bid): ?>
+                            <option value="<?php echo $bid['bid_id']; ?>" data-amount="<?php echo $bid['amount_bidded']; ?>">
+                                <?php echo htmlspecialchars($bid['auction_title']); ?> -
+                                Won: $<?php echo number_format($bid['amount_bidded'], 2); ?>
+                            </option>
+                        <?php endforeach; ?>
+                    </select>
+                </div>
 
-            <label>Payment Method:</label>
-            <select name="payment_method" required>
-                <option value="">Select Payment Method</option>
-                <option value="credit_card">Credit Card</option>
-                <option value="bank_transfer">Bank Transfer</option>
-                <option value="mobile_money">Mobile Money</option>
-                <option value="cash">Cash</option>
-            </select>
+                <!-- Show selected bid info -->
+                <div id="bidInfo" class="info-box" style="display: none;"></div>
 
-            <label>Payment Status:</label>
-            <select name="payment_status" required>
-                <option value="pending" selected>Pending</option>
-                <option value="completed">Completed</option>
-                <option value="failed">Failed</option>
-                <option value="refunded">Refunded</option>
-            </select>
+                <!-- Amount to pay (auto-filled, cannot change) -->
+                <div class="form-group">
+                    <label>Amount to Pay ($):</label>
+                    <input type="number" step="0.01" name="amount" id="amount" readonly required>
+                    <small style="color: #666;">Amount is fixed based on your winning bid</small>
+                </div>
 
-            <label>Transaction Reference:</label>
-            <input type="text" name="transaction_reference" placeholder="Optional">
+                <!-- Payment method selection -->
+                <div class="form-group">
+                    <label>How would you like to pay?</label>
+                    <select name="payment_method" required>
+                        <option value="">-- Select payment method --</option>
+                        <option value="credit_card">💳 Credit Card</option>
+                        <option value="bank_transfer">🏦 Bank Transfer</option>
+                        <option value="mobile_money">📱 Mobile Money</option>
+                        <option value="cash">💰 Cash (Pay in person)</option>
+                    </select>
+                </div>
 
-            <label>Payment Date:</label>
-            <?php $input_name = 'payment_date';
-            include __DIR__ . '/../datepicker.php'; ?>
+                <!-- Transaction reference (optional) -->
+                <div class="form-group">
+                    <label>Transaction Reference (if you have one):</label>
+                    <input type="text" name="transaction_reference" placeholder="e.g., MTC123456">
+                    <small style="color: #666;">Leave empty if you don't have it yet</small>
+                </div>
 
-            <label>Completed At:</label>
-            <?php $input_name = 'completed_at';
-            include __DIR__ . '/../datepicker.php'; ?>
+                <!-- Submit button -->
+                <button type="submit" name="initiate_payment" class="btn">Start Payment</button>
+            </form>
 
-            <button type="submit">Add Payment</button>
-        </form>
+            <a href="payment_history.php" class="back-btn">← Back to My Payments</a>
+        <?php endif; ?>
     </div>
+
+    <script>
+        // This function runs when user selects an auction
+        function updateAmount() {
+            const select = document.getElementById('bid_id');
+            const amountInput = document.getElementById('amount');
+            const bidInfo = document.getElementById('bidInfo');
+
+            // Get the selected option
+            const selectedOption = select.options[select.selectedIndex];
+
+            if (selectedOption.value) {
+                // Get amount from data-amount attribute
+                const amount = selectedOption.dataset.amount;
+                amountInput.value = amount;
+
+                // Show info box with details
+                bidInfo.style.display = 'block';
+                bidInfo.innerHTML = `Your amount: <strong>${selectedOption.text}</strong>`;
+            } else {
+                // No auction selected
+                amountInput.value = '';
+                bidInfo.style.display = 'none';
+            }
+        }
+
+        // This function runs when form is submitted
+        function validateForm() {
+            const bidSelect = document.getElementById('bid_id');
+            const amount = document.getElementById('amount').value;
+
+            if (!bidSelect.value) {
+                alert('Please select an auction to pay for');
+                return false;
+            }
+
+            if (amount <= 0) {
+                alert('Invalid amount');
+                return false;
+            }
+
+            return true;
+        }
+    </script>
 </body>
 
-<?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+</html>
 
+<?php
+// This part runs when form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['initiate_payment'])) {
+
+    // Get form data
     $bid_id = $_POST['bid_id'];
-    $bidder_id = $_POST['bidder_id'];
     $amount = $_POST['amount'];
     $payment_method = $_POST['payment_method'];
-    $payment_status = $_POST['payment_status'];
     $transaction_reference = !empty($_POST['transaction_reference']) ? trim($_POST['transaction_reference']) : null;
-    $payment_date = !empty($_POST['payment_date']) ? $_POST['payment_date'] : date('Y-m-d H:i:s');
-    $completed_at = !empty($_POST['completed_at']) ? $_POST['completed_at'] : null;
-    $processed_by_staff = $_SESSION['user_id'];
 
-    $stmt = $conn->prepare(
-        "INSERT INTO payments 
-        (bid_id, bidder_id, amount, payment_method, payment_status, transaction_reference, payment_date, completed_at, processed_by_staff)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-    );
+    
+    if ($check_stmt->rowCount() > 0) {
+        // Save payment to database with status 'pending'
+        $stmt = $conn->prepare("
+            INSERT INTO payment 
+            (bid_id, bidder_id, amount, payment_method, payment_status, transaction_reference, payment_date)
+            VALUES (?, ?, ?, ?, 'pending', ?, NOW())
+        ");
 
-    try {
-        $success = $stmt->execute([
-            $bid_id,
-            $bidder_id,
-            $amount,
-            $payment_method,
-            $payment_status,
-            $transaction_reference,
-            $payment_date,
-            $completed_at,
-            $processed_by_staff
-        ]);
+        try {
+            $stmt->execute([
+                $bid_id,
+                $user_id,
+                $amount,
+                $payment_method,
+                $transaction_reference
+            ]);
 
-        if ($success) {
-            $_SESSION['success'] = "Payment added successfully";
-            header('Location: payment_list.php');
+            $_SESSION['success'] = "Payment started successfully! Please wait for staff to process it.";
+            header('Location: user_payment_list.php');
             exit();
-        } else {
-            $_SESSION['error'] = "Failed to add payment";
+
+        } catch (PDOException $e) {
+            $_SESSION['error'] = "Database error: " . $e->getMessage();
+            header('Location: payments.php');
+            exit();
         }
-    } catch (PDOException $e) {
-        $_SESSION['error'] = "Database error: " . $e->getMessage();
+    } else {
+        $_SESSION['error'] = "Invalid bid selected.";
+        header('Location: payments.php');
+        exit();
     }
 }
+
+include __DIR__ . '/../footer.php';
 ?>

@@ -1,7 +1,7 @@
 <?php
 include __DIR__ . ('/../header.php');
 
-if (empty($_SESSION['user_id']) || $_SESSION['login_type'] !== 'user') {
+if (empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user') {
     $_SESSION['error'] = "Please Login to access the page";
     header("Location: login.php");
     exit();
@@ -22,7 +22,7 @@ $stmt = $conn->prepare("
         a.auction_id,
         auc.auction_name,
         auc.auction_code
-    FROM payments p
+    FROM payment p
     LEFT JOIN auction_bids a ON p.bid_id = a.bid_id
     LEFT JOIN auctions auc ON a.auction_id = auc.auction_id
     WHERE p.bidder_id = :user_id

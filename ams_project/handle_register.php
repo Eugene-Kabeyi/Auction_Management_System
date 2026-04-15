@@ -1,4 +1,7 @@
 <?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 require 'config.php';
 
 class RegisterHandler extends DatabaseConfig
@@ -54,13 +57,15 @@ class RegisterHandler extends DatabaseConfig
                     ':username' => $username,
                     ':password_hash' => $password // later: hash with password_hash()
                 ]);
-
+                $_SESSION['success'] = 'Sucessfully create account' . $username ;
                 // Redirect without echo before header
-                header("Location: ../ams_project/users/login.html");
+                header("Location: ../ams_project/users/login.php");
                 exit();
 
             } catch (PDOException $e) {
-                echo "❌ Registration failed: " . $e->getMessage();
+                $_SESSION['error'] = "❌ Registration failed: " . $e->getMessage();
+                header("Location: ../ams_project/users/register.php");
+                exit();
             }
         }
     }

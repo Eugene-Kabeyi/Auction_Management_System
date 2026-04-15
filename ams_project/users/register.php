@@ -1,3 +1,9 @@
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+$_SESSION['error'] = $_SESSION['error'] ?? '';
+?>
 <!DOCTYPE html>
 <html lang="en">
 
@@ -12,16 +18,24 @@
             background-color: #f3f4f6;
             font-size: 14px;
             color: #374151;
+            display: flex;
+            justify-content: center;
+            margin-top: 20px;
         }
 
-        /* Registration container */
         .register_container {
-            width: 520px;
+            margin-top: 20px;
+            display: flex;
+            flex-direction: column;
+            justify-items: center;
+            gap: 20px;
+            width: 25%;
             background-color: #ffffff;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
-            padding: 28px;
+            padding: 32px;
             box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+            text-align: center;
         }
 
         /* Logo */
@@ -49,15 +63,15 @@
 
         .register_container h3 {
             text-align: center;
-            font-size: 15px;
+            font-size: 18px;
             font-weight: 500;
             color: #6b7280;
-            margin-bottom: 20px;
+            margin-bottom: 5px;
         }
 
         /* Form */
         form {
-            margin-top: 10px;
+            max-width: 95%;
         }
 
         /* Labels */
@@ -80,6 +94,10 @@
             border-radius: 6px;
             font-size: 14px;
             transition: border-color 0.2s ease;
+        }
+
+        select {
+            margin-left: 13px !important;
         }
 
         input:focus,
@@ -126,9 +144,6 @@
         }
 
         /* Make sure form stays visible */
-        .register_container {
-            margin-left: 360px;
-        }
 
         /* Password text to be disc */
         .pass_w {
@@ -139,10 +154,9 @@
 
         /* Hide/Show Password inside the password field */
         .hide_show {
-            position: absolute;
-            margin-left: 440px;
-            margin-top: -28px;
-            font-size: 12px;
+            position: relative;
+            top: -32px;
+            left: 140px;
             color: #6b7280;
             cursor: pointer;
             user-select: none;
@@ -156,24 +170,73 @@
             color: #6b7280;
             text-align: center;
         }
+
         .already a {
             color: #1f2933;
             text-decoration: none;
             font-weight: 500;
         }
+
         .already a:hover {
             text-decoration: underline;
+        }
+
+        .flash {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            min-width: 260px;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 9999;
+            animation: slideIn 0.4s ease, fadeOut 0.4s ease 4s forwards;
+        }
+
+        .flash.success {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border-left: 5px solid #10b981;
+        }
+
+        .flash.error {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-left: 5px solid #ef4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
         }
     </style>
 </head>
 
 <body>
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?= $_SESSION['error']; ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
 
     <div class="register_container">
-
-        <h2>Register for AMS</h2>
-        <span class="logo">AMS</span>
-        <h3>Sign Up</h3>
+       <h2>Register for AMS</h2>
+            <span class="logo">AMS</span>
         <form action="../handle_register.php" method="post">
             <label>National ID</label>
             <input type="text" id="national_id" name="national_id">
@@ -182,14 +245,7 @@
             <label>Business ID (Optional)</label>
             <input type="text" name="business_id">
 
-            <label>Role</label>
-            <select id="role_id" name="role_id">
-                <option value="">-- Select Role --</option>
-                <option value="1">Consigner</option>
-                <option value="2">Bidder</option>
 
-            </select>
-            <span class="error" id="roleErr"></span>
 
             <label>First Name</label>
             <input type="text" id="firstname" name="firstname">
@@ -222,9 +278,18 @@
             <span class="hide_show" id="togglePassword">Hide/Show</span>
             <span class="error" id="passErr"></span>
 
+            <label>Role</label>
+            <select id="role_id" name="role_id">
+                <option value="">-- Select Role --</option>
+                <option value="1">Consigner</option>
+                <option value="2">Bidder</option>
+
+            </select>
+            <span class="error" id="roleErr"></span>
+
             <input type="submit" value="Register">
         </form>
-        <span class="already">Already have an account? <a href="login.html">Login</a></span>
+        <span class="already">Already have an account? <a href="login.php">Login</a></span>
         <script>
             function togglePasswordVisibility() {
                 var passwordField = document.getElementById("password");

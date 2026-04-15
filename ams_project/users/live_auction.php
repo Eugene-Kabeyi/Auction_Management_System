@@ -1,17 +1,19 @@
 <?php include __DIR__ . '/../header.php';
-if (!isset($_SESSION['user_id'])|| empty($_SESSION['user_id'])) {
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     header("Location: login.php");
     exit();
 }
 include __DIR__ . '/../config.php'; ?>
+
 <head>
     <style>
         body {
             font-family: Arial, sans-serif;
             background-color: #f4f4f4;
             margin: 0;
-           
+
         }
+
         .header_container {
             text-align: center;
             margin-bottom: 20px;
@@ -48,7 +50,8 @@ include __DIR__ . '/../config.php'; ?>
             margin: 10px 0;
         }
 
-        #bidButton, #exitBidButton {
+        #bidButton,
+        #exitBidButton {
             background-color: #1f2933;
             color: #ffffff;
             border: none;
@@ -59,7 +62,8 @@ include __DIR__ . '/../config.php'; ?>
             font-weight: 600;
         }
 
-        #bidButton:hover, #exitBidButton:hover {
+        #bidButton:hover,
+        #exitBidButton:hover {
             background-color: #ffffff;
             color: #000000;
             border: 1px solid #1f2933;
@@ -67,43 +71,48 @@ include __DIR__ . '/../config.php'; ?>
 
         /* Modal Styles */
         .modal {
-            display: none; 
-            position: fixed; 
-            z-index: 1; 
+            display: none;
+            position: fixed;
+            z-index: 1;
             left: 0;
             top: 0;
-            width: 100%; 
-            height: 100%; 
-            overflow: auto; 
-            background-color: rgba(0,0,0,0.4); 
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0, 0, 0, 0.4);
         }
 
         .modal-content {
             background-color: #fefefe;
-            margin: 15% auto; 
+            margin: 15% auto;
             padding: 20px;
             border: 1px solid #888;
-            width: 300px; 
+            width: 300px;
             border-radius: 5px;
-            height: auto;   
+            height: auto;
         }
-        .modal-content h2 , .modal-content label {
-             margin: 0;
+
+        .modal-content h2,
+        .modal-content label {
+            margin: 0;
             margin-top: 0;
             text-align: center;
         }
+
         .modal-content form {
             display: flex;
             flex-direction: column;
             gap: 15px;
             margin-top: 20px;
         }
+
         .modal-content input[type="number"] {
             padding: 10px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
         }
+
         .modal-content button {
             padding: 10px;
             border: none;
@@ -131,6 +140,7 @@ include __DIR__ . '/../config.php'; ?>
         }
     </style>
 </head>
+
 <body>
     <?php
     // Fetch auction and item details from the database
@@ -138,17 +148,17 @@ include __DIR__ . '/../config.php'; ?>
     if ($auction_id) {
         $stmt = $conn->prepare("SELECT a.item_id, a.auction_name, a.auction_code, a.start_time, a.end_time, i.item_name, i.item_description, e.reserve_price, i.image_path FROM auctions a JOIN consigner_items i ON a.item_id = i.item_id JOIN evaluated_items e ON i.item_id = e.item_id WHERE a.auction_id = :auction_id");
         $stmt->execute(['auction_id' => $auction_id]);
-        $auction = $stmt->fetch();  
+        $auction = $stmt->fetch();
         if ($auction) {
             $auction_name = $auction['auction_name'];
             $auction_code = $auction['auction_code'];
             $item_name = $auction['item_name'];
             $item_description = $auction['item_description'];
             $starting_bid = $auction['reserve_price'];
-            $item_image_url = $auction['image_path'] ;
+            $item_image_url = $auction['image_path'];
             $start_time = date("F j, Y, g:i a", strtotime($auction['start_time'])); // Format start time for display
             $end_time = date("F j, Y, g:i a", strtotime($auction['end_time'])); // Format end time for display
-            $minimum_bid = max($starting_bid, $current_highest_bid + 1); // Minimum bid must be at least 1 unit higher than current highest
+    
         } else {
             echo "<p>Auction not found.</p>";
             exit();
@@ -159,15 +169,20 @@ include __DIR__ . '/../config.php'; ?>
     }
     // Fetch current highest bid
     $stmt = $conn->prepare("SELECT MAX(amount_bidded) AS highest_bid FROM auction_bids WHERE auction_id = :auction_id");
+    $stmt->execute(['auction_id' => $auction_id]);
+    $bid_result = $stmt->fetch();
+
+    $current_highest_bid = $bid_result['highest_bid'] ?? 0;
+    $minimum_bid = max($starting_bid, $current_highest_bid + 1); // Minimum bid must be at least 1 unit higher than current highest
     ?>
-    <div class = "header_container">
-    <h2>Welcome to <?php echo $auction_name; ?></h2>
-    <p>Auction Code: <?php echo $auction_code; ?></p>
+    <div class="header_container">
+        <h2>Welcome to <?php echo $auction_name; ?></h2>
+        <p>Auction Code: <?php echo $auction_code; ?></p>
     </div>
     <div class="outer_container">
         <!--Picture of auctioned item -->
-        <div class="pic_inner_container" >
-            
+        <div class="pic_inner_container">
+
             <img src="<?php echo $item_image_url; ?>" alt="Auctioned Item Image" style="max-width:100%; height:auto; ">
         </div>
         <!--Details of auctioned item -->
@@ -177,15 +192,15 @@ include __DIR__ . '/../config.php'; ?>
             <p><strong>Description:</strong> <?php echo $item_description; ?></p>
             <p><strong>Starting Bid:</strong> $<?php echo number_format($starting_bid, 2); ?></p>
             <p><strong>Current Highest Bid:</strong> $<?php echo number_format($current_highest_bid, 2); ?></p>
-            <p><strong>Auction Ends At:</strong> <?php echo $end_time; ?></p>   
+            <p><strong>Auction Ends At:</strong> <?php echo $end_time; ?></p>
 
             <!-- Bid Submission Modal Trigger Button and Exit Bid Button -->
-             <div>
-            <button id="bidButton">Place Your Bid</button>
-            <button id = "exitBidButton">Exit Bid</button>
+            <div>
+                <button id="bidButton">Place Your Bid</button>
+                <button id="exitBidButton">Exit Bid</button>
             </div>
         </div>
-    </div>  
+    </div>
 
     <!-- Bid Submission Modal -->
     <div id="bidModal" class="modal">
@@ -195,13 +210,14 @@ include __DIR__ . '/../config.php'; ?>
             <form action="" method="post">
 
                 <label for="bid_amount">Bid Amount (Minimum: $<?php echo number_format($minimum_bid, 2); ?>):</label>
-                <input type="number" id="bid_amount" name="bid_amount" step="0.01" min="<?php echo $minimum_bid; ?>" required>
+                <input type="number" id="bid_amount" name="bid_amount" step="0.01" min="<?php echo $minimum_bid; ?>"
+                    required>
                 <button type="submit">Submit Bid</button>
             </form>
         </div>
     </div>
 
-<?php include __DIR__ . '/../footer.php'; ?>    
+    <?php include __DIR__ . '/../footer.php'; ?>
     <script>
         // Get modal element
         var modal = document.getElementById("bidModal");
@@ -213,36 +229,36 @@ include __DIR__ . '/../config.php'; ?>
         var exitBidBtn = document.getElementById("exitBidButton");
 
         // Listen for open click
-        bidBtn.onclick = function() {
+        bidBtn.onclick = function () {
             modal.style.display = "block";
         }
 
         // Listen for close click
-        closeBtn.onclick = function() {
+        closeBtn.onclick = function () {
             modal.style.display = "none";
         }
 
         // Listen for exit bid click
-        exitBidBtn.onclick = function() {
+        exitBidBtn.onclick = function () {
             window.location.href = "user_dashboard.php"; // Redirect to another page
         }
 
         // Listen for outside click
-        window.onclick = function(event) {
+        window.onclick = function (event) {
             if (event.target == modal) {
                 modal.style.display = "none";
             }
         }
     </script>
-<?php
-// Handle bid submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $bid_amount = $_POST['bid_amount'];
-    $user_id = $_SESSION['user_id']; // Assuming user ID is stored in session   
-    // Insert bid into database
-    $stmt = $conn->prepare("INSERT INTO auction_bids (auction_id, bidder_id, amount_bidded) VALUES (:auction_id, :user_id, :amount_bidded)");
-    $stmt->execute(['auction_id' => $auction_id, 'user_id' => $user_id, 'amount_bidded' => $bid_amount]);
-    // Redirect back to the auction page to see updated bid
-     header("Location: live_auction.php?auction_id=" . $auction_id);
-    exit();
-}
+    <?php
+    // Handle bid submission
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        $bid_amount = $_POST['bid_amount'];
+        $user_id = $_SESSION['user_id']; // Assuming user ID is stored in session   
+        // Insert bid into database
+        $stmt = $conn->prepare("INSERT INTO auction_bids (auction_id, bidder_id, amount_bidded) VALUES (:auction_id, :user_id, :amount_bidded)");
+        $stmt->execute(['auction_id' => $auction_id, 'user_id' => $user_id, 'amount_bidded' => $bid_amount]);
+        // Redirect back to the auction page to see updated bid
+        header("Location: live_auction.php?auction_id=" . $auction_id);
+        exit();
+    }

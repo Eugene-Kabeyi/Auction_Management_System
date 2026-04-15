@@ -2,7 +2,23 @@
 session_start();
 include __DIR__ . '/../header.php';
 
+include __DIR__. '/../config.php';
 
+$stmt = $conn->prepare("SELECT COUNT(*) FROM consigner_items WHERE consigner_id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$items_consigned = $stmt->fetchColumn();
+
+$stmt = $conn->prepare("SELECT COUNT(DISTINCT auction_id) FROM auction_bids WHERE bidder_id = ?");
+$stmt->execute([$_SESSION['user_id']]);
+$auctions_participated = $stmt->fetchColumn();
+
+$stmt = $conn->prepare("SELECT COUNT(*) FROM auction_bids WHERE bidder_id = ? AND result = 'won'");
+$stmt->execute([$_SESSION['user_id']]);
+$bids_won = $stmt->fetchColumn();
+
+$stmt = $conn->prepare("SELECT IFNULL(SUM(amount),0) FROM payment WHERE bidder_id = ? AND payment_status='completed'");
+$stmt->execute([$_SESSION['user_id']]);
+$total_payments = $stmt->fetchColumn();
 ?>
 
 <head>
@@ -35,25 +51,25 @@ include __DIR__ . '/../header.php';
     <div class="stats-container">
         <div class="stat-card">
             <div class="stat-icon icon-auction">📦</div>
-            <div class="stat-value">5</div>
+            <div class="stat-value"><?= htmlspecialchars($items_consigned) ?? '0'?></div>
             <div class="stat-label">Items Consigned</div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon icon-bid">🔨</div>
-            <div class="stat-value">18</div>
+            <div class="stat-value"><?=htmlspecialchars($auctions_participated )?? '0'?></div>
             <div class="stat-label">Auctions Participated</div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon icon-revenue">🏆</div>
-            <div class="stat-value">3</div>
+            <div class="stat-value"><?= htmlspecialchars($bids_won) ?? '0'?></div>
             <div class="stat-label">Bids Won</div>
         </div>
 
         <div class="stat-card">
             <div class="stat-icon icon-users">💰</div>
-            <div class="stat-value">$12,450</div>
+            <div class="stat-value">Ksh &nbsp;<?= number_format($total_payments,2) ?? '0'?></div>
             <div class="stat-label">Payment History</div>
         </div>
     </div>

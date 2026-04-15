@@ -5,7 +5,7 @@ if(empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user'){
     header('Location:login.php');
 
 }
-include __DIR__. ('/../header.php');
+include __DIR__. ('/../config.php');
 $tmt = $conn->prepare('SELECT * FROM consigner_items WHERE consigner_id = :user_id ') ;
 $tmt -> execute(["user_id" => $_SESSION['user_id']]);
 $items = $tmt ->fetchAll()
@@ -14,9 +14,11 @@ $items = $tmt ->fetchAll()
     <style>
         .outer_container{
             width: 80%;
-            display: flex;
-            flex-direction: column;
-            gap :20px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  justify-content: center;
+  margin: 20px auto;
 
         }
         h2{

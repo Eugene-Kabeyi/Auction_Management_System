@@ -1,7 +1,7 @@
 <?php
 include __DIR__ . ('/../header.php');
 
-if (empty($_SESSION['user_id']) || $_SESSION['login_type'] !== 'seller') {
+if (empty($_SESSION['user_id']) || $_SESSION['login_type'] !== 'user') {
     $_SESSION['error'] = "Please Login as Seller to access the page";
     header("Location: login.php");
     exit();
@@ -23,9 +23,9 @@ $stmt = $conn->prepare("
         s.transaction_reference,
         s.created_at,
         s.updated_at,
-        a.title AS item_title
-    FROM settlements s
-    JOIN auction_items a ON s.auction_item_id = a.auction_item_id
+        a.item_name AS item_title
+    FROM settlement s
+    JOIN consigner_items a ON s.auction_item_id = a.auction_item_id
     WHERE a.seller_id = :seller_id
     ORDER BY s.created_at DESC
 ");
