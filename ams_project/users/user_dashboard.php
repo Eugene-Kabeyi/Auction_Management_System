@@ -1,6 +1,12 @@
 <?php
-session_start();
 include __DIR__ . '/../header.php';
+if ($_SESSION['login_type'] !== 'user' || !isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    header("Location: login.php");
+    session_destroy();
+    $_SESSION['error'] = "Please log in as a user to access this page.";
+    exit();
+}
+
 
 include __DIR__. '/../config.php';
 
@@ -49,29 +55,29 @@ $total_payments = $stmt->fetchColumn();
 
     <!-- Stats Cards -->
     <div class="stats-container">
-        <div class="stat-card">
+        <div class="stat-card"><a href="items_consign_list.php">
             <div class="stat-icon icon-auction">📦</div>
             <div class="stat-value"><?= htmlspecialchars($items_consigned) ?? '0'?></div>
-            <div class="stat-label">Items Consigned</div>
+            <div class="stat-label">Items Consigned</div></a>
         </div>
 
-        <div class="stat-card">
+        <div class="stat-card"><a href="auctions_participated.php">
             <div class="stat-icon icon-bid">🔨</div>
             <div class="stat-value"><?=htmlspecialchars($auctions_participated )?? '0'?></div>
-            <div class="stat-label">Auctions Participated</div>
+            <div class="stat-label">Auctions Participated</div></a>
         </div>
 
-        <div class="stat-card">
+        <div class="stat-card"><a href="bids_won.php">
             <div class="stat-icon icon-revenue">🏆</div>
             <div class="stat-value"><?= htmlspecialchars($bids_won) ?? '0'?></div>
-            <div class="stat-label">Bids Won</div>
+            <div class="stat-label">Bids Won</div></a>
         </div>
 
-        <div class="stat-card">
+        <div class="stat-card"><a href="payment_history.php">
             <div class="stat-icon icon-users">💰</div>
             <div class="stat-value">Ksh &nbsp;<?= number_format($total_payments,2) ?? '0'?></div>
             <div class="stat-label">Payment History</div>
-        </div>
+        </a></div>
     </div>
 
     <!-- User Actions -->
@@ -105,20 +111,20 @@ $total_payments = $stmt->fetchColumn();
         <h2 class="section-title">My Records</h2>
         <div class="actions-grid">
 
-            <div class="action-btn">
+            <div class="action-btn"><a href="bids_won.php">
                 <div class="action-icon">🏆</div>
                 <div class="action-label">View Bids Won</div>
-            </div>
+            </a></div>
 
-            <div class="action-btn">
+            <div class="action-btn"><a href="bid_auction_history.php">
                 <div class="action-icon">📜</div>
                 <div class="action-label">Bid & Auction History</div>
-            </div>
+            </a></div>
 
-            <div class="action-btn">
+            <div class="action-btn"><a href="settlements.php"> 
                 <div class="action-icon">💵</div>
                 <div class="action-label">Settlement Amounts</div>
-            </div>
+            </a></div>
 
         </div>
     </div>

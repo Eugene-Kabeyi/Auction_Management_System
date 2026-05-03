@@ -391,6 +391,10 @@
     font-size: 13px;
     color: #374151;
 }
+.stats-container a{
+    text-decoration: none;  
+    
+}
 
 
 .outer_form_container .form_data input[type="text"],

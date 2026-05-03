@@ -291,9 +291,15 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
         </form>
         <span class="already">Already have an account? <a href="login.php">Login</a></span>
         <script>
+
+            // Toggle password visibility
             function togglePasswordVisibility() {
+
+                // Fetch the password field and the toggle text element
                 var passwordField = document.getElementById("password");
                 var toggleText = document.getElementById("togglePassword");
+
+                // Toggle the class to switch between text and password styles
                 if (passwordField.classList.contains("pass_w")) {
                     passwordField.classList.remove("pass_w");
                     toggleText.textContent = "Hide";

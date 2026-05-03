@@ -25,8 +25,8 @@ $stmt = $conn->prepare("
         s.updated_at,
         a.item_name AS item_title
     FROM settlement s
-    JOIN consigner_items a ON s.auction_item_id = a.auction_item_id
-    WHERE a.seller_id = :seller_id
+    JOIN consigner_items a ON s.auction_item_id = a.item_id
+    WHERE a.consigner_id = :seller_id
     ORDER BY s.created_at DESC
 ");
 

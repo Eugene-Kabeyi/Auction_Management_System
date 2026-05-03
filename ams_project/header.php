@@ -27,9 +27,21 @@ if (session_status() == PHP_SESSION_NONE) {
     </div>
 
     <div class="nav-links">
-        <a href="#" class="nav-item">Dashboard</a>
-        <a href="#" class="nav-item">Auctions</a>
-        <a href="#" class="nav-item">Inventory</a>
+        <?php
+        $link = '';
+        $link2 = '../users/auction_list.php';
+        if ($_SESSION['login_type'] === 'staff') {
+            $link = '../staff/staff_dashboard.php';
+            $link2 = '../staff/list_items.php';
+        } elseif ($_SESSION['login_type'] === 'user') {
+            $link = '../users/user_dashboard.php'; 
+        } else {
+            $link = '../admin/admin_dashboard.php';
+        }
+        ?>
+
+        <a href="<?php echo empty($_SESSION['username']) ? htmlspecialchars('../users/user_dashboard.php') : htmlspecialchars($link); ?>" class="nav-item">Dashboard</a>
+        <a href="<?php echo htmlspecialchars($link2); ?>" class="nav-item">Auctions</a>
         <a href="#" class="nav-item">Bidders</a>
         <a href="#" class="nav-item">Reports</a>
         <a href="#" class="nav-item">Settings</a>

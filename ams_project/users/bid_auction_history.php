@@ -1,9 +1,9 @@
 <?php
 include __DIR__ . ('/../header.php');
 
-if (empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user'){
+if (empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user') {
 
-    
+
     $_SESSION['error'] = "Please Login to access the page";
     header("Location:login.php");
 }
@@ -14,6 +14,8 @@ $stmt = $conn->prepare("
     SELECT 
         a.auction_id,
         a.bidder_id,
+        a.amount_bidded,
+        a.bid_status,
         a.result,
         c.auction_name,
         c.auction_code
@@ -21,7 +23,6 @@ $stmt = $conn->prepare("
     JOIN users b ON a.bidder_id = b.UID
     JOIN auctions c ON a.auction_id = c.auction_id
     WHERE a.bidder_id = :user_id
-    GROUP BY auction_name;
 ");
 
 $stmt->execute([
@@ -34,12 +35,25 @@ $results = $stmt->fetchAll();
 
 <head>
     <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #ebe9e9;
+        }
+
         .outer_container {
             display: flex;
             flex-direction: column;
             gap: 20px;
-            max-width: 80%;
-            margin: 0 auto;
+            max-width: 100%;
+            margin: 0 40px;
             justify-content: center;
         }
 
@@ -51,6 +65,8 @@ $results = $stmt->fetchAll();
         table {
             width: 100%;
             border-collapse: collapse;
+            background-color: #ffffff;
+
         }
 
         th,
@@ -81,28 +97,30 @@ $results = $stmt->fetchAll();
 
 </head>
 
-<body>
-    <h2>Auctions Participated</h2>
+<body style="background-color: #ebe9e9;">
+    <h2>Bidding History</h2>
     <div class="outer_container">
-    <table>
-        <tr>
-            <th>Auction ID</th>
-            <th>Auction Name</th>
-            <th>Auction Code</th>
-            
-        </tr>
-        <?php foreach ($results as $result): ?>
+        <table>
             <tr>
-            <td><?= htmlspecialchars($result['auction_id']) ?></td>
-            <td><?= htmlspecialchars($result['auction_name']) ?></td>
-            <td><?= htmlspecialchars($result['auction_code']) ?></td>
+                <th>Auction Name</th>
+                <th>Amount Bidded</th>
+                <th>Bid Status</th>
+                <th>Result</th>
             </tr>
-
-        <?php endforeach ?>
-    </table>
+            <?php foreach ($results as $result): ?>
+                <tr>
+                    <td><?= htmlspecialchars($result['auction_name']) ?></td>
+                    <td><?= htmlspecialchars($result['amount_bidded']) ?></td>
+                    <td><?= htmlspecialchars($result['bid_status']) ?></td>
+                    <td><?= htmlspecialchars($result['result']) ?></td>
+                </tr>
+            <?php endforeach ?>
+        </table>
     </div>
 
 </body>
 <?php
-include __DIR__.("/../footer.php");
+include __DIR__ . ("/../footer.php");
 ?>
+
+</html>

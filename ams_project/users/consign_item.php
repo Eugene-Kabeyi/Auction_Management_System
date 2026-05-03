@@ -9,8 +9,34 @@ if (empty($_SESSION['user_id']) && $_SESSION['login_type']!== 'user'){
 }
 
 include __DIR__ . '/../header.php'; ?>
+<head>
+    <style>
+                html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
 
-<main>
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #ebe9e9;
+        }
+
+        .outer_container {
+            width: 80%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px auto;
+
+        }
+    </style>
+</head>
+
+<body>
 <?php if (isset($_SESSION['error'])): ?>
     <div class="flash error">
         <?= $_SESSION['error']; ?>
@@ -55,7 +81,7 @@ include __DIR__ . '/../header.php'; ?>
         </form>
     </div>
 
-</main>
+</body>
 <?php include __DIR__ . '/../footer.php'; ?>
 
 <?php

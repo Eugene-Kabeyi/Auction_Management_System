@@ -1,33 +1,50 @@
 <?php
 include __DIR__ . ('/../header.php');
-if(empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user'){
+if (empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user') {
     $_SESSION['error'] = "Please login to access the page";
     header('Location:login.php');
 
 }
-include __DIR__. ('/../config.php');
-$tmt = $conn->prepare('SELECT * FROM consigner_items WHERE consigner_id = :user_id ') ;
-$tmt -> execute(["user_id" => $_SESSION['user_id']]);
-$items = $tmt ->fetchAll()
-?>
+include __DIR__ . ('/../config.php');
+$tmt = $conn->prepare('SELECT * FROM consigner_items WHERE consigner_id = :user_id ');
+$tmt->execute(["user_id" => $_SESSION['user_id']]);
+$items = $tmt->fetchAll()
+    ?>
+
 <head>
     <style>
-        .outer_container{
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #ebe9e9;
+        }
+
+        .outer_container {
             width: 80%;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
-  justify-content: center;
-  margin: 20px auto;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px auto;
 
         }
-        h2{
+
+        h2 {
             text-align: center;
 
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
+            background-color: #ffffff;
         }
 
         th,
@@ -56,8 +73,9 @@ $items = $tmt ->fetchAll()
         }
     </style>
 </head>
+
 <body>
-    
+
     <h2>My Consigned Items</h2>
 
     <div class="outer_container">
@@ -73,22 +91,21 @@ $items = $tmt ->fetchAll()
                 <th>Created</th>
             </tr>
 
-            <?php 
+            <?php
             if (empty($items)) {
                 echo "<tr><td colspan='8'>No items submitted yet.</td></tr>";
             }
 
-            foreach ($items as $item): 
+            foreach ($items as $item):
                 $statusClass = "status-" . htmlspecialchars($item['item_status']);
-            ?>
+                ?>
                 <tr>
                     <td><?= htmlspecialchars($item['item_id']) ?></td>
 
                     <td>
                         <?php if (!empty($item['image_path'])): ?>
-                            <img src="<?= htmlspecialchars($item['image_path']) ?>" 
-                                 width="60" height="60" 
-                                 style="object-fit:cover; border-radius:5px;">
+                            <img src="<?= htmlspecialchars($item['image_path']) ?>" width="60" height="60"
+                                style="object-fit:cover; border-radius:5px;">
                         <?php else: ?>
                             No Image
                         <?php endif; ?>
@@ -106,6 +123,5 @@ $items = $tmt ->fetchAll()
     </div>
 </body>
 <?php
-include __DIR__.("/../footer.php");
+include __DIR__ . ("/../footer.php");
 ?>
-

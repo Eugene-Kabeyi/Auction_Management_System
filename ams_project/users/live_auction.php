@@ -1,9 +1,72 @@
 <?php include __DIR__ . '/../header.php';
+
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    if (isset($_SESSION['login_type']) && ($_SESSION['login_type'] === 'admin' || $_SESSION['login_type'] === 'staff')) {
+        header("Location: ../staff/staff_dashboard.php");
+        exit();
+    }
     header("Location: login.php");
+    session_destroy();
+    $_SESSION['error'] = "Please log in as a user to access this page.";
     exit();
 }
-include __DIR__ . '/../config.php'; ?>
+
+include __DIR__ . '/../config.php';
+
+$auction_id = $_GET['auction_id'] ?? null;
+// GET AUCTION TIME
+$stmt = $conn->prepare("
+    SELECT end_time FROM auctions WHERE auction_id = :auction_id
+");
+$stmt->execute(['auction_id' => $auction_id]);
+$auctionData = $stmt->fetch();
+
+$current_time = date("Y-m-d H:i:s");
+
+//CHECK IF ALREADY DONE
+
+$stmt = $conn->prepare("
+    SELECT COUNT(*) as c 
+    FROM auction_bids 
+    WHERE auction_id = :auction_id AND result != 'pending'
+");
+$stmt->execute(['auction_id' => $auction_id]);
+$alreadyFinalized = $stmt->fetch()['c'];
+
+
+// FINALIZE AUCTION
+
+if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
+
+    $conn->beginTransaction();
+
+    try {
+
+        //SET WINNER + LOSERS
+
+        $stmt = $conn->prepare("
+            UPDATE auction_bids
+            SET result = CASE 
+                WHEN bid_status = 'winning' THEN 'won'
+                ELSE 'lost'
+            END
+            WHERE auction_id = :auction_id
+        ");
+        $stmt->execute(['auction_id' => $auction_id]);
+
+        $conn->commit();
+
+    } catch (Exception $e) {
+        $conn->rollBack();
+        if ($loginType === 'admin' || $loginType === 'staff') {
+
+            $_SESSION['error'] = "Error finalizing auction.";
+        }
+    }
+}
+?>
+
+
 
 <head>
     <style>
@@ -138,10 +201,51 @@ include __DIR__ . '/../config.php'; ?>
             text-decoration: none;
             cursor: pointer;
         }
+
+        .flash {
+            z-index: 2;
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            min-width: 260px;
+            padding: 14px 18px;
+            border-radius: 6px;
+            font-size: 14px;
+            z-index: 9999;
+            animation: slideIn 0.4s ease, fadeOut 0.4s ease 4s forwards;
+        }
+
+        /* Flash message styles */
+        .flash.error {
+            background-color: #fef2f2;
+            color: #991b1b;
+            border-left: 5px solid #ef4444;
+        }
+
+        @keyframes slideIn {
+            from {
+                transform: translateX(-30px);
+                opacity: 0;
+            }
+
+            to {
+                transform: translateX(0);
+                opacity: 1;
+            }
+        }
+        }
+
+
+        @keyframes fadeOut {
+            to {
+                opacity: 0;
+                transform: translateX(-30px);
+            }
+        }
     </style>
 </head>
 
-<body>
+<body style="height: 100%;">
     <?php
     // Fetch auction and item details from the database
     $auction_id = $_GET['auction_id'] ?? null; // Get auction ID from URL
@@ -173,8 +277,15 @@ include __DIR__ . '/../config.php'; ?>
     $bid_result = $stmt->fetch();
 
     $current_highest_bid = $bid_result['highest_bid'] ?? 0;
-    $minimum_bid = max($starting_bid, $current_highest_bid + 1); // Minimum bid must be at least 1 unit higher than current highest
+    $minimum_bid = ($current_highest_bid > 0) ? $current_highest_bid + 1 : $starting_bid; // Minimum bid must be at least 1 unit higher than current highest
     ?>
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?= $_SESSION['error']; ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
+
     <div class="header_container">
         <h2>Welcome to <?php echo $auction_name; ?></h2>
         <p>Auction Code: <?php echo $auction_code; ?></p>
@@ -187,15 +298,17 @@ include __DIR__ . '/../config.php'; ?>
         </div>
         <!--Details of auctioned item -->
         <div class="details_inner_container">
+            <h2 id="countDown">Time Remaining: <span id="countdownTimer">00:00:00</span></h2>
             <h3>Item Details</h3>
             <p><strong>Item Name:</strong> <?php echo $item_name; ?></p>
             <p><strong>Description:</strong> <?php echo $item_description; ?></p>
-            <p><strong>Starting Bid:</strong> $<?php echo number_format($starting_bid, 2); ?></p>
-            <p><strong>Current Highest Bid:</strong> $<?php echo number_format($current_highest_bid, 2); ?></p>
-            <p><strong>Auction Ends At:</strong> <?php echo $end_time; ?></p>
+            <p><strong>Starting Bid:</strong> ksh <?php echo number_format($starting_bid, 2); ?></p>
+            <p><strong> <span id="c_change">Current</span> Highest Bid:</strong> ksh
+                <?php echo number_format($current_highest_bid, 2); ?></p>
+            <p><strong>Auction <span id="end_change">Ends </span> At:</strong> <?php echo $end_time; ?></p>
 
             <!-- Bid Submission Modal Trigger Button and Exit Bid Button -->
-            <div>
+            <div id="auctionDetails">
                 <button id="bidButton">Place Your Bid</button>
                 <button id="exitBidButton">Exit Bid</button>
             </div>
@@ -207,12 +320,15 @@ include __DIR__ . '/../config.php'; ?>
         <div class="modal-content">
             <span class="close">&times;</span>
             <h2>Place Your Bid</h2>
-            <form action="" method="post">
 
-                <label for="bid_amount">Bid Amount (Minimum: $<?php echo number_format($minimum_bid, 2); ?>):</label>
-                <input type="number" id="bid_amount" name="bid_amount" step="0.01" min="<?php echo $minimum_bid; ?>"
-                    required>
-                <button type="submit">Submit Bid</button>
+            <!--Form bid submission-->
+            <form id="bidForm" action="" method="post">
+                <!-- Minimum bid amount is dynamically set based on current highest bid or starting bid -->
+                <label for="bid_amount">Bid Amount (Minimum: ksh <?php echo number_format($minimum_bid, 2); ?>):</label>
+                <input type="text" id="bid_amount" name="bid_amount" placeholder="Enter your bid amount" required onmouseout="validateBid()">
+                <!-- Error message display for bid validation -->
+                <div id="errorMsg" class="error"></div>
+                <button type="submit" name="submit">Submit Bid</button>
             </form>
         </div>
     </div>
@@ -227,6 +343,21 @@ include __DIR__ . '/../config.php'; ?>
         var closeBtn = document.getElementsByClassName("close")[0];
         // Get exit bid button
         var exitBidBtn = document.getElementById("exitBidButton");
+        // Get form 
+        var form = document.getElementById("bidForm");
+        // Get bid amount input
+        var bidInput = document.getElementById("bid_amount");
+        // Get error message element
+        var errorMsg = document.getElementById("errorMsg");
+        //Full Countdown text element
+        var countDown = document.getElementById("countDown");
+        // Countdown timer
+        var countdownTimer = document.getElementById("countdownTimer");
+        // Auction container
+        var auctionDetails = document.getElementById("auctionDetails");
+        // Change text elements for better UX
+        var cChange = document.getElementById("c_change");
+        var endChange = document.getElementById("end_change");
 
         // Listen for open click
         bidBtn.onclick = function () {
@@ -249,16 +380,136 @@ include __DIR__ . '/../config.php'; ?>
                 modal.style.display = "none";
             }
         }
+        // Minimum bid from PHP
+        var minimumBid = <?php echo $minimum_bid; ?>;
+        // Listen for form submission
+        function validateBid() {
+            var bidValue = parseFloat(bidInput.value);
+
+            // Clear previous error
+            //errorMsg.textContent = "";
+
+            // Validation checks
+            if (isNaN(bidValue)) {
+               //alert("Please enter a valid number.");
+                event.preventDefault();
+                <?php $_SESSION['error'] = "Please enter a valid number."; ?>
+                return;
+            }
+
+            if (bidValue < minimumBid) {
+                //alert("Bid must be at least Ksh" + minimumBid.toFixed(2));
+                event.preventDefault();
+                <?php $_SESSION['error'] = "Bid must be at least Ksh" . number_format($minimum_bid, 2) . "."; ?>
+                return;
+            }
+
+            if (bidValue <= 0) {
+               //alert("Bid must be greater than 0.");
+                event.preventDefault();
+                <?php $_SESSION['error'] = "Bid must be greater than 0."; ?>
+                return;
+            }
+
+        });
+
+        //Disable auctiondetails for admin and staff
+        var userRole = "<?php echo $_SESSION['login_type']; ?>";
+        if (userRole === 'staff' || userRole === 'admin') {
+            auctionDetails.style.display = "none";
+            auctionDetails.style.pointerEvents = "none";
+        }
+        //Disable bid button and form for staff and admin
+        if (userRole === 'staff' || userRole === 'admin') {
+            bidBtn.style.display = "none";
+            bidBtn.style.pointerEvents = "none";
+            form.style.display = "none";
+            form.style.pointerEvents = "none";
+            <?php $_SESSION['error'] = "Staff and admin users cannot place bids."; ?>
+        }
+
+        // Countdown timer logic
+        document.addEventListener("DOMContentLoaded", function () {
+            var auctionEndTime = new Date("<?php echo $auction['end_time']; ?>").getTime();
+            var countdownInterval = setInterval(function () {
+
+                var now = new Date().getTime();
+                var distance = auctionEndTime - now;
+
+                // If time is up
+                if (distance <= 0) {
+                    clearInterval(countdownInterval);
+                    countDown.style.display = "none";
+                    auctionDetails.textContent = "Auction Ended";
+                    auctionDetails.style.color = "red";
+                    auctionDetails.style.textAlign = "center";
+                    auctionDetails.style.fontSize = "24px";
+                    cChange.style.display = "none";
+                    endChange.textContent = "Ended";
+
+                    // Disable bidding
+                    bidInput.disabled = true;
+                    document.querySelector("#bidForm button").disabled = true;
+                    <?php $_SESSION['error'] = "Auction has ended."; ?>
+                    return;
+                }
+                if (distance < 60000) { // less than 1 minute
+                    timerElement.style.color = "red";
+                    <?php $_SESSION['error'] = "Hurry! Auction is about to end."; ?>
+                }
+                else if (distance < 300000) { // less than 5 minutes
+                    timerElement.style.color = "orange";
+                    <?php $_SESSION['error'] = "Auction ending soon! Place your bid now."; ?>
+                }
+
+                // Time calculations
+                var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+                var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+                // Display
+                timerElement.textContent =
+                    hours + "h " + minutes + "m " + seconds + "s";
+
+            }, 1000);
+        });
     </script>
     <?php
     // Handle bid submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $bid_amount = $_POST['bid_amount'];
-        $user_id = $_SESSION['user_id']; // Assuming user ID is stored in session   
-        // Insert bid into database
-        $stmt = $conn->prepare("INSERT INTO auction_bids (auction_id, bidder_id, amount_bidded) VALUES (:auction_id, :user_id, :amount_bidded)");
-        $stmt->execute(['auction_id' => $auction_id, 'user_id' => $user_id, 'amount_bidded' => $bid_amount]);
-        // Redirect back to the auction page to see updated bid
-        header("Location: live_auction.php?auction_id=" . $auction_id);
-        exit();
-    }
+        $user_id = $_SESSION['user_id']; // Assuming user ID is stored in session 
+        if ($bid_amount < $minimum_bid) {
+            $_SESSION['error'] = "Bid must be at least $minimum_bid";
+            header("Location: live_auction.php?auction_id=" . $auction_id);
+            exit();
+        }
+        // Insert bid into database with transaction to ensure data integrity
+        $conn->beginTransaction();
+
+        try {
+            // 1. Mark exisying winning bid as outbid
+            $stmt = $conn->prepare("UPDATE auction_bids SET bid_status = 'outbid' WHERE auction_id = :auction_id AND bid_status = 'winning'");
+            $stmt->execute(['auction_id' => $auction_id]);
+
+            // 2. Insert new bid as winning
+            $stmt = $conn->prepare("INSERT INTO auction_bids (auction_id, bidder_id, amount_bidded, bid_status) VALUES (:auction_id, :user_id, :amount_bidded, 'winning')");
+            $stmt->execute([
+                'auction_id' => $auction_id,
+                'user_id' => $user_id,
+                'amount_bidded' => $bid_amount
+            ]);
+
+            $conn->commit();
+
+            // Redirect
+            header("Location: live_auction.php?auction_id=" . $auction_id);
+            exit();
+
+        } catch (Exception $e) {
+            $conn->rollBack();
+            $_SESSION['error'] = "Error placing bid.";
+        }
+
+
+    } ?>
