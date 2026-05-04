@@ -182,7 +182,7 @@
                     <option value="10">November</option>
                     <option value="11">December</option>
                 </select>
-                <input type="number" class="year_input" value="2024" min="1900" max="2100">
+                <input type="text" class="year_input" value="2024" maxlength="4">
             </div>
             <button class="next">Next</button>
         </div>
@@ -254,9 +254,9 @@
 */
 document.querySelectorAll('.datepicker_container').forEach(datepicker => {
 
-    // ==============================
+  
     // GET ELEMENTS INSIDE THIS PICKER
-    // ==============================
+    
 
     // Visible input (what the user clicks)
     const dateInput = datepicker.querySelector('.date_input');
@@ -287,27 +287,27 @@ document.querySelectorAll('.datepicker_container').forEach(datepicker => {
     let year = selectedDate.getFullYear();   // e.g. 2026
     let month = selectedDate.getMonth();     // 0–11 (Jan–Dec)
 
-    // ==============================
+   
     // SHOW DATEPICKER
-    // ==============================
+  
 
     // When user clicks the visible input, show popup
     dateInput.addEventListener('click', () => {
         datepickerPopup.style.display = 'block';
     });
 
-    // ==============================
+
     // CLOSE DATEPICKER
-    // ==============================
+    
 
     // Close button hides the popup
     closeBtn.addEventListener('click', () => {
         datepickerPopup.style.display = 'none';
     });
 
-    // ==============================
+   
     // APPLY SELECTED DATE
-    // ==============================
+   
 
     applyBtn.addEventListener('click', () => {
 
@@ -353,7 +353,13 @@ document.querySelectorAll('.datepicker_container').forEach(datepicker => {
             datesContainer.appendChild(btn);
         }
 
-        // --------------------------------
+        // --------------------------------const firstDay = new Date(year, month, 1).getDay();
+
+        // Get number of days in the month
+        const lastDate = new Date(year, month + 1, 0).getDate();
+
+        // Today's date (used for highlighting)
+        const today = new Date();
         // Create date buttons
         // --------------------------------
         for (let day = 1; day <= lastDate; day++) {

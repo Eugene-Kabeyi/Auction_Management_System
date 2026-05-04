@@ -1,27 +1,34 @@
 <?php
+// This file is the user dashboard page, showing stats and quick links to user actions and records.
 include __DIR__ . '/../header.php';
+// Check if user is logged in and is of type 'user'
 if ($_SESSION['login_type'] !== 'user' || !isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
+    // Not logged in or not a user, redirect to login page
     header("Location: login.php");
     session_destroy();
+    // Set an error message to show on the login page
     $_SESSION['error'] = "Please log in as a user to access this page.";
     exit();
 }
 
 
 include __DIR__. '/../config.php';
-
+// Fetch stats for the dashboard
 $stmt = $conn->prepare("SELECT COUNT(*) FROM consigner_items WHERE consigner_id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $items_consigned = $stmt->fetchColumn();
 
+// Count distinct auctions participated in
 $stmt = $conn->prepare("SELECT COUNT(DISTINCT auction_id) FROM auction_bids WHERE bidder_id = ?");
 $stmt->execute([$_SESSION['user_id']]);
 $auctions_participated = $stmt->fetchColumn();
 
+// Count bids won
 $stmt = $conn->prepare("SELECT COUNT(*) FROM auction_bids WHERE bidder_id = ? AND result = 'won'");
 $stmt->execute([$_SESSION['user_id']]);
 $bids_won = $stmt->fetchColumn();
 
+// Calculate total payments made by the user
 $stmt = $conn->prepare("SELECT IFNULL(SUM(amount),0) FROM payment WHERE bidder_id = ? AND payment_status='completed'");
 $stmt->execute([$_SESSION['user_id']]);
 $total_payments = $stmt->fetchColumn();

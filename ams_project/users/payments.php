@@ -180,7 +180,7 @@ $winning_bids = $stmt->fetchAll();
                 <!-- Amount to pay (auto-filled, cannot change) -->
                 <div class="form-group">
                     <label>Amount to Pay ($):</label>
-                    <input type="number" step="0.01" name="amount" id="amount" readonly required>
+                    <input type="text" id="amount" readonly required>
                     <small style="color: #666;">Amount is fixed based on your winning bid</small>
                 </div>
 
@@ -248,6 +248,10 @@ $winning_bids = $stmt->fetchAll();
 
             if (amount <= 0) {
                 alert('Invalid amount');
+                return false;
+            }
+            if (isNaN(amount)) {
+                alert('Amount must be a number');
                 return false;
             }
 

@@ -204,7 +204,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
         <span class="logo">AMS</span>
         <h3>Staff Log In</h3>
         <!-- Login Form -->
-        <form action="../handle_login.php" method="post" class="login_form">
+        <form action="../handle_login.php" method="post" class="login_form" onsubmit="return ValidateForm()">
 
             <label for="username">Username:</label>
             <input type="text" id="username" name="username" required>
@@ -239,6 +239,38 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
             });
         }
         togglePasswordVisibility();
+        function ValidateForm() {
+            if (!validateUsername()) return false;
+            if (!validatePassword()) return false;
+
+            return true;
+        }
+        function validateUsername() {
+            var username = document.getElementById("username").value;
+
+            // Trim spaces
+            username = username.trim();
+
+            if (username.length == 0) {
+                alert("Username cannot be empty");
+                document.getElementById("username").focus();
+                return false;
+            }
+            return true;
+        }
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+
+            // Trim spaces
+            password = password.trim();
+
+            if (password.length == 0) {
+                alert("Password cannot be empty");
+                document.getElementById("password").focus();
+                return false;
+            }
+            return true;
+        }
 
     </script>
 

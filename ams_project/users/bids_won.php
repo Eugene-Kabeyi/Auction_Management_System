@@ -3,7 +3,7 @@ include __DIR__ . ('/../header.php');
 
 if (empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user') {
 
-    
+
     $_SESSION['error'] = "Please Login to access the page";
     header("Location:login.php");
 }
@@ -34,13 +34,27 @@ $results = $stmt->fetchAll();
 
 <head>
     <style>
+        html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #ebe9e9;
+        }
+
         .outer_container {
+            width: 80%;
             display: flex;
             flex-direction: column;
             gap: 20px;
-            max-width: 80%;
-            margin: 0 auto;
             justify-content: center;
+            margin: 20px auto;
+
         }
 
         h2 {
@@ -84,29 +98,32 @@ $results = $stmt->fetchAll();
 <body>
     <h2>Auctions Participated</h2>
     <div class="outer_container">
-    <table>
-        <tr>
-            <th>Auction ID</th>
-            <th>Auction Name</th>
-            <th>Auction Code</th>
-            
-        </tr>
-        <?php 
-        if(empty($results)){
-            echo htmlspecialchars("No Bids Won yet");
-        }
-        
-        foreach ($results as $result): ?>
-            <td><?= htmlspecialchars($result['auction_id']) ?></td>
-            <td><?= htmlspecialchars($result['auction_name']) ?></td>
-            <td><?= htmlspecialchars($result['auction_code']) ?></td>
-          
-        
-        <?php endforeach ?>
-    </table>
+        <table>
+            <tr>
+                <th>Auction ID</th>
+                <th>Auction Name</th>
+                <th>Auction Code</th>
+
+            </tr>
+            <?php if (empty($results)): ?>
+                <tr>
+                    <td colspan="3">No Bids Won yet</td>
+                </tr>
+            <?php endif ?>
+
+            <?php foreach ($results as $result): ?>
+                <tr>
+
+                    <td><?= htmlspecialchars($result['auction_id']) ?></td>
+                    <td><?= htmlspecialchars($result['auction_name']) ?></td>
+                    <td><?= htmlspecialchars($result['auction_code']) ?></td>
+
+                </tr>
+            <?php endforeach ?>
+        </table>
     </div>
 
 </body>
 <?php
-include __DIR__.("/../footer.php");
+include __DIR__ . ("/../footer.php");
 ?>

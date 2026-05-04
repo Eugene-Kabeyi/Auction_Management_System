@@ -38,13 +38,27 @@ $payments = $stmt->fetchAll();
 
 <head>
     <style>
+                       html,
+        body {
+            height: 100%;
+            margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #ebe9e9;
+        }
+
         .outer_container {
+            width: 80%;
             display: flex;
             flex-direction: column;
             gap: 20px;
-            max-width: 90%;
-            margin: 0 auto;
             justify-content: center;
+            margin: 20px auto;
+
         }
 
         h2 {
@@ -55,6 +69,7 @@ $payments = $stmt->fetchAll();
         table {
             width: 100%;
             border-collapse: collapse;
+            background-color: #ffffff;
         }
 
         th, td {

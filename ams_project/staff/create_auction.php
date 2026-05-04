@@ -122,18 +122,16 @@ include __DIR__ . '/../config.php';
                 </select>
 
                 <label>Start Date</label>
-                <?php $input_name = 'start_date';
-                include __DIR__ . '/../datepicker.php'; ?>
+                <input type="text" id="start_date" name="start_date" placeholder="dd/mm/yyyy">
 
-                <label for="start_time">Start Time</label>
-                <input type="time" name="start_time" id="start_time" required>
+                <label>Start Time</label>
+                <input type="text" id="start_time" name="start_time" placeholder="hh:mm">
 
                 <label>End Date</label>
-                <?php $input_name = 'end_date';
-                include __DIR__ . '/../datepicker.php'; ?>
+                <input type="text" id="end_date" name="end_date" placeholder="dd/mm/yyyy">
 
-                <label for="end_time">End Time</label>
-                <input type="time" name="end_time" id="end_time" required>
+                <label>End Time</label>
+                <input type="text" id="end_time" name="end_time" placeholder="hh:mm">
 
                 <label>Status</label>
                 <select name="status">
@@ -150,6 +148,151 @@ include __DIR__ . '/../config.php';
     </div>
 
     <script>
+
+      
+        // MAIN CONTROLLER
+      
+        function validateAuction() {
+
+            if (!validateAuctionName()) return false;
+            if (!validateAuctionCode()) return false;
+            if (!validateDates()) return false;
+            if (!validateTimes()) return false;
+
+            return true;
+        }
+
+        //AUCTION NAME
+        function validateAuctionName() {
+
+            var name = document.getElementById("auction_name").value.trim();
+
+            if (name.length == 0) {
+                alert("Auction name is required");
+                document.getElementById("auction_name").focus();
+                return false;
+            }
+
+            if (name.length < 3) {
+                alert("Auction name must be at least 3 characters");
+                document.getElementById("auction_name").focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // AUCTION CODE
+        function validateAuctionCode() {
+
+            var code = document.getElementById("auction_code").value.trim();
+
+            if (code.length == 0) {
+                alert("Auction code is required");
+                document.getElementById("auction_code").focus();
+                return false;
+            }
+
+            if (code.length < 4) {
+                alert("Auction code must be at least 4 characters");
+                document.getElementById("auction_code").focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        //DATE VALIDATION (dd/mm/yyyy)
+        function validateDates() {
+
+            var start = document.getElementById("start_date").value;
+            var end = document.getElementById("end_date").value;
+
+            if (start.length == 0 || end.length == 0) {
+                alert("Start and End dates are required");
+                return false;
+            }
+
+            if (start.indexOf("/") == -1 || end.indexOf("/") == -1) {
+                alert("Date format must be dd/mm/yyyy");
+                return false;
+            }
+
+            var s = start.split("/");
+            var e = end.split("/");
+
+            if (s.length != 3 || e.length != 3) {
+                alert("Invalid date format");
+                return false;
+            }
+
+            if (isNaN(s[0]) || isNaN(s[1]) || isNaN(s[2])) {
+                alert("Start date must contain only numbers");
+                return false;
+            }
+
+            if (isNaN(e[0]) || isNaN(e[1]) || isNaN(e[2])) {
+                alert("End date must contain only numbers");
+                return false;
+            }
+
+            var startDate = new Date(s[2], s[1] - 1, s[0]);
+            var endDate = new Date(e[2], e[1] - 1, e[0]);
+
+            if (endDate < startDate) {
+                alert("End date cannot be earlier than start date");
+                return false;
+            }
+
+            return true;
+        }
+
+        // TIME VALIDATION (hh:mm)
+        function validateTimes() {
+
+            var startTime = document.getElementById("start_time").value;
+            var endTime = document.getElementById("end_time").value;
+
+            if (startTime.length == 0 || endTime.length == 0) {
+                alert("Start and End times are required");
+                return false;
+            }
+
+            if (startTime.indexOf(":") == -1 || endTime.indexOf(":") == -1) {
+                alert("Time must be in hh:mm format");
+                return false;
+            }
+
+            var s = startTime.split(":");
+            var e = endTime.split(":");
+
+            if (s.length != 2 || e.length != 2) {
+                alert("Invalid time format");
+                return false;
+            }
+
+            var sh = parseInt(s[0]);
+            var sm = parseInt(s[1]);
+            var eh = parseInt(e[0]);
+            var em = parseInt(e[1]);
+
+            if (sh < 0 || sh > 23 || eh < 0 || eh > 23) {
+                alert("Hour must be between 0 and 23");
+                return false;
+            }
+
+            if (sm < 0 || sm > 59 || em < 0 || em > 59) {
+                alert("Minutes must be between 0 and 59");
+                return false;
+            }
+
+            if (sh > eh || (sh == eh && sm >= em)) {
+                alert("End time must be after start time");
+                return false;
+            }
+
+            return true;
+        }
 
     </script>
 </body>
@@ -171,6 +314,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $status = $_POST['status'];
     $start_datetime = date('Y-m-d H:i:s', strtotime("$start_date $start_time"));
     $end_datetime = date('Y-m-d H:i:s', strtotime("$end_date $end_time"));
+
+    if (strtotime($end_datetime) <= strtotime($start_datetime)) {
+        $_SESSION['error'] = "Invalid auction schedule";
+        exit();
+    }
 
     // Here you would typically insert the data into a database
     $tmt = $conn->prepare("INSERT INTO auctions (auction_name, auction_code, auction_type, item_id, created_by_staff, start_time, end_time, status) VALUES (:auction_name, :auction_code, :auction_type, :item_id, :created_by_staff, :start_time, :end_time, :status)");

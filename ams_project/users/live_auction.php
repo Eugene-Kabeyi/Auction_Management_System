@@ -70,10 +70,26 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
 
 <head>
     <style>
+        html,
         body {
-            font-family: Arial, sans-serif;
-            background-color: #f4f4f4;
+            height: 100%;
             margin: 0;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #ebe9e9;
+        }
+
+        .outer_container {
+            width: 80%;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            justify-content: center;
+            margin: 20px auto;
 
         }
 
@@ -96,6 +112,10 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
             border: 1px solid #ccc;
             padding: 20px;
             border-radius: 5px;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            background-color: #ffffff;
         }
 
         .details_inner_container {
@@ -103,6 +123,7 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
             border: 1px solid #ccc;
             padding: 20px;
             border-radius: 5px;
+            background-color: #ffffff;
         }
 
         .details_inner_container h3 {
@@ -285,6 +306,10 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
         </div>
         <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
+    <?php if (strtotime($auction['end_time']) <= time()) {
+        $_SESSION['error'] = "Auction has ended.";
+    } ?>
+
 
     <div class="header_container">
         <h2>Welcome to <?php echo $auction_name; ?></h2>
@@ -304,7 +329,8 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
             <p><strong>Description:</strong> <?php echo $item_description; ?></p>
             <p><strong>Starting Bid:</strong> ksh <?php echo number_format($starting_bid, 2); ?></p>
             <p><strong> <span id="c_change">Current</span> Highest Bid:</strong> ksh
-                <?php echo number_format($current_highest_bid, 2); ?></p>
+                <?php echo number_format($current_highest_bid, 2); ?>
+            </p>
             <p><strong>Auction <span id="end_change">Ends </span> At:</strong> <?php echo $end_time; ?></p>
 
             <!-- Bid Submission Modal Trigger Button and Exit Bid Button -->
@@ -325,7 +351,8 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
             <form id="bidForm" action="" method="post">
                 <!-- Minimum bid amount is dynamically set based on current highest bid or starting bid -->
                 <label for="bid_amount">Bid Amount (Minimum: ksh <?php echo number_format($minimum_bid, 2); ?>):</label>
-                <input type="text" id="bid_amount" name="bid_amount" placeholder="Enter your bid amount" required onmouseout="validateBid()">
+                <input type="text" id="bid_amount" name="bid_amount" placeholder="Enter your bid amount" required
+                    onmouseout="validateBid()">
                 <!-- Error message display for bid validation -->
                 <div id="errorMsg" class="error"></div>
                 <button type="submit" name="submit">Submit Bid</button>
@@ -391,27 +418,27 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
 
             // Validation checks
             if (isNaN(bidValue)) {
-               //alert("Please enter a valid number.");
+                //alert("Please enter a valid number.");
                 event.preventDefault();
-                <?php $_SESSION['error'] = "Please enter a valid number."; ?>
+                alert("Please enter a valid number.");
                 return;
             }
 
             if (bidValue < minimumBid) {
                 //alert("Bid must be at least Ksh" + minimumBid.toFixed(2));
                 event.preventDefault();
-                <?php $_SESSION['error'] = "Bid must be at least Ksh" . number_format($minimum_bid, 2) . "."; ?>
+                alert("Bid must be at least Ksh " + minimumBid.toFixed(2));
                 return;
             }
 
             if (bidValue <= 0) {
-               //alert("Bid must be greater than 0.");
+                //alert("Bid must be greater than 0.");
                 event.preventDefault();
-                <?php $_SESSION['error'] = "Bid must be greater than 0."; ?>
+                alert("Bid must be greater than 0.");
                 return;
             }
 
-        });
+        };
 
         //Disable auctiondetails for admin and staff
         var userRole = "<?php echo $_SESSION['login_type']; ?>";
@@ -425,7 +452,7 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
             bidBtn.style.pointerEvents = "none";
             form.style.display = "none";
             form.style.pointerEvents = "none";
-            <?php $_SESSION['error'] = "Staff and admin users cannot place bids."; ?>
+            alert("Staff and admin users cannot place bids.");
         }
 
         // Countdown timer logic
@@ -436,7 +463,7 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
                 var now = new Date().getTime();
                 var distance = auctionEndTime - now;
 
-                // If time is up
+                //If time is up
                 if (distance <= 0) {
                     clearInterval(countdownInterval);
                     countDown.style.display = "none";
@@ -450,16 +477,17 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
                     // Disable bidding
                     bidInput.disabled = true;
                     document.querySelector("#bidForm button").disabled = true;
-                    <?php $_SESSION['error'] = "Auction has ended."; ?>
+
                     return;
+
                 }
-                if (distance < 60000) { // less than 1 minute
-                    timerElement.style.color = "red";
-                    <?php $_SESSION['error'] = "Hurry! Auction is about to end."; ?>
+                if (distance < 60000 && distance > 0) { // less than 1 minute
+                    countdownTimer.style.color = "red";
+                    alert("Auction ending in less than 1 minute! Place your bid now.");
                 }
-                else if (distance < 300000) { // less than 5 minutes
-                    timerElement.style.color = "orange";
-                    <?php $_SESSION['error'] = "Auction ending soon! Place your bid now."; ?>
+                else if (distance < 300000 && distance > 0) { // less than 5 minutes
+                    countdownTimer.style.color = "orange";
+                    alert("Auction ending in less than 5 minutes! Place your bid soon.");
                 }
 
                 // Time calculations
@@ -468,11 +496,11 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
                 var seconds = Math.floor((distance % (1000 * 60)) / 1000);
 
                 // Display
-                timerElement.textContent =
+                countdownTimer.textContent =
                     hours + "h " + minutes + "m " + seconds + "s";
 
             }, 1000);
-        });
+       });
     </script>
     <?php
     // Handle bid submission

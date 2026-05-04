@@ -68,7 +68,7 @@ include __DIR__ . '/../header.php';
             border-radius: 4px;
         }
 
-        
+
 
         .f_inner_container h3 {
             margin: 0;
@@ -144,8 +144,9 @@ include __DIR__ . '/../header.php';
             ?>
         </div>
         <div class="new_form_container">
-            <p style="text-align: center; font-weight: 200;"><i>Please review the item details below and approve or reject the item.</i></p>
-            <form action="" method="post" class="form_data">
+            <p style="text-align: center; font-weight: 200;"><i>Please review the item details below and approve or
+                    reject the item.</i></p>
+            <form action="" method="post" class="form_data" onsubmit="return validateEvaluation()">
                 <label for="item_id">Item ID:</label>
                 <!--display fetched item_id and make it read-only-->
                 <input type="text" id="item_id" name="item_id"
@@ -164,7 +165,7 @@ include __DIR__ . '/../header.php';
                 <input type="number" id="reserved_price" name="reserved_price" required>
 
                 <label for="evaluation_date">Evaluation Date:</label>
-                <?php $input_name = "evaluation_date"; include __DIR__ . '/../datepicker.php'; ?>
+                <input type="text" id="evaluation_date" name="evaluation_date" placeholder="dd/mm/yyyy">
 
                 <label for="rating">Rating:</label>
                 <select name="rating" id="rating" required>
@@ -195,6 +196,133 @@ include __DIR__ . '/../header.php';
         // Make the form read-only for review purposes - later will apply DRY principle
         document.getElementById('item_id').readOnly = true;
         document.getElementById('item_name').readOnly = true;
+
+
+
+        // MAIN CONTROLLER
+
+        function validateEvaluation() {
+
+            if (!validateNotes()) return false;
+            if (!validatePrice()) return false;
+            if (!validateDate()) return false;
+            if (!validateRating()) return false;
+            if (!validateAuthenticity()) return false;
+
+            return true;
+        }
+
+        // Evaluation Notes
+        function validateNotes() {
+
+            var notes = document.getElementById("eval_notes").value.trim();
+
+            if (notes.length == 0) {
+                alert("Evaluation notes are required");
+                document.getElementById("eval_notes").focus();
+                return false;
+            }
+
+            if (notes.length < 10) {
+                alert("Evaluation notes must be at least 10 characters");
+                document.getElementById("eval_notes").focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // Reserved Price
+        function validatePrice() {
+
+            var price = document.getElementById("reserved_price").value;
+
+            if (price.length == 0 || isNaN(price)) {
+                alert("Reserved price must be a valid number");
+                document.getElementById("reserved_price").focus();
+                return false;
+            }
+
+            if (parseFloat(price) <= 0) {
+                alert("Reserved price must be greater than 0");
+                document.getElementById("reserved_price").focus();
+                return false;
+            }
+
+            return true;
+        }
+
+        // Date Validation (dd/mm/yyyy)
+        function validateDate() {
+
+            var date = document.getElementById("evaluation_date").value;
+
+            if (date.length == 0) {
+                alert("Evaluation date is required");
+                document.getElementById("evaluation_date").focus();
+                return false;
+            }
+
+            if (date.indexOf("/") == -1) {
+                alert("Date must be in format dd/mm/yyyy");
+                return false;
+            }
+
+            var parts = date.split("/");
+
+            if (parts.length != 3) {
+                alert("Invalid date format");
+                return false;
+            }
+
+            if (isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) {
+                alert("Date must contain only numbers");
+                return false;
+            }
+
+            var day = parseInt(parts[0]);
+            var month = parseInt(parts[1]);
+            var year = parseInt(parts[2]);
+
+            if (day < 1 || day > 31) {
+                alert("Invalid day");
+                return false;
+            }
+
+            if (month < 1 || month > 12) {
+                alert("Invalid month");
+                return false;
+            }
+
+            return true;
+        }
+
+        //Rating
+        function validateRating() {
+
+            var index = document.getElementById("rating").selectedIndex;
+
+            if (index == 0) {
+                alert("Please select a rating");
+                return false;
+            }
+
+            return true;
+        }
+
+        //Authenticity
+        function validateAuthenticity() {
+
+            var index = document.getElementById("authenticity").selectedIndex;
+
+            if (index == 0) {
+                alert("Please select authenticity status");
+                return false;
+            }
+
+            return true;
+        }
+
     </script>
 </body>
 <?php include __DIR__ . '/../footer.php';
@@ -205,6 +333,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $item_id = $_POST['item_id'];
     $action = $_POST['action'];
     $date = $_POST['evaluation_date'];
+
+    if (empty($_POST['eval_notes']) || $_POST['reserved_price'] <= 0) {
+        $_SESSION['error'] = "Invalid evaluation data";
+        exit();
+    }
 
     if ($action === 'approved') {
         // Insert evaluation data into evaluated_items table

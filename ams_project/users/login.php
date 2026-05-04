@@ -241,6 +241,39 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
             });
         }
         togglePasswordVisibility();
+        function validateLogin() {
+
+            if (!validateUsername()) return false;
+            if (!validatePassword()) return false;
+
+            return true;
+        }
+        function validateUsername() {
+            var username = document.getElementById("username").value;
+
+            // Trim spaces
+            username = username.trim();
+
+            if (username.length == 0) {
+                alert("Username cannot be empty");
+                document.getElementById("username").focus();
+                return false;
+            }
+            return true;
+        }
+        function validatePassword() {
+            var password = document.getElementById("password").value;
+
+            // Trim spaces
+            password = password.trim();
+
+            if (password.length == 0) {
+                alert("Password cannot be empty");
+                document.getElementById("password").focus();
+                return false;
+            }
+            return true;
+        }
 
     </script>
 
