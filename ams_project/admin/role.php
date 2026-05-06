@@ -13,64 +13,9 @@ include __DIR__ . '/../config.php';
 ?>
 
 <head>
-    <style>
-        .outer_container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 80%;
-            margin: 0 auto;
-            justify-content: center;
-        }
-        h2 {
-            text-align: center;
-            margin: 20px 0;
-        }
+    <title>Roles Management</title>
+    <link rel="stylesheet" href="admin_style.css">
 
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f4f4f4;
-        }
-
-        td a {
-            border-radius: 5px;
-            color: #ffffff;
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 12px;
-        }
-
-        td a:hover {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #1f2933;
-        }
-        .back{
-            color: #ffffff;
-            background-color: #000000;
-            padding: 5px 5px 5px 100px;
-            border-radius: 5px;
-            width: 20%;
-            text-decoration: none;
-            font-weight: 500;
-        }
-        .back:hover{
-              background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #1f2933;
-        }
-    </style>
 </head>
 
 <body>
@@ -109,10 +54,10 @@ include __DIR__ . '/../config.php';
                     <td><?php echo htmlspecialchars($role['role_id']); ?></td>
                     <td><?php echo htmlspecialchars($role['role_name'])?></td>
                     <td><?php echo htmlspecialchars($role['role_description']); ?></td>
-                    <!-- <td>
+                    <td>
                        
                         <a href="edit_role.php?role_id=<?php echo $role['role_id']; ?>">Edit</a ></td>
-                </tr> -->
+                </tr> 
             <?php endforeach; ?>
         </table>
     </div>

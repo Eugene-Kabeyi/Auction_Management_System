@@ -9,6 +9,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin' && $_SES
 include __DIR__ . '/../config.php';
 ?>
 <head>
+    <title>Admin List</title>
+    <link rel="stylesheet" href="admin_style.css">
     <style>
         .outer_container {
             display: flex;
@@ -18,35 +20,7 @@ include __DIR__ . '/../config.php';
             margin: 0 auto;
             justify-content: center;
         }
-        h2 {
-            text-align: center;
-            margin: 20px 0;
-        }
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-        th,
-        td {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-        th {
-            background-color: #f4f4f4;
-        }
-        td a {
-            border-radius: 5px;
-            color: #ffffff;
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 12px;  
-        }
-        td a:hover {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #1f2933;
-        }
+        
         .outer_container .back {
             border-radius: 5px;
             color: #ffffff;
@@ -58,7 +32,8 @@ include __DIR__ . '/../config.php';
         }
     </style>
 </head>
-<div class="outer_container">
+<body>
+   <div class="outer_container">
     <h2>Admin List</h2>
     <a href="add_admin.php" class="back">Add New Admin </a>
     <!--| role_id       | int(11)                                 | NO   | MUL | NULL                |                |
@@ -80,7 +55,7 @@ include __DIR__ . '/../config.php';
             <th>Email</th>
             <th>Username</th>
             <th>Admin Level</th>
-            <!-- <th>Actions</th> -->
+            <th>Actions</th> 
         </tr>
 
         <?php
@@ -99,11 +74,22 @@ include __DIR__ . '/../config.php';
             echo "<td>" . htmlspecialchars($admin['email']) . "</td>";
             echo "<td>" . htmlspecialchars($admin['username']) . "</td>";
             echo "<td>" . htmlspecialchars($admin['admin_level']) . "</td>";
-            // echo "<td>
-            //         <a href='admin_edit.php?id=" . htmlspecialchars($admin['admin_id']) . "'>Edit</a>
-            //       </td>";
+             echo "<td>
+                  <a href='admin_edit.php?id=" . htmlspecialchars($admin['admin_id']) . "'>Edit</a>
+                   </td>";
             echo "</tr>";
         }
         ?>
     </table>
-</div>
+</div> 
+</body>
+<?php include __DIR__ . '/../footer.php'; ?>
+
+
+<script>
+    var adminlevel = <?php echo json_encode($_SESSION['admin_level']); ?>;
+    if (adminlevel !== 'super_admin') {
+        document.querySelectorAll('a href="admin_edit.php"]').forEach(function(link) {
+            link.style.display = 'none';
+        });
+</script>

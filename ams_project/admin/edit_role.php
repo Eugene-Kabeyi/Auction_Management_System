@@ -11,74 +11,22 @@ if(isset($_SESSION['user_id']) && $_SESSION['login_type'] === 'admin') {
     exit();
 }
 include __DIR__ . '/../config.php';
+$role_id = $_GET['role_id'] ?? null;
+
+$stmt = $conn->prepare("SELECT * FROM roles WHERE role_id = :role_id");
+$stmt->execute(['role_id' => $role_id]);
+$role = $stmt->fetch(PDO::FETCH_ASSOC);
+
+if (!$role) {
+    die("Role not found");
+}
+
 ?>
 
 <head>
-    <style>
-        .outer_container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 640px;
-            margin: 0 auto;
-            justify-content: center;
-        }
-
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        form label {
-            font-weight: bold;
-        }
-
-        form input,
-        form textarea,
-        form select {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        form .delete {
-            background-color: #ff4d4d;
-            color: #ffffff;
-        }
-
-        form .delete:hover {
-            background-color: #ffffff;
-            color: #ff4d4d;
-            border: 1px solid #ff4d4d;
-        }
-
-        form button {
-            padding: 10px;
-            background-color: #1f2933;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        form button:hover {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #1f2933;
-        }
-
-        .outer_container .back {
-            border-radius: 5px;
-            color: #ffffff;
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 0 6px 30px;
-            width: 28%;
-        }
-    </style>
-    </style>
+    <title>Edit Role Details</title>
+    <link rel="stylesheet" href="admin_style.css">
+   
 </head> 
 <body>
    <?php if (!empty($_SESSION['success'])): ?>
@@ -94,20 +42,47 @@ include __DIR__ . '/../config.php';
     <div class="outer_container">
         <div class="f_inner_container">
             <h2>Edit Role</h2>
-            <form action="" method="POST">
-                <input type="hidden" name="role_id" value="<?php echo $_GET['id']; ?>">
+            <form action="" method="POST" onsubmit="return validateRole();">
+                <input type="hidden" name="role_id" value="<?php echo htmlspecialchars($role['role_id']); ?>">
                 <label for="role_name">Role Name:</label>
-                <input type="text" id="role_name" name="role_name" required>
+                <input type="text" id="role_name" name="role_name" value="<?php echo htmlspecialchars($role['role_name']); ?>" >
+                <label for="role_description">Role Description:</label>
+                <textarea id="role_description" name="role_description"><?php echo htmlspecialchars($role['role_description']); ?></textarea>
                 <button type="submit" name="update_role">Update Role</button>
                 <button type ="submit" name="delete_role" value="delete" class="delete">Delete</button>
+
             </form>
         </div>
     </div>
 
+    <script>
+function validateRole(){
+
+    var role = document.getElementById("role_name").value.trim();
+
+    if(role.length == 0){
+        alert("Role name is required");
+        return false;
+    }
+
+    if(role.length < 3){
+        alert("Role name must be at least 3 characters");
+        return false;
+    }
+
+    return true;
+}
+</script>
+</body>
+<?php
+include __DIR__ . '/../footer.php';
+?>
+
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $role_id = $_POST['role_id'];
-    $role_name = $_POST['role_name'];   
+    $role_name = $_POST['role_name'];  
+    $role_description = $_POST['role_description']; 
     // Update the role in the database
 
     if (isset($_POST['delete_role'])) {
@@ -116,8 +91,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
          header("Location: role.php");
          exit();
     }elseif (isset($_POST['update_role'])) {
-    $stmt = $conn->prepare("UPDATE roles SET role_name = :role_name WHERE role_id = :role_id");
-    $stmt->execute(['role_name' => $role_name, 'role_id' => $role_id]);
+    $stmt = $conn->prepare("UPDATE roles SET role_name = :role_name, role_description = :role_description WHERE role_id = :role_id");
+    $stmt->execute(['role_name' => $role_name, 'role_description' => $role_description, 'role_id' => $role_id]);
     // Redirect back to the roles list page after updating
     header("Location: role.php");
     exit();

@@ -1,17 +1,18 @@
-<?php 
-    if (session_status() == PHP_SESSION_NONE) {
-        session_start();
-    }
-if (empty($_SESSION['user_id']) && $_SESSION['login_type']!== 'user'){
+<?php
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+if (empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user') {
     $_SESSION['error'] = "Please log in to access this page";
     header("Location: login.php");
     exit;
 }
 
 include __DIR__ . '/../header.php'; ?>
+
 <head>
     <style>
-                html,
+        html,
         body {
             height: 100%;
             margin: 0;
@@ -37,12 +38,12 @@ include __DIR__ . '/../header.php'; ?>
 </head>
 
 <body>
-<?php if (isset($_SESSION['error'])): ?>
-    <div class="flash error">
-        <?= $_SESSION['error']; ?>
-    </div>
-    <?php unset($_SESSION['error']); ?>
-<?php endif; ?>
+    <?php if (isset($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?= $_SESSION['error']; ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
 
     <h2 style="text-align: center">Consign an Item</h2>
 
@@ -53,10 +54,10 @@ include __DIR__ . '/../header.php'; ?>
         <form action="" method="POST" enctype="multipart/form-data" class="form_data" onsubmit="return validateForm()">
 
             <label>Item Name</label>
-            <input type="text" name="item_name" id="name"required>
+            <input type="text" name="item_name" id="name" required>
 
             <label>Item Quantity</label>
-            <input type="text" name="item_quantity" id="quantity"required>
+            <input type="text" name="item_quantity" id="quantity" required>
 
             <label>Item Description</label>
             <textarea name="item_description" id="description"></textarea>
@@ -83,72 +84,72 @@ include __DIR__ . '/../header.php'; ?>
 
 </body>
 <script>
-// Main function (like your template style)
-function validateForm(){
+    // Main function (like your template style)
+    function validateForm() {
 
-    // Call all validations
-    if(!validateName()) return false;
-    if(!validateQuantity()) return false;
-    if(!validateCondition()) return false;
-    if(!validateImage()) return false;
+        // Call all validations
+        if (!validateName()) return false;
+        if (!validateQuantity()) return false;
+        if (!validateCondition()) return false;
+        if (!validateImage()) return false;
 
-    return true; // allow submission if all pass
-}
-
-//  Validate Item Name
-function validateName(){
-    var name = document.getElementById("name").value;
-
-    if(name.length == 0){
-        alert("You must enter an Item Name");
-        document.getElementById("name").focus();
-        return false;
-    }
-    return true;
-}
-
-//  Validate Quantity
-function validateQuantity(){
-    var quantity = document.getElementById("quantity").value;
-
-    if(quantity.length == 0 || isNaN(quantity)){
-        alert("Quantity must be a valid number");
-        document.getElementById("quantity").focus();
-        return false;
+        return true; // allow submission if all pass
     }
 
-    if(quantity <= 0){
-        alert("Quantity must be greater than 0");
-        document.getElementById("quantity").focus();
-        return false;
+    //  Validate Item Name
+    function validateName() {
+        var name = document.getElementById("name").value;
+
+        if (name.length == 0) {
+            alert("You must enter an Item Name");
+            document.getElementById("name").focus();
+            return false;
+        }
+        return true;
     }
 
-    return true;
-}
+    //  Validate Quantity
+    function validateQuantity() {
+        var quantity = document.getElementById("quantity").value;
 
-// Validate Condition (select box like your gender function)
-function validateCondition(){
-    var index = document.getElementById("condition").selectedIndex;
+        if (quantity.length == 0 || isNaN(quantity)) {
+            alert("Quantity must be a valid number");
+            document.getElementById("quantity").focus();
+            return false;
+        }
 
-    if(index == 0){
-        alert("Please select item condition");
-        return false;
+        if (quantity <= 0) {
+            alert("Quantity must be greater than 0");
+            document.getElementById("quantity").focus();
+            return false;
+        }
+
+        return true;
     }
 
-    return true;
-}
+    // Validate Condition (select box like your gender function)
+    function validateCondition() {
+        var index = document.getElementById("condition").selectedIndex;
 
-//  Validate Image Upload
-function validateImage(){
-    var image = document.querySelector("input[name='item_image']").value;
+        if (index == 0) {
+            alert("Please select item condition");
+            return false;
+        }
 
-    if(image.length == 0){
-        alert("Please upload an item image");
-        return false;
+        return true;
     }
 
-    return true;
-}
+    //  Validate Image Upload
+    function validateImage() {
+        var image = document.querySelector("input[name='item_image']").value;
+
+        if (image.length == 0) {
+            alert("Please upload an item image");
+            return false;
+        }
+
+        return true;
+    }
 
 </script>
 <?php include __DIR__ . '/../footer.php'; ?>
@@ -204,13 +205,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     ]);
 
     if ($success) {
-    $_SESSION['success'] = "Item consigned successfully!";
-    header("Location: user_dashboard.php");
-    exit;
-} else {
-    $_SESSION['error'] = "Something went wrong. Please try again.";
-    header("Location: consign_item.php");
-}
+        $_SESSION['success'] = "Item consigned successfully!";
+        header("Location: user_dashboard.php");
+        exit;
+    } else {
+        $_SESSION['error'] = "Something went wrong. Please try again.";
+        header("Location: consign_item.php");
+    }
 
 }
 ?>

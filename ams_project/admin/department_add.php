@@ -91,7 +91,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
         <h2>Add New Department</h2>
         <a href="department_list.php" class="back">Back to Department List</a>
 
-        <form action="" method="POST">
+        <form action="" method="POST" onsubmit="return validateDepartment()">
            
 
             <label for="department_name">Department Name:</label>
@@ -106,6 +106,20 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
 
 
 </body>
+<script>
+    function validateDepartment() {
+        var deptName = document.getElementById("department_name").value.trim();
+        if (deptName.length == 0) {
+            alert("Department name is required");
+            return false;
+        }
+        if (deptName.length < 3) {
+            alert("Department name must be at least 3 characters");
+            return false;
+        }
+        return true;
+    }
+</script>
 
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST'){

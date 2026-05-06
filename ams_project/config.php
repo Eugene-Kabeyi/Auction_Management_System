@@ -36,6 +36,7 @@ class DatabaseConfig {
             } catch (PDOException $e) {
                 // Connection failed - throw error
                 echo"Connection failed: " . $e->getMessage();
+                $_SESSION['error'] = "Database connection failed. Please try again later.";
             }
         }
         

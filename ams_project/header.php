@@ -30,17 +30,21 @@ if (session_status() == PHP_SESSION_NONE) {
         <?php
         $link = '';
         $link2 = '../users/auction_list.php';
-        if ($_SESSION['login_type'] === 'staff') {
+        if ($_SESSION['login_type'] === 'staff' ) {
             $link = '../staff/staff_dashboard.php';
             $link2 = '../staff/list_items.php';
         } elseif ($_SESSION['login_type'] === 'user') {
             $link = '../users/user_dashboard.php'; 
-        } else {
-            $link = '../admin/admin_dashboard.php';
+        }else if ($_SESSION['login_type'] === 'admin') {
+            $link = '../admin/admin_dashboard.php'; 
+
+        }
+        else {
+            $link = '../users/login.php';
         }
         ?>
 
-        <a href="<?php echo empty($_SESSION['username']) ? htmlspecialchars('../users/user_dashboard.php') : htmlspecialchars($link); ?>" class="nav-item">Dashboard</a>
+        <a href="<?php echo htmlspecialchars($link); ?>" class="nav-item">Dashboard</a>
         <a href="<?php echo htmlspecialchars($link2); ?>" class="nav-item">Auctions</a>
         <a href="#" class="nav-item">Bidders</a>
         <a href="#" class="nav-item">Reports</a>

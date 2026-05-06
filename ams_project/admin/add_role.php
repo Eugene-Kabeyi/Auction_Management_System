@@ -14,7 +14,10 @@ include __DIR__ . '/../config.php';
 ?>
 
 <head>
+    <title>Add New Role</title>
+    <link rel="stylesheet" href="admin_style.css">
     <style>
+        
         .outer_container {
             display: flex;
             flex-direction: column;
@@ -78,6 +81,7 @@ include __DIR__ . '/../config.php';
             color: #1f2933;
             border: 1px solid #1f2933;
         }
+        
     </style>
 </head>
 
@@ -100,7 +104,7 @@ include __DIR__ . '/../config.php';
         <div class="outer_container">
             
                 
-                <form action="" method="POST">
+                <form action="" method="POST" onsubmit="return validateRole()">
                     <label for="role_name">Role Name:</label>
                     <input type="text" id="role_name" name="role_name" required>
                     <label for="description">Description:</label>
@@ -110,6 +114,18 @@ include __DIR__ . '/../config.php';
             
         </div>
 </body>
+<script>
+        function validateRole() {
+            const roleName = document.getElementById('role_name').value.trim();
+            const description = document.getElementById('description').value.trim();
+
+            if (roleName === '' || description === '') {
+                alert('Please fill in all fields.');
+                return false;
+            }
+            return true;
+        }
+</script>
 <?php include __DIR__ . '/../footer.php'; ?>
 <?php
 // Handle form submission for adding a new role

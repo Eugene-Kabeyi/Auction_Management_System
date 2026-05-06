@@ -9,61 +9,8 @@ if(!isset($_SESSION['user_id']) || empty($_SESSION['user_id']) || $_SESSION['log
 } ?>
 
 <head>
-    <style>
-        .outer_container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 80%;
-            margin: 0 auto;
-            justify-content: center;
-        }
-
-        h2 {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-        }
-
-        th,
-        td {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f4f4f4;
-        }
-
-        td a {
-            border-radius: 5px;
-            color: #ffffff;
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 12px;
-        }
-
-        td a:hover {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #1f2933;
-        }
-
-        .outer_container .back {
-            border-radius: 5px;
-            color: #ffffff;
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 0 6px 30px;
-            width: 20%;
-            ;
-        }
-    </style>
+    <title>Staff List</title>
+    <link rel="stylesheet" href="admin_style.css">
 </head>
 
 <body>

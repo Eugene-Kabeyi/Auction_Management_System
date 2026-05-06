@@ -11,61 +11,14 @@ include __DIR__ . '/../config.php';
 ?>
 
 <head>
-    <style>
-        .outer_container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 640px;
-            margin: 0 auto;
-            justify-content: center;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        form label {
-            font-weight: bold;
-        }
-
-        form input,
-        form textarea,
-        form select {
-            padding: 8px;
-            border: 1px solid #ccc;
-        }
-        form button {
-            padding: 10px;
-            background-color: #1f2933;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        form button:hover {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #1f2933;
-        }
-        .outer_container .back {
-            border-radius: 5px;
-            color: #ffffff;
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 0 6px 30px; 
-            width: 20%; 
-            ;
-        }
-
-
-    </style>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add New Staff Member</title>
+    <link rel="stylesheet" href="admin_style.css">
+    
 </head>
 
 <body>
-    /<!-- ADD staff members TO the database(username,                | national_id       
+    <!-- ADD staff members TO the database(username,                | national_id       
 | employee_id       
 | role_id           
 | department_id     
@@ -82,7 +35,7 @@ include __DIR__ . '/../config.php';
     <div class="outer_container">
         <h2>Add New Staff Member</h2>
         <a href="staff_list.php" class="back">Back to Staff List</a>
-        <form action="" method="POST">
+        <form action="" method="POST" onsubmit="return validateStaff()">
 
             <label for="firstname">First Name:</label>
             <input type="text" id="firstname" name="firstname" required>
@@ -94,7 +47,7 @@ include __DIR__ . '/../config.php';
             <input type="text" id="surname" name="surname" required>
 
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+            <input type="text" id="email" name="email" required>
 
             <label for="phone_number">Phone Number:</label>
             <input type="text" id="phone_number" name="phone_number">
@@ -103,7 +56,7 @@ include __DIR__ . '/../config.php';
             <input type="text" id="job_title" name="job_title">
 
             <label for="department_id">Department ID:</label>
-            <input type="number" id="department_id" name="department_id">
+            <input type="text" id="department_id" name="department_id">
 
             <label for="role_id">Role:</label>
             <?php
@@ -129,7 +82,7 @@ include __DIR__ . '/../config.php';
             <input type="password" id="password" name="password" required>
 
             <label for="hire_date">Hire Date:</label>
-            <input type="date" id="hire_date" name="hire_date">
+            <input type="text" id="hire_date" name="hire_date">
 
             <label for="employment_status">Employment Status:</label>
             <select id="employment_status" name="employment_status">
@@ -154,6 +107,185 @@ include __DIR__ . '/../config.php';
         </form>
     </div>
 </body>
+<script>
+
+    function validateStaff() {
+
+        if (!validateNames()) return false;
+        if (!validateEmail()) return false;
+        if (!validatePhone()) return false;
+        if (!validateIDs()) return false;
+        if (!validateUsername()) return false;
+        if (!validatePassword()) return false;
+        if (!validateDate()) return false;
+        if (!validateDropdowns()) return false;
+
+        return true;
+    }
+
+    //////////////////////////////////////////////////
+    // NAMES
+    function validateNames() {
+
+        var fname = document.getElementById("firstname").value.trim();
+        var sname = document.getElementById("surname").value.trim();
+
+        if (fname.length == 0) {
+            alert("First name is required");
+            return false;
+        }
+
+        if (sname.length == 0) {
+            alert("Surname is required");
+            return false;
+        }
+
+        return true;
+    }
+
+    //////////////////////////////////////////////////
+    // EMAIL
+    function validateEmail() {
+
+        var email = document.getElementById("email").value;
+
+        if (email.length == 0) {
+            alert("Email is required");
+            return false;
+        }
+
+        if (email.indexOf("@") == -1 || email.indexOf(".") == -1) {
+            alert("Invalid email format");
+            return false;
+        }
+
+        return true;
+    }
+
+    //////////////////////////////////////////////////
+    // PHONE
+    function validatePhone() {
+
+        var phone = document.getElementById("phone_number").value;
+
+        if (phone.length == 0) {
+            alert("Phone number is required");
+            return false;
+        }
+
+        if (isNaN(phone)) {
+            alert("Phone must be numeric");
+            return false;
+        }
+
+        if (phone.length < 9) {
+            alert("Phone number too short");
+            return false;
+        }
+
+        return true;
+    }
+
+    //////////////////////////////////////////////////
+    // IDS
+    function validateIDs() {
+
+        var dept = document.getElementById("department_id").value;
+        var national = document.getElementById("national_id").value;
+
+        if (dept.length > 0 && isNaN(dept)) {
+            alert("Department ID must be numeric");
+            return false;
+        }
+
+        if (national.length > 0 && isNaN(national)) {
+            alert("National ID must be numeric");
+            return false;
+        }
+
+        return true;
+    }
+
+    //////////////////////////////////////////////////
+    // USERNAME
+    function validateUsername() {
+
+        var username = document.getElementById("username").value;
+
+        if (username.length < 4) {
+            alert("Username must be at least 4 characters");
+            return false;
+        }
+
+        return true;
+    }
+
+    //////////////////////////////////////////////////
+    // PASSWORD
+    function validatePassword() {
+
+        var pass = document.getElementById("password").value;
+
+        if (pass.length < 6) {
+            alert("Password must be at least 6 characters");
+            return false;
+        }
+
+        return true;
+    }
+
+    //////////////////////////////////////////////////
+    // DATE
+    function validateDate() {
+
+        var date = document.getElementById("hire_date").value;
+
+        if (date.length == 0) {
+            alert("Hire date is required");
+            return false;
+        }
+
+        if (date.indexOf("/") == -1) {
+            alert("Date must be dd/mm/yyyy");
+            return false;
+        }
+
+        var parts = date.split("/");
+
+        if (parts.length != 3) {
+            alert("Invalid date format");
+            return false;
+        }
+
+        if (isNaN(parts[0]) || isNaN(parts[1]) || isNaN(parts[2])) {
+            alert("Date must contain numbers only");
+            return false;
+        }
+
+        return true;
+    }
+
+    //////////////////////////////////////////////////
+    // DROPDOWNS
+    function validateDropdowns() {
+
+        var role = document.getElementById("role_id").selectedIndex;
+        var dept = document.getElementById("department").selectedIndex;
+
+        if (role == 0) {
+            alert("Please select a role");
+            return false;
+        }
+
+        if (dept == 0) {
+            alert("Please select a department");
+            return false;
+        }
+
+        return true;
+    }
+
+</script>
 <?php include __DIR__ . '/../footer.php'; ?>
 <?php
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -173,7 +305,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $hire_date = $_POST['hire_date'];
     $employment_status = $_POST['employment_status'];
 
-    
+
 
     // Prepare and execute the insert statement
     $stmt = $conn->prepare("INSERT INTO staff (firstname, secondname, surname, email, phone_number, job_title, department_id, role_id, employee_id, national_id, username, password_hash, hire_date, employment_status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");

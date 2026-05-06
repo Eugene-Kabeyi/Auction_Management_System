@@ -11,77 +11,8 @@ include __DIR__ . '/../config.php';
 ?>
 
 <head>
-    <style>
-        .outer_container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 640px;
-            margin: 0 auto;
-            justify-content: center;
-            margin-bottom: 40px ;
-        }
-
-        h2 {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        form label {
-            font-weight: bold;
-        }
-
-        form input,
-        form textarea,
-        form select {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-
-        }
-
-        .outer_container form button {
-            padding: 10px;
-            background-color: #1f2933;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        form button:hover {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #1f2933;
-        }
-        form button.delete {
-            background-color: #ff4d4d;
-        }
-        form button.delete:hover {
-            background-color: #ffffff;
-            color: #ff4d4d;
-            border: 1px solid #ff4d4d;
-        }
-
-        .outer_container .back {
-            border-radius: 5px;
-            color: #ffffff;
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 0 6px 30px;
-            width: 25%;
-            ;
-        }
-    </style>
+    <title>Edit Staff Member</title>
+    <link rel="stylesheet" href="admin_style.css">
 </head>
 
 <body>

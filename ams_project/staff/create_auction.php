@@ -87,7 +87,7 @@ include __DIR__ . '/../config.php';
     <div class="outer_container">
         <div class="f_inner_container"></div>
         <div class="s_inner_container">
-            <form action="create_auction.php" method="post">
+            <form action="create_auction.php" method="post" onsubmit="return validateAuction()">
                 <label for="auction_name">Auction Name:</label>
                 <input type="text" id="auction_name" name="auction_name" required>
 
@@ -101,7 +101,7 @@ include __DIR__ . '/../config.php';
                 </select>
 
                 <label>Item ID</label>
-                <select name="item_id">
+                <select name="item_id" id="item_id" required>
                     <!--php fetch for items in evaluate_items-->
                     <?php
                     $sql = "SELECT ei.item_id, i.item_name, i.consigner_id  FROM evaluated_items ei JOIN consigner_items i ON ei.item_id = i.item_id";

@@ -82,6 +82,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             }
         } catch (Exception $e) {
             $error = "Database error: " . $e->getMessage();
+            $_SESSION['error'] = $error;
         }
     }
 }

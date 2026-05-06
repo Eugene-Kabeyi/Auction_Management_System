@@ -14,7 +14,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['login_type'] === 'admin') {
 include __DIR__ . '/../config.php';
 $stmt = $conn->prepare('SELECT COUNT(*) FROM users');
 $stmt -> execute();
-$count = $stmt ->fetchColumn();
+$count_users = $stmt ->fetchColumn();
 
 ?>
     <?php if (!empty($_SESSION['success'])): ?>
@@ -49,7 +49,7 @@ $count = $stmt ->fetchColumn();
 
         <div class="stat-card"><a href="user_list.php" style="text-decoration:none;">
             <div class="stat-icon">👥</div>
-            <div class="stat-value"><?= $count ?> </div>
+            <div class="stat-value"><?= $count_users ?> </div>
             <div class="stat-label">Registered Users</div></a>
         </div>
 

@@ -27,6 +27,8 @@ if (!$admin) {
 }
 ?>
 <head>
+    <title>Edit Admin Details</title>
+    <link rel="stylesheet" href="admin_style.css">
     <style>
         .outer_container {
             display: flex;
@@ -60,6 +62,10 @@ if (!$admin) {
             display: flex;
             flex-direction: column;
             gap: 15px;
+            background-color: #ffffff;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
         }
 
         form label {

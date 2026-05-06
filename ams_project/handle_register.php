@@ -63,7 +63,8 @@ class RegisterHandler extends DatabaseConfig
                 exit();
 
             } catch (PDOException $e) {
-                $_SESSION['error'] = "❌ Registration failed: " . $e->getMessage();
+                $_SESSION['error'] = "Registration failed."; // Generic error message
+                echo "❌ Registration failed: " . $e->getMessage();
                 header("Location: ../ams_project/users/register.php");
                 exit();
             }

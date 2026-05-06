@@ -22,70 +22,8 @@ $dept = $stmt->fetch(PDO::FETCH_ASSOC);
 ?>
 
 <head>
-    <style>
-        .outer_container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 640px;
-            margin: 0 auto;
-            justify-content: center;
-        }
-
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        form label {
-            font-weight: bold;
-        }
-
-        form input,
-        form textarea,
-        form select {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        form .delete {
-            background-color: #ff4d4d;
-            color: #ffffff;
-        }
-
-        form .delete:hover {
-            background-color: #ffffff;
-            color: #ff4d4d;
-            border: 1px solid #ff4d4d;
-        }
-
-        form button {
-            padding: 10px;
-            background-color: #1f2933;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        form button:hover {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #1f2933;
-        }
-
-        .outer_container .back {
-            border-radius: 5px;
-            color: #ffffff;
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 0 6px 30px;
-            width: 28%;
-        }
-    </style>
+    <title>Edit Department Details</title>
+    <link rel="stylesheet" href="admin_style.css">
 
 </head>
 
