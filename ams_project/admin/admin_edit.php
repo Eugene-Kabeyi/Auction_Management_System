@@ -26,112 +26,75 @@ if (!$admin) {
     exit();
 }
 ?>
+<?php
+// Update and delete functionality
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $firstname = $_POST['firstname'];
+    $secondname = $_POST['secondname'];
+    $surname = $_POST['surname'];
+    $email = $_POST['email'];
+    $username = $_POST['username'];
+    $phone_number = $_POST['phone_number'];
+    $admin_level = $_POST['admin_level'];
+    $admin_id = $_POST['admin_id'];
+
+    // Update admin details
+    if(isset($_POST['update'])) {
+        $stmt = $conn->prepare("UPDATE admin SET firstname = ?, secondname = ?, surname = ?, email = ?, username = ?, phone_number = ?, admin_level = ? WHERE admin_id = ?");
+        $success = $stmt->execute([$firstname, $secondname, $surname, $email, $username, $phone_number, $admin_level, $admin_id]);
+        if ($success) {
+            $_SESSION['success'] = "Admin details updated successfully.";
+            
+        }else {
+            $_SESSION['error'] = "Failed to update admin details.";
+        }
+        header("Location: admin_edit.php?id=" . $admin_id);
+            exit();
+    }
+    else if (isset($_POST['delete'])) {
+        $stmt = $conn->prepare("DELETE FROM admin WHERE admin_id = ?");
+        $success = $stmt->execute([$admin_id]);
+        if ($success) {
+            $_SESSION['success'] = "Admin deleted successfully.";
+        } else {
+            $_SESSION['error'] = "Failed to delete admin.";
+        }
+        header("Location: /admin_list.php");
+        exit();
+    }
+     else {
+        $_SESSION['error'] = "Invalid form submission.";
+        header("Location: /admin_edit.php?id=" . $admin_id);
+        exit();     
+     }
+    
+}?>
 <head>
     <title>Edit Admin Details</title>
-    <link rel="stylesheet" href="admin_style.css">
-    <style>
-        .outer_container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 640px;
-            margin: 0 auto;
-            justify-content: center;
-        }
-
-        .f_inner_container {
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            flex: 1;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .s_inner_container {
-            flex: 1;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            background-color: #ffffff;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        form label {
-            font-weight: bold;
-        }
-
-        form input,
-        form textarea,
-        form select {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-        form .delete {
-            background-color: #ff4d4d;
-            color: #ffffff;
-        }
-        form .delete:hover {
-            background-color: #ffffff;
-            color: #ff4d4d;
-            border: 1px solid #ff4d4d;
-        }
-        form button {
-            padding: 10px;
-            background-color: #1f2933;
-            color: #ffffff;
-            border: none;   
-            border-radius: 5px;
-            cursor: pointer;
-        }
-        form button:hover {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #1f2933;
-        }
-        .outer_container .back {
-            border-radius: 5px;
-            color: #ffffff; 
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 0 6px 30px;
-            width: 28%;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/form_table_styles.css">
+    
 
 </head>
 <body>
-    <div class="outer_container">
+    <div class="outer_container f_container" >
         <h2>Edit Admin Details</h2>
-        <a href="admin_list.php" class="back">Back to Admin List</a>
-        <form action="" method="POST">
+        <a href="admin_list.php" class="back">Back </a>
+        <form action="" method="POST" onsubmit="return validateAdmin()">
             <input type="hidden" name="admin_id" value="<?php echo htmlspecialchars($admin['admin_id']); ?>">
             <label for="firstname">First Name:</label>
-            <input type="text" id="firstname" name="firstname" value="<?php echo htmlspecialchars($admin['firstname']); ?>" required>
+            <input type="text" id="firstname" name="firstname" value="<?php echo htmlspecialchars($admin['firstname']); ?>" >
 
             <label for="secondname">Second Name:</label>
             <input type="text" id="secondname" name="secondname" value="<?php echo htmlspecialchars($admin['secondname']); ?>">
 
             <label for="surname">Surname:</label>
-            <input type="text" id="surname" name="surname" value="<?php echo htmlspecialchars($admin['surname']); ?>" required>
+            <input type="text" id="surname" name="surname" value="<?php echo htmlspecialchars($admin['surname']); ?>">
 
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($admin['email']); ?>" required>
+            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($admin['email']); ?>" >
 
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($admin['username']); ?>" required>
+            <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($admin['username']); ?>" >
 
             <label for="phone_number">Phone Number:</label>
             <input type="text" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($admin['phone_number']); ?>" required>
@@ -152,40 +115,37 @@ if (!$admin) {
         
     </div>
 </body>
+<script>
+    function validateAdmin() {
+        var firstname = document.getElementById("firstname").value.trim();
+        var surname = document.getElementById("surname").value.trim();
+        var email = document.getElementById("email").value.trim();
+        var username = document.getElementById("username").value.trim();
+        var phone_number = document.getElementById("phone_number").value.trim();
+
+        if (firstname.length == 0) {
+            alert("First name is required");
+            return false;
+        }
+        if (surname.length == 0) {
+            alert("Surname is required");
+            return false;
+        }
+        if (email.length == 0) {
+            alert("Email is required");
+            return false;
+        }
+        if (username.length == 0) {
+            alert("Username is required");
+            return false;
+        }
+        if (phone_number.length == 0) {
+            alert("Phone number is required");
+            return false;
+        }
+        return true;
+    }
+</script>
 <?php
 include __DIR__ . '/../footer.php';
 ?>
-<?php
-// Update and delete functionality
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $firstname = $_POST['firstname'];
-    $secondname = $_POST['secondname'];
-    $surname = $_POST['surname'];
-    $email = $_POST['email'];
-    $username = $_POST['username'];
-    $phone_number = $_POST['phone_number'];
-    $admin_level = $_POST['admin_level'];
-    $admin_id = $_POST['admin_id'];
-
-    // Update admin details
-    if(isset($_POST['update'])) {
-        $stmt = $conn->prepare("UPDATE admin SET firstname = ?, secondname = ?, surname = ?, email = ?, username = ?, phone_number = ?, admin_level = ? WHERE admin_id = ?");
-        $stmt->execute([$firstname, $secondname, $surname, $email, $username, $phone_number, $admin_level, $admin_id]);
-        $_SESSION['success'] = "Admin details updated successfully.";
-        header("Location: admin_edit.php?id=" . $admin_id);
-        exit();
-    }
-    else if (isset($_POST['delete'])) {
-        $stmt = $conn->prepare("DELETE FROM admin WHERE admin_id = ?");
-        $stmt->execute([$admin_id]);
-        $_SESSION['success'] = "Admin deleted successfully.";
-        header("Location: /admin_list.php");
-        exit();
-    }
-     else {
-        $_SESSION['error'] = "Invalid form submission.";
-        header("Location: /admin_edit.php?id=" . $admin_id);
-        exit();     
-     }
-    
-}

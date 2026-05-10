@@ -12,111 +12,8 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin' && $_SES
 
 <head>
     <title>Add New Admin</title>
-    <link rel="stylesheet" href="admin_style.css">
-    <style>
+    <link rel="stylesheet" href="../css/form_table_styles.css">
     
-
-        .outer_container {
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            justify-content: center;
-            margin: 20px auto;
-            min-width: 640px;
-
-        }
-
-        .f_inner_container {
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            flex: 1;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .s_inner_container {
-            flex: 1;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        form {
-
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            background-color: #ffffff;
-            padding: 20px;
-        }
-
-        h2 {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        form label {
-            font-weight: bold;
-        }
-
-        form input,
-        form textarea,
-        form select {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        form button {
-            padding: 10px;
-            background-color: #1f2933;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-
-        }
-
-        form button:hover {
-            background-color: #ffffff;
-            color: #000000;
-            border: solid #1f2933;
-        }
-
-        /* Password text to be disc */
-        .pass_w {
-            -webkit-text-security: disc;
-            font-size: 16px;
-            letter-spacing: 2px;
-        }
-
-        /* Hide/Show Password inside the password field */
-        .hide_show {
-            font-size: 12px;
-            position: relative;
-            top: -32px;
-            left: 140px;
-            color: #6b7280;
-            cursor: pointer;
-            user-select: none;
-        }
-
-
-        .outer_container .back {
-            border-radius: 5px;
-            color: #ffffff;
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 0 6px 4px;
-            width: 30%;
-        }   
-    </style>
 
 </head>
 <?php if (!empty($_SESSION['success'])): ?>
@@ -134,7 +31,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin' && $_SES
 <?php endif; ?>
 
 <body>
-    <div class="outer_container">
+    <div class="outer_container f_container">
         <h2>Add New Admin</h2>
         <a href="admin_list.php" class="back">← Back to Admin List</a>
 

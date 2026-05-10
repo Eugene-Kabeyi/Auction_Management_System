@@ -12,66 +12,8 @@ $items = $tmt->fetchAll()
     ?>
 
 <head>
-    <style>
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: #ebe9e9;
-        }
-
-        .outer_container {
-            width: 80%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            justify-content: center;
-            margin: 20px auto;
-
-        }
-
-        h2 {
-            text-align: center;
-
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #ffffff;
-        }
-
-        th,
-        td {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f4f4f4;
-        }
-
-        td a {
-            border-radius: 5px;
-            color: #ffffff;
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 12px;
-        }
-
-        td a:hover {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #1f2933;
-        }
-    </style>
+    <title>My Consigned Items</title>
+    <link rel="stylesheet" href="../css/form_table_styles.css">
 </head>
 
 <body>

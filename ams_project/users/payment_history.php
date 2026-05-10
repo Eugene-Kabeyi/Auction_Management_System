@@ -37,71 +37,8 @@ $payments = $stmt->fetchAll();
 ?>
 
 <head>
-    <style>
-                       html,
-        body {
-            height: 100%;
-            margin: 0;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: #ebe9e9;
-        }
-
-        .outer_container {
-            width: 80%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            justify-content: center;
-            margin: 20px auto;
-
-        }
-
-        h2 {
-            text-align: center;
-            margin: 20px 0;
-        }
-
-        table {
-            width: 100%;
-            border-collapse: collapse;
-            background-color: #ffffff;
-        }
-
-        th, td {
-            padding: 8px 12px;
-            border: 1px solid #ccc;
-            text-align: left;
-        }
-
-        th {
-            background-color: #f4f4f4;
-        }
-
-        .status-pending {
-            color: orange;
-            font-weight: bold;
-        }
-
-        .status-completed {
-            color: green;
-            font-weight: bold;
-        }
-
-        .status-failed {
-            color: red;
-            font-weight: bold;
-        }
-
-        .status-refunded {
-            color: blue;
-            font-weight: bold;
-        }
-    </style>
+    <title>Payment History</title>
+    <link rel="stylesheet" href="../css/form_table_styles.css">
 </head>
 
 <body>

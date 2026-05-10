@@ -3,11 +3,13 @@
      height: 100%;
      margin: 0;
  }
- .navbar{
-    width: 100%;
+
+ .navbar {
+     width: 100%;
  }
- .footer{
-    width: 100%;
+
+ .footer {
+     width: 100%;
  }
 
  body {
@@ -21,11 +23,23 @@
      display: flex;
      flex-direction: column;
      gap: 20px;
-     min-width: 640px;
-     margin: 0 300px;
+     max-width: 1000px;
+     margin: 0 auto;
+     width: 80%;
      margin-bottom: 40px;
      justify-content: center;
+
  }
+ .f_container{
+    width: 50% !important;
+ }
+
+ .inner_container {
+    width: 100%;
+     overflow: auto;
+     -webkit-overflow-scrolling: touch;
+ }
+
 
  h2 {
      text-align: center;
@@ -36,6 +50,7 @@
      width: 100%;
      border-collapse: collapse;
      background-color: #ffffff;
+
  }
 
  th,
@@ -71,8 +86,8 @@
      background-color: #ffffff;
      border: 1px solid #ccc;
      border-radius: 5px;
-     min-width: 640px;
-        margin: 0 auto;
+     width: 100%;
+     margin: 0 auto;
  }
 
  form label {
@@ -116,11 +131,12 @@
  .outer_container .back {
      border-radius: 5px;
      color: #ffffff;
+     display: inline-block;
      text-decoration: none;
      background-color: #1f2933;
-     padding: 6px 0 6px 30px;
-     width: 20%;
-     
+     padding: 6px 12px;
+     width: fit-content;
+
  }
 
  .flash {
@@ -164,4 +180,24 @@
          opacity: 0;
          transform: translateX(-30px);
      }
+ }
+
+ .status-pending {
+     color: orange;
+     font-weight: bold;
+ }
+
+ .status-completed {
+     color: green;
+     font-weight: bold;
+ }
+
+ .status-failed {
+     color: red;
+     font-weight: bold;
+ }
+
+ .status-refunded {
+     color: blue;
+     font-weight: bold;
  }

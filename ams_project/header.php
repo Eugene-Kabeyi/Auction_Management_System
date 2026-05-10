@@ -25,21 +25,23 @@ if (session_status() == PHP_SESSION_NONE) {
             <div class="logo-subtitle">Streamline Your Auction Business</div>
         </div>
     </div>
+    <div class="menu-toggle" id="menuToggle">
+        ☰
+    </div>
 
-    <div class="nav-links">
+    <div class="nav-links" id="navLinks">
         <?php
         $link = '';
         $link2 = '../users/auction_list.php';
-        if ($_SESSION['login_type'] === 'staff' ) {
+        if ($_SESSION['login_type'] === 'staff') {
             $link = '../staff/staff_dashboard.php';
             $link2 = '../staff/list_items.php';
         } elseif ($_SESSION['login_type'] === 'user') {
-            $link = '../users/user_dashboard.php'; 
-        }else if ($_SESSION['login_type'] === 'admin') {
-            $link = '../admin/admin_dashboard.php'; 
+            $link = '../users/user_dashboard.php';
+        } else if ($_SESSION['login_type'] === 'admin') {
+            $link = '../admin/admin_dashboard.php';
 
-        }
-        else {
+        } else {
             $link = '../users/login.php';
         }
         ?>
@@ -102,6 +104,18 @@ if (session_status() == PHP_SESSION_NONE) {
                 document.getElementById("userInfo").style.display = "none";
             }
         });
+
+
+        const menuToggle = document.getElementById("menuToggle");
+        const navLinks = document.getElementById("navLinks");
+
+        menuToggle.addEventListener("click", function () {
+
+            navLinks.classList.toggle("active");
+
+        });
+
+
 
     </script>
 </nav>

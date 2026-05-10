@@ -1,4 +1,6 @@
-/* Reset basic defaults */
+/* =========================
+   GLOBAL RESET
+========================= */
 * {
     margin: 0;
     padding: 0;
@@ -6,17 +8,23 @@
     font-family: "Segoe UI", Tahoma, Arial, sans-serif;
 }
 
-/* Navbar container */
+/* =========================
+   NAVBAR
+========================= */
 .navbar {
     display: flex;
-    align-items: center;
     justify-content: space-between;
+    align-items: center;
     background-color: #ffffff;
     padding: 14px 32px;
     border-bottom: 1px solid #e5e7eb;
+    position: relative;
+    z-index: 1000;
 }
 
-/* Logo section */
+/* =========================
+   LOGO SECTION
+========================= */
 .logo-container {
     display: flex;
     align-items: center;
@@ -31,8 +39,8 @@
     font-weight: 700;
     font-size: 18px;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     border-radius: 6px;
 }
 
@@ -47,9 +55,12 @@
     color: #6b7280;
 }
 
-/* Navigation links */
+/* =========================
+   NAV LINKS
+========================= */
 .nav-links {
     display: flex;
+    align-items: center;
     gap: 22px;
 }
 
@@ -60,12 +71,14 @@
     color: #374151;
     padding: 6px 0;
     position: relative;
+    transition: color 0.2s ease;
 }
 
 .nav-item:hover {
     color: #1f2933;
 }
 
+/* UNDERLINE EFFECT */
 .nav-item::after {
     content: "";
     position: absolute;
@@ -74,11 +87,93 @@
     width: 0;
     height: 2px;
     background-color: #1f2933;
-    transition: width 0.2s ease-in-out;
+    transition: width 0.3s ease;
 }
 
 .nav-item:hover::after {
     width: 100%;
+}
+
+/* LOGIN SECTION */
+.login-container {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    
+}
+
+/* =========================
+   HAMBURGER MENU
+========================= */
+.menu-toggle {
+    display: none;
+    font-size: 28px;
+    cursor: pointer;
+    user-select: none;
+}
+
+/* =========================
+   MOBILE RESPONSIVE
+========================= */
+@media screen and (max-width:768px) {
+
+    /* NAVBAR */
+    .navbar {
+        flex-wrap: wrap;
+        padding: 14px 20px;
+    }
+
+    /* HAMBURGER */
+    .menu-toggle {
+        display: block;
+    }
+
+    /* NAVIGATION LINKS */
+    .nav-links {
+        width: 100%;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0;
+
+        background-color: #ffffff;
+
+        max-height: 0;
+        overflow: hidden;
+
+        transition: max-height 0.3s ease;
+
+        margin-top: 10px;
+    }
+
+    /* ACTIVE MENU */
+    .nav-links.active {
+        max-height: 500px;
+    }
+
+    /* MOBILE NAV ITEMS */
+    .nav-item {
+        width: 100%;
+        padding: 14px 0;
+        border-top: 1px solid #e5e7eb;
+    }
+
+    /* REMOVE UNDERLINE ON MOBILE */
+    .nav-item::after {
+        display: none;
+    }
+
+    /* LOGIN CONTAINER */
+    .login-container {
+        width: 100%;
+        margin-top: 10px;
+        justify-content: flex-end;
+    }
+
+    /* LOGO */
+    .logo-container {
+        max-width: 80%;
+    }
+
 }
 
 /*Landing page*/
@@ -172,7 +267,8 @@
     font-size: 13px;
     font-weight: 600;
 }
-.user-info{
+
+.user-info {
     position: relative;
     display: flex;
     align-items: center;
@@ -180,16 +276,16 @@
     cursor: pointer;
 }
 
-.dropdown-arrow{
+.dropdown-arrow {
     font-size: 12px;
     transition: transform 0.3s ease;
 }
 
-.dropdown-arrow.rotate{
+.dropdown-arrow.rotate {
     transform: rotate(180deg);
 }
 
-.dropdown-menu{
+.dropdown-menu {
     display: none;
     position: absolute;
     top: 40px;
@@ -198,17 +294,17 @@
     border: 1px solid #ddd;
     border-radius: 6px;
     min-width: 140px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
-.dropdown-menu a{
+.dropdown-menu a {
     display: block;
     padding: 10px;
     text-decoration: none;
     color: #333;
 }
 
-.dropdown-menu a:hover{
+.dropdown-menu a:hover {
     background: #f5f5f5;
 }
 
@@ -391,9 +487,10 @@
     font-size: 13px;
     color: #374151;
 }
-.stats-container a{
-    text-decoration: none;  
-    
+
+.stats-container a {
+    text-decoration: none;
+
 }
 
 
@@ -486,4 +583,3 @@
     text-decoration: none;
     color: inherit;
 }
-

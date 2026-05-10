@@ -1,10 +1,10 @@
 <?php
-include __DIR__ . '/../header.php'; 
+include __DIR__ . '/../header.php';
 
 //Fetch auction list from the database
 include __DIR__ . '/../config.php';
-if(empty($_SESSION['user_id']) ||!isset($_SESSION['user_id'])) {
-    if(empty($_SESSION['login_type']) || $_SESSION['login_type'] !== 'user') {
+if (empty($_SESSION['user_id']) || !isset($_SESSION['user_id'])) {
+    if (empty($_SESSION['login_type']) || $_SESSION['login_type'] !== 'user') {
         header('Location: ../staff/staff_login.php');
         session_destroy();
         $_SESSION['error'] = "Please log in to view auction listings.";
@@ -71,12 +71,9 @@ $auctions = $stmt->fetchAll();
         }
 
         .outer_container {
-            width: 80%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            justify-content: center;
-            margin: 20px auto;
+            width: 80%;            
+            margin: 0px auto;
+            overflow: auto;
 
         }
         table {
@@ -151,7 +148,7 @@ $auctions = $stmt->fetchAll();
 </head>
 
 <body>
-    <form method="GET" style="margin:20px;">
+    <form method="GET" style="margin:20px;" class="form_class">
         <label>View:</label>
 
         <select name="type">
@@ -184,30 +181,30 @@ $auctions = $stmt->fetchAll();
     </h2>
     <h2>Auction List</h2>
     <div class="outer_container">
-    <table>
-        <thead>
-            <tr>
-                <th>Auction ID</th>
-                <th>Auction Name</th>
-                <th>Start Date</th>
-                <th>End Date</th>
-                <th>Action</th>
-            </tr>
-        </thead>
-        <tbody>
-            <?php foreach ($auctions as $auction): ?>
-                <?php $start_time = date("F j, Y, g:i a", strtotime($auction['start_time'])); // Format start time for display
-                    $end_time = date("F j, Y, g:i a", strtotime($auction['end_time'])); // Format end time for display ?>
+        <table>
+            <thead>
                 <tr>
-                    <td><?= htmlspecialchars($auction['auction_id']) ?></td>
-                    <td><?= htmlspecialchars($auction['auction_name']) ?></td>
-                    <td><?= htmlspecialchars($start_time) ?></td>
-                    <td><?= htmlspecialchars($end_time) ?></td>
-                    
-                    <td><a href="live_auction.php?auction_id=<?= $auction['auction_id'] ?>">View Details</a></td>
+                    <th>Auction ID</th>
+                    <th>Auction Name</th>
+                    <th>Start Date</th>
+                    <th>End Date</th>
+                    <th>Action</th>
                 </tr>
-            <?php endforeach; ?>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+                <?php foreach ($auctions as $auction): ?>
+                    <?php $start_time = date("F j, Y, g:i a", strtotime($auction['start_time'])); // Format start time for display
+                        $end_time = date("F j, Y, g:i a", strtotime($auction['end_time'])); // Format end time for display ?>
+                    <tr>
+                        <td><?= htmlspecialchars($auction['auction_id']) ?></td>
+                        <td><?= htmlspecialchars($auction['auction_name']) ?></td>
+                        <td><?= htmlspecialchars($start_time) ?></td>
+                        <td><?= htmlspecialchars($end_time) ?></td>
+
+                        <td><a href="live_auction.php?auction_id=<?= $auction['auction_id'] ?>">View</a></td>
+                    </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
     </div>
     <?php include __DIR__ . '/../footer.php'; ?>

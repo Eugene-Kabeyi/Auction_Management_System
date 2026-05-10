@@ -14,7 +14,7 @@ include __DIR__ . '/../config.php';
 
 <head>
     <title>Roles Management</title>
-    <link rel="stylesheet" href="admin_style.css">
+    <link rel="stylesheet" href="../css/form_table_styles.css">
 
 </head>
 
@@ -42,6 +42,7 @@ include __DIR__ . '/../config.php';
     <div class="outer_container">
         <h2>Roles List</h2>
          <a href="add_role.php" class = "back">Add Role</a>
+        <div class="inner_container">
         <table>
             <tr>
                 <th>Role ID</th>
@@ -60,6 +61,7 @@ include __DIR__ . '/../config.php';
                 </tr> 
             <?php endforeach; ?>
         </table>
+        </div>
     </div>
 </body>
 <?php include __DIR__ . '/../footer.php'; ?>
