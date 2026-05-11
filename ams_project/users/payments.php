@@ -3,6 +3,7 @@
 
 include __DIR__ . '/../header.php';
 include __DIR__ . '/../config.php';
+include __DIR__ . '/../log_activity.php';
 
 // Check if user is logged in
 if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'user') {
@@ -30,8 +31,69 @@ $stmt->execute([$user_id]);
 $winning_bids = $stmt->fetchAll();
 ?>
 
-<!DOCTYPE html>
-<html>
+<?php
+// This part runs when form is submitted
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['initiate_payment'])) {
+
+    // Get form data
+    $bid_id = $_POST['bid_id'];
+    $amount = $_POST['amount'];
+    $payment_method = $_POST['payment_method'];
+    $transaction_reference = !empty($_POST['transaction_reference']) ? trim($_POST['transaction_reference']) : null;
+    $check_stmt = $conn->prepare("
+    SELECT bid_id
+    FROM auction_bids
+    WHERE bid_id = ?
+    AND bidder_id = ?
+    AND result = 'won'
+    AND NOT EXISTS (
+        SELECT 1 FROM payment p 
+        WHERE p.bid_id = ab.bid_id 
+        AND p.payment_status IN ('pending', 'completed')
+    )
+");
+
+    $check_stmt->execute([$bid_id, $user_id]);
+
+
+    if ($check_stmt->rowCount() > 0) {
+        // Save payment to database with status 'pending'
+        $stmt = $conn->prepare("
+            INSERT INTO payment 
+            (bid_id, bidder_id, amount, payment_method, payment_status, transaction_reference, payment_date)
+            VALUES (?, ?, ?, ?, 'pending', ?, NOW())
+        ");
+
+        try {
+            $stmt->execute([
+                $bid_id,
+                $user_id,
+                $amount,
+                $payment_method,
+                $transaction_reference
+            ]);
+            logActivity($conn, $user_id, $_SESSION['username'], "Payment initiated for bid ID: " . $bid_id);
+
+            $_SESSION['success'] = "Payment started successfully! Please wait for staff to process it.";
+            header('Location: payments_history.php');
+            exit();
+
+        } catch (PDOException $e) {
+            $_SESSION['error'] = "Error initiating payment: " ;
+            logActivity($conn, $user_id, $_SESSION['username'], "Error initiating payment for bid ID: " . $bid_id . " - " . $e->getMessage());
+            header('Location: payments.php');
+            exit();
+        }
+    } else {
+        $_SESSION['error'] = "Invalid bid selected or payment already initiated for this bid.";
+        logActivity($conn, $user_id, $_SESSION['username'], "Invalid bid selected for payment initiation: " . $bid_id);
+        header('Location: payments.php');
+        exit();
+    }
+}
+
+
+?>
 
 <head>
     <title>Start Payment</title>
@@ -42,7 +104,7 @@ $winning_bids = $stmt->fetchAll();
         }
 
         .container {
-        
+
             margin: 20px 200px;
             background: white;
             padding: 30px;
@@ -50,8 +112,8 @@ $winning_bids = $stmt->fetchAll();
             display: flex;
             justify-content: center;
             flex-direction: column;
-           
-            
+
+
         }
 
         h2 {
@@ -167,8 +229,8 @@ $winning_bids = $stmt->fetchAll();
                         <option value="">-- Choose an auction --</option>
                         <?php foreach ($winning_bids as $bid): ?>
                             <option value="<?php echo $bid['bid_id']; ?>" data-amount="<?php echo $bid['amount_bidded']; ?>">
-                                <?php echo htmlspecialchars($bid['auction_title']); ?> -
-                                Won: $<?php echo number_format($bid['amount_bidded'], 2); ?>
+                                <?php echo htmlspecialchars($bid['auction_name']); ?> -
+                                Won: ksh<?php echo number_format($bid['amount_bidded'], 2); ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
@@ -179,8 +241,8 @@ $winning_bids = $stmt->fetchAll();
 
                 <!-- Amount to pay (auto-filled, cannot change) -->
                 <div class="form-group">
-                    <label>Amount to Pay ($):</label>
-                    <input type="text" id="amount" readonly required>
+                    <label>Amount to Pay (Ksh):</label>
+                    <input type="text" id="amount" name="amount" placeholder="Select an auction to see amount" readonly>
                     <small style="color: #666;">Amount is fixed based on your winning bid</small>
                 </div>
 
@@ -212,6 +274,8 @@ $winning_bids = $stmt->fetchAll();
     </div>
 
     <script>
+        //make amount readonly
+        document.getElementById('amount').setAttribute('readonly', true);
         // This function runs when user selects an auction
         function updateAmount() {
             const select = document.getElementById('bid_id');
@@ -241,6 +305,7 @@ $winning_bids = $stmt->fetchAll();
             const bidSelect = document.getElementById('bid_id');
             const amount = document.getElementById('amount').value;
 
+
             if (!bidSelect.value) {
                 alert('Please select an auction to pay for');
                 return false;
@@ -260,51 +325,4 @@ $winning_bids = $stmt->fetchAll();
     </script>
 </body>
 
-</html>
-
-<?php
-// This part runs when form is submitted
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['initiate_payment'])) {
-
-    // Get form data
-    $bid_id = $_POST['bid_id'];
-    $amount = $_POST['amount'];
-    $payment_method = $_POST['payment_method'];
-    $transaction_reference = !empty($_POST['transaction_reference']) ? trim($_POST['transaction_reference']) : null;
-
-    
-    if ($check_stmt->rowCount() > 0) {
-        // Save payment to database with status 'pending'
-        $stmt = $conn->prepare("
-            INSERT INTO payment 
-            (bid_id, bidder_id, amount, payment_method, payment_status, transaction_reference, payment_date)
-            VALUES (?, ?, ?, ?, 'pending', ?, NOW())
-        ");
-
-        try {
-            $stmt->execute([
-                $bid_id,
-                $user_id,
-                $amount,
-                $payment_method,
-                $transaction_reference
-            ]);
-
-            $_SESSION['success'] = "Payment started successfully! Please wait for staff to process it.";
-            header('Location: user_payment_list.php');
-            exit();
-
-        } catch (PDOException $e) {
-            $_SESSION['error'] = "Database error: " . $e->getMessage();
-            header('Location: payments.php');
-            exit();
-        }
-    } else {
-        $_SESSION['error'] = "Invalid bid selected.";
-        header('Location: payments.php');
-        exit();
-    }
-}
-
-include __DIR__ . '/../footer.php';
-?>
+<?php include __DIR__ . '/../footer.php'; ?>

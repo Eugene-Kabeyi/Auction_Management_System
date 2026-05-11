@@ -1,6 +1,7 @@
 <?php
 include __DIR__ . '/../header.php';
 include __DIR__ . '/../config.php';
+include __DIR__ . '/../log_activity.php';
 
 if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
     header('Location: ../staff/staff_login.php');
@@ -38,8 +39,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($success) {
             $_SESSION['success'] = "Department updated successfully!";
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Updated department with ID: " . $dept_id);
         } else {
             $_SESSION['error'] = "An error occurred while updating.";
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed to update department with ID: " . $dept_id);
         }
 
         header('Location: department_list.php');
@@ -53,8 +56,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         if ($success) {
             $_SESSION['success'] = "Department deleted successfully!";
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Deleted department with ID: " . $dept_id);
         } else {
             $_SESSION['error'] = "Failed to delete department.";
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed to delete department with ID: " . $dept_id);
         }
 
         header('Location: department_list.php');

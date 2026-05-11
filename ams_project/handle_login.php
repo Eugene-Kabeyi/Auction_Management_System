@@ -1,6 +1,7 @@
 <?php
 session_start();
-include 'config.php'; // make sure the path is correct
+include 'config.php'; 
+include 'log_activity.php';
 
 $error = '';
 
@@ -57,10 +58,13 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
                 $_SESSION['success'] = "Login successful! Welcome, " . htmlspecialchars($user['firstname']) . ".";
                 if ($loginType === 'admin') {
+                    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Admin logged in");
                     header("Location: ../ams_project/admin/admin_dashboard.php");
                 } elseif ($loginType === 'staff') {
+                    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Staff logged in");
                     header("Location: ../ams_project/staff/staff_dashboard.php");
                 } else {
+                    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "User logged in");
                     header("Location: ../ams_project/users/user_dashboard.php");
                 }
                 exit(); // very important
@@ -69,19 +73,22 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
             } else {
                 $_SESSION['error'] = $error;
                 if ($loginType === 'staff') {
+                    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed staff login attempt: " . $error);
                     header("Location: ../ams_project/staff/staff_login.php?error=1");
                     exit();
                 } elseif ($loginType === 'admin') {
-                    header("Location: ../ams_project/staff/staff_login.php?error=1");
-
+                    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed admin login attempt: " . $error);
+                    header("Location: ../ams_project/admin/admin_login.php?error=1");
                     exit();
                 } else {
+                    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed user login attempt: " . $error);
                     header("Location: ../ams_project/users/login.php?error=1");
                     exit();
                 }
             }
         } catch (Exception $e) {
             $error = "Database error: " . $e->getMessage();
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Database error during login: " . $error);
             $_SESSION['error'] = $error;
         }
     }

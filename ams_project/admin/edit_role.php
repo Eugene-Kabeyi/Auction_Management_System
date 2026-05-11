@@ -1,5 +1,6 @@
 <?php
 include __DIR__ . '/../header.php';
+include __DIR__ . '/../log_activity.php';
 
 if (isset($_SESSION['user_id']) && $_SESSION['login_type'] === 'admin') {
     // User is logged in and has the admin role, allow access to the page
@@ -8,6 +9,7 @@ if (isset($_SESSION['user_id']) && $_SESSION['login_type'] === 'admin') {
     header("Location: ../staff/staff_login.php");
     session_destroy();
     $_SESSION['error'] = "Please log in as an admin to access this page.";
+    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed to access role edit page without admin privileges.");
     exit();
 }
 include __DIR__ . '/../config.php';
@@ -34,8 +36,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $success = $tmt->execute(['role_id' => $role_id]);
         if ($success) {
             $_SESSION['success'] = "Role deleted successfully.";
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Deleted role with ID: " . $role_id);
         } else {
             $_SESSION['error'] = "Failed to delete role.";
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed to delete role with ID: " . $role_id);
         }
         header("Location: role.php");
         exit();
@@ -44,8 +48,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $success = $stmt->execute(['role_name' => $role_name, 'role_description' => $role_description, 'role_id' => $role_id]);
         if ($success) {
             $_SESSION['success'] = "Role updated successfully.";
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Updated role with ID: " . $role_id);
         } else {
             $_SESSION['error'] = "Failed to update role.";
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed to update role with ID: " . $role_id);
         }
         // Redirect back to the roles list page after updating
         header("Location: role.php");
@@ -53,6 +59,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Invalid form submission
         $_SESSION['error'] = "Invalid form submission.";
+        logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Invalid form submission while editing role with ID: " . $role_id);
+        header("Location: role_edit.php?role_id=" . $role_id);
+        exit();
 
     }
 }

@@ -42,6 +42,18 @@ $payments = $stmt->fetchAll();
 </head>
 
 <body>
+    <?php if (!empty($_SESSION['success'])): ?>
+        <div class="flash success">
+            <?php echo $_SESSION['success'];
+            unset($_SESSION['success']); ?>
+        </div>
+    <?php endif; ?>
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?php echo $_SESSION['error'];
+            unset($_SESSION['error']); ?>
+        </div>
+    <?php endif; ?>
     <h2>My Payments</h2>
     <div class="outer_container">
         <table>

@@ -1,5 +1,6 @@
 <?php
 include __DIR__ . '/../header.php';
+include __DIR__ . '/../log_activity.php';
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
     // Redirect to login page if not logged in
     header('Location: ../staff/staff_login.php');
@@ -10,33 +11,93 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id']) || $_SESSION['lo
 include __DIR__ . '/../config.php';
 ?>
 
+<?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $staff_id = $_GET['id'];
+    $employee_id = $_POST['employee_id'];
+    $national_id = $_POST['national_id'];
+    $firstname = $_POST['firstname'];
+    $secondname = $_POST['secondname'];
+    $surname = $_POST['surname'];
+    $email = $_POST['email'];
+    $phone_number = $_POST['phone_number'];
+    $job_title = $_POST['job_title'];
+    $role_id = $_POST['role_id'];
+    $employment_status = $_POST['employment_status'];
+    // Update the staff member in the database  
+    if (isset($_POST['delete_staff'])) {
+        $stmt = $conn->prepare("DELETE FROM staff WHERE staff_id = :staff_id");
+        $success = $stmt->execute(['staff_id' => $staff_id]);
+        if ($success) {
+            $_SESSION['success'] = "Staff member deleted successfully.";
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Deleted staff member with ID: " . $staff_id);
+        } else {
+            $_SESSION['error'] = "Failed to delete staff member.";
+        }
+        header("Location: staff_list.php");
+        exit();
+    } elseif (isset($_POST['update_staff'])) {
+        $stmt = $conn->prepare("UPDATE staff SET employee_id = :employee_id, national_id = :national_id, firstname = :firstname, secondname = :secondname, surname = :surname, email = :email, phone_number = :phone_number, job_title = :job_title, role_id = :role_id, employment_status = :employment_status WHERE staff_id = :staff_id");
+        $success = $stmt->execute([
+            'employee_id' => $employee_id,
+            'national_id' => $national_id,
+            'firstname' => $firstname,
+            'secondname' => $secondname,
+            'surname' => $surname,
+            'email' => $email,
+            'phone_number' => $phone_number,
+            'job_title' => $job_title,
+            'role_id' => $role_id,
+            'employment_status' => $employment_status,
+            'staff_id' => $staff_id
+        ]);
+        if ($success) {
+            $_SESSION['success'] = "Staff member updated successfully.";
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Updated staff member with ID: " . $staff_id);
+        } else {
+            $_SESSION['error'] = "Failed to update staff member.";
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed to update staff member with ID: " . $staff_id);
+        }
+        header("Location: staff_edit.php?id=" . $staff_id);
+        exit();
+
+
+
+    } else {
+        // Invalid form submission
+        $_SESSION['error'] = "Invalid form submission.";
+        logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Invalid form submission while editing staff member with ID: " . $staff_id);
+        header("Location: staff_edit.php?id=" . $staff_id);
+        exit();
+    }
+}
+?>
+
 <head>
     <title>Edit Staff Member</title>
-    <link rel="stylesheet" href="admin_style.css">
+    <link rel="stylesheet" href="../css/form_table_styles.css">
 </head>
 
 <body>
-    <div class="outer_container">
+    <?php if (!empty($_SESSION['success'])): ?>
+        <div class="flash success">
+            <?php echo $_SESSION['success'];
+            unset($_SESSION['success']); ?>
+        </div>
+    <?php endif; ?>
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?php echo $_SESSION['error'];
+            unset($_SESSION['error']); ?>
+        </div>
+    <?php endif; ?>
+    <div class="outer_container f_container">
         <h2>Edit Staff Member</h2>
 
         <a href="staff_list.php" class="back">Back to Staff List</a>
 
         <?php
-        /* Fetch staff members from the database(username,                | national_id       
-| employee_id       
-| role_id           
-| department_id     
-| firstname         
-| secondname        
-| surname           
-| job_title         
-| phone_number      
-| email            
-| username        
-| password_hash    
-| hire_date         
-| employment_status | enum('active','on_leave','terminated','suspended') )*/
-        //Based on selected staff
+
         $_GET['id'];
 
         $stmt = $conn->query("SELECT s.staff_id, s.firstname, s.secondname, s.surname, s.username, s.national_id, s.hire_date, s.employment_status, s.job_title, s.email, s.employee_id, r.role_name AS role, s.phone_number FROM staff s JOIN roles r ON s.role_id = r.role_id WHERE s.staff_id = " . $_GET['id']);
@@ -79,7 +140,7 @@ include __DIR__ . '/../config.php';
 
             <label for="role">Role:</label>
             <?php $stmt = $conn->query("SELECT * FROM roles");
-            $roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $roles = $stmt->fetchAll();
             ?>
             <select name="role_id" id="role_id">
                 <?php foreach ($roles as $role): ?>
@@ -98,7 +159,9 @@ include __DIR__ . '/../config.php';
             </select>
 
             <button type="submit" name="update_staff">Update Staff Member</button>
-            <button type="submit" name="delete_staff" value="delete" class="delete">Delete Staff Member</button>
+            <button type="submit" name="delete_staff" value="delete" class="delete"
+                onclick="return confirm('Are you sure you want to delete this staff member?')">Delete Staff
+                Member</button>
         </form>
     </div>
 </body>
@@ -106,53 +169,10 @@ include __DIR__ . '/../config.php';
 <script>
     //show warning before deleting a staff member
     const deleteButton = document.querySelector('.delete');
-    deleteButton.addEventListener('click', function(event) {
+    deleteButton.addEventListener('click', function (event) {
         const confirmDelete = confirm("Are you sure you want to delete this staff member? This action cannot be undone.");
         if (!confirmDelete) {
             event.preventDefault(); // Prevent form submission if user cancels
         }
     });
 </script>
-<?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $staff_id = $_GET['id'];
-    $employee_id = $_POST['employee_id'];
-    $national_id = $_POST['national_id'];
-    $firstname = $_POST['firstname'];
-    $secondname = $_POST['secondname'];
-    $surname = $_POST['surname'];
-    $email = $_POST['email'];
-    $phone_number = $_POST['phone_number'];
-    $job_title = $_POST['job_title'];
-    $role_id = $_POST['role_id'];
-    $employment_status = $_POST['employment_status'];   
-    // Update the staff member in the database  
-    if (isset($_POST['delete_staff'])) {
-        $stmt = $conn->prepare("DELETE FROM staff WHERE staff_id = :staff_id");
-        $stmt->execute(['staff_id' => $staff_id]);
-        header("Location: staff_list.php");
-        exit();
-    } elseif (isset($_POST['update_staff'])) {
-        $stmt = $conn->prepare("UPDATE staff SET employee_id = :employee_id, national_id = :national_id, firstname = :firstname, secondname = :secondname, surname = :surname, email = :email, phone_number = :phone_number, job_title = :job_title, role_id = :role_id, employment_status = :employment_status WHERE staff_id = :staff_id");
-        $stmt->execute([
-            'employee_id' => $employee_id,
-            'national_id' => $national_id,
-            'firstname' => $firstname,
-            'secondname' => $secondname,
-            'surname' => $surname,
-            'email' => $email,
-            'phone_number' => $phone_number,
-            'job_title' => $job_title,
-            'role_id' => $role_id,
-            'employment_status' => $employment_status,
-            'staff_id' => $staff_id
-        ]);
-        // Redirect back to the staff list page after updating
-        header("Location: staff_list.php");
-        exit();
-    } else {
-        // Invalid form submission
-        $_SESSION['error'] = "Invalid form submission.";
-    }
-}
-    ?>

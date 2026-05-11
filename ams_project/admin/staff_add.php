@@ -9,42 +9,110 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id']) || $_SESSION['lo
 }
 include __DIR__ . '/../config.php';
 ?>
+<?php
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Retrieve and sanitize form inputs
+    $firstname = $_POST['firstname'];
+    $secondname = $_POST['secondname'];
+    $surname = $_POST['surname'];
+    $email = $_POST['email'];
+    $phone_number = $_POST['phone_number'];
+    $job_title = $_POST['job_title'];
+    $department_id = $_POST['department_id'];
+    $role_id = $_POST['role_id'];
+    $employee_id = $_POST['employee_id'];
+    $national_id = $_POST['national_id'];
+    $username = $_POST['username'];
+    $password = $_POST['password'];
+    $hire_date = $_POST['hire_date'];
+    $employment_status = $_POST['employment_status'];
+    //format date for database
+    $date_parts = explode("/", $hire_date);
+    if (count($date_parts) == 3) {
+        $hire_date = $date_parts[2] . "-" . $date_parts[1] . "-" . $date_parts[0];
+    }else {
+        $hire_date = null; // Invalid date format, set to null
+    }
+
+
+
+
+    // Prepare and execute the insert statement
+    $stmt = $conn->prepare("INSERT INTO staff (firstname, secondname, surname, email, phone_number, job_title, department_id, role_id, employee_id, national_id, username, password_hash, hire_date, employment_status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+    $success = $stmt->execute([
+        $firstname,
+        $secondname,
+        $surname,
+        $email,
+        $phone_number,
+        $job_title,
+        $department_id,
+        $role_id,
+        $employee_id,
+        $national_id,
+        $username,
+        $password,
+        $hire_date,
+        $employment_status
+    ]);
+    if ($success) {
+        $_SESSION['success'] = "Staff member added successfully!";
+    } else {
+        $_SESSION['error'] = "An error occurred while adding the staff member.";
+    }
+    // Redirect to staff list after successful addition
+    header("Location: staff_list.php");
+    exit();
+}
+?>
 
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Add New Staff Member</title>
-    <link rel="stylesheet" href="admin_style.css">
-    
+    <title>Add Staff Member</title>
+    <link rel="stylesheet" href="../css/form_table_styles.css">
+    <style>
+        #togglePassword {
+            cursor: pointer;
+            font-size: 10px;
+            color: #7a7b7c;
+            margin-left: 5px;
+        }
+
+        .pass_w {
+            font-family: 'Courier New', Courier, monospace;
+            letter-spacing: 3px;
+            -webkit-text-security: disc;
+        }
+    </style>
+
 </head>
 
 <body>
-    <!-- ADD staff members TO the database(username,                | national_id       
-| employee_id       
-| role_id           
-| department_id     
-| firstname         
-| secondname        
-| surname           
-| job_title         
-| phone_number      
-| email            
-| username        
-| password_hash    
-| hire_date         
-| employment_status | enum('active','on_leave','terminated','suspended') )*/-->
-    <div class="outer_container">
+    <?php if (!empty($_SESSION['success'])): ?>
+        <div class="flash success">
+            <?= htmlspecialchars($_SESSION['success']); ?>
+        </div>
+        <?php unset($_SESSION['success']); ?>
+    <?php endif; ?>
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?= htmlspecialchars($_SESSION['error']); ?>
+        </div>
+        <?php unset($_SESSION['error']); ?>
+    <?php endif; ?>
+    <div class="outer_container f_container">
         <h2>Add New Staff Member</h2>
         <a href="staff_list.php" class="back">Back to Staff List</a>
         <form action="" method="POST" onsubmit="return validateStaff()">
 
             <label for="firstname">First Name:</label>
-            <input type="text" id="firstname" name="firstname" required>
+            <input type="text" id="firstname" name="firstname" >
 
             <label for="secondname">Second Name:</label>
             <input type="text" id="secondname" name="secondname">
 
             <label for="surname">Surname:</label>
-            <input type="text" id="surname" name="surname" required>
+            <input type="text" id="surname" name="surname" >
 
             <label for="email">Email:</label>
             <input type="text" id="email" name="email" required>
@@ -56,8 +124,17 @@ include __DIR__ . '/../config.php';
             <input type="text" id="job_title" name="job_title">
 
             <label for="department_id">Department ID:</label>
-            <input type="text" id="department_id" name="department_id">
-
+            <?php
+            $tmt = $conn->query("SELECT * FROM department");
+            $departments = $tmt->fetchAll(PDO::FETCH_ASSOC);
+            ?>
+            <select id="department_id" name="department_id">
+                <option value="">--Select Department--</option>
+                <?php foreach ($departments as $department): ?>
+                    <option value="<?= $department['department_id'] ?>"><?= $department['department_name'] ?></option>
+                <?php endforeach; ?>
+            </select>
+            
             <label for="role_id">Role:</label>
             <?php
             $stmt = $conn->query("SELECT * FROM roles");
@@ -79,7 +156,8 @@ include __DIR__ . '/../config.php';
             <input type="text" id="username" name="username" required>
 
             <label for="password">Password:</label>
-            <input type="password" id="password" name="password" required>
+            <input type="text" id="password" name="password" >
+            <span id="togglePassword" onclick="togglePasswordVisibility()">Show/Hide</span>
 
             <label for="hire_date">Hire Date:</label>
             <input type="text" id="hire_date" name="hire_date">
@@ -108,6 +186,21 @@ include __DIR__ . '/../config.php';
     </div>
 </body>
 <script>
+    function togglePasswordVisibility() {
+
+                // Fetch the password field and the toggle text element
+                var passwordField = document.getElementById("password");
+                var toggleText = document.getElementById("togglePassword");
+
+                // Toggle the class to switch between text and password styles
+                if (passwordField.classList.contains("pass_w")) {
+                    passwordField.classList.remove("pass_w");
+                    toggleText.textContent = "Hide";
+                } else {
+                    passwordField.classList.add("pass_w");
+                    toggleText.textContent = "Show";
+                }
+            }
 
     function validateStaff() {
 
@@ -123,7 +216,6 @@ include __DIR__ . '/../config.php';
         return true;
     }
 
-    //////////////////////////////////////////////////
     // NAMES
     function validateNames() {
 
@@ -143,7 +235,6 @@ include __DIR__ . '/../config.php';
         return true;
     }
 
-    //////////////////////////////////////////////////
     // EMAIL
     function validateEmail() {
 
@@ -162,7 +253,6 @@ include __DIR__ . '/../config.php';
         return true;
     }
 
-    //////////////////////////////////////////////////
     // PHONE
     function validatePhone() {
 
@@ -186,7 +276,6 @@ include __DIR__ . '/../config.php';
         return true;
     }
 
-    //////////////////////////////////////////////////
     // IDS
     function validateIDs() {
 
@@ -206,7 +295,6 @@ include __DIR__ . '/../config.php';
         return true;
     }
 
-    //////////////////////////////////////////////////
     // USERNAME
     function validateUsername() {
 
@@ -234,7 +322,6 @@ include __DIR__ . '/../config.php';
         return true;
     }
 
-    //////////////////////////////////////////////////
     // DATE
     function validateDate() {
 
@@ -261,11 +348,18 @@ include __DIR__ . '/../config.php';
             alert("Date must contain numbers only");
             return false;
         }
+        //convert to date and make sure it is not in the future
+        var hireDate = new Date(parts[2], parts[1] - 1, parts[0]);
+        var today = new Date();
+        if (hireDate > today) {
+            alert("Hire date cannot be in the future");
+            return false;
+        }
 
         return true;
-    }
 
-    //////////////////////////////////////////////////
+
+    }
     // DROPDOWNS
     function validateDropdowns() {
 
@@ -287,46 +381,3 @@ include __DIR__ . '/../config.php';
 
 </script>
 <?php include __DIR__ . '/../footer.php'; ?>
-<?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Retrieve and sanitize form inputs
-    $firstname = $_POST['firstname'];
-    $secondname = $_POST['secondname'];
-    $surname = $_POST['surname'];
-    $email = $_POST['email'];
-    $phone_number = $_POST['phone_number'];
-    $job_title = $_POST['job_title'];
-    $department_id = $_POST['department_id'];
-    $role_id = $_POST['role_id'];
-    $employee_id = $_POST['employee_id'];
-    $national_id = $_POST['national_id'];
-    $username = $_POST['username'];
-    $password = $_POST['password'];
-    $hire_date = $_POST['hire_date'];
-    $employment_status = $_POST['employment_status'];
-
-
-
-    // Prepare and execute the insert statement
-    $stmt = $conn->prepare("INSERT INTO staff (firstname, secondname, surname, email, phone_number, job_title, department_id, role_id, employee_id, national_id, username, password_hash, hire_date, employment_status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-    $stmt->execute([
-        $firstname,
-        $secondname,
-        $surname,
-        $email,
-        $phone_number,
-        $job_title,
-        $department_id,
-        $role_id,
-        $employee_id,
-        $national_id,
-        $username,
-        $password,
-        $hire_date,
-        $employment_status
-    ]);
-    // Redirect to staff list after successful addition
-    header("Location: staff_list.php");
-    exit();
-}
-?>

@@ -1,4 +1,5 @@
 <?php include __DIR__ . '/../header.php';
+include __DIR__ . '/../log_activity.php';
 
 if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
     if (isset($_SESSION['login_type']) && ($_SESSION['login_type'] === 'admin' || $_SESSION['login_type'] === 'staff')) {
@@ -37,6 +38,7 @@ $alreadyFinalized = $stmt->fetch()['c'];
 // FINALIZE AUCTION
 
 if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
+    
 
     $conn->beginTransaction();
 
@@ -55,6 +57,7 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
         $stmt->execute(['auction_id' => $auction_id]);
 
         $conn->commit();
+        logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Auction finalized for auction ID: " . $auction_id);
 
     } catch (Exception $e) {
         $conn->rollBack();
@@ -62,13 +65,61 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
 
             $_SESSION['error'] = "Error finalizing auction.";
         }
+        logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Error finalizing auction for auction ID: " . $auction_id . " - " . $e->getMessage());
+        header("Location: live_auction.php?auction_id=" . $auction_id);
+        exit();
+       
     }
 }
 ?>
 
+<?php
 
+// Handle bid submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $bid_amount = $_POST['bid_amount'];
+    $user_id = $_SESSION['user_id']; // Assuming user ID is stored in session 
+    if ($bid_amount < $minimum_bid) {
+        $_SESSION['error'] = "Bid must be at least $minimum_bid";
+        header("Location: live_auction.php?auction_id=" . $auction_id);
+        exit();
+    }
+    // Insert bid into database with transaction to ensure data integrity
+    $conn->beginTransaction();
+
+    try {
+        // 1. Mark exisying winning bid as outbid
+        $stmt = $conn->prepare("UPDATE auction_bids SET bid_status = 'outbid' WHERE auction_id = :auction_id AND bid_status = 'winning'");
+        $stmt->execute(['auction_id' => $auction_id]);
+
+        // 2. Insert new bid as winning
+        $stmt = $conn->prepare("INSERT INTO auction_bids (auction_id, bidder_id, amount_bidded, bid_status) VALUES (:auction_id, :user_id, :amount_bidded, 'winning')");
+        $stmt->execute([
+            'auction_id' => $auction_id,
+            'user_id' => $user_id,
+            'amount_bidded' => $bid_amount
+        ]);
+
+        $conn->commit();
+        logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Placed a bid of Ksh " . number_format($bid_amount, 2) . " on auction ID: " . $auction_id);
+
+        // Redirect
+        header("Location: live_auction.php?auction_id=" . $auction_id);
+        exit();
+
+    } catch (Exception $e) {
+        $conn->rollBack();
+        $_SESSION['error'] = "Error placing bid.";
+        logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Error placing bid on auction ID: " . $auction_id . " - " . $e->getMessage());
+        header("Location: live_auction.php?auction_id=" . $auction_id);
+        exit();
+    }
+
+
+} ?>
 
 <head>
+    <title>Live Auction</title>
     <style>
         html,
         body {
@@ -500,44 +551,5 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
                     hours + "h " + minutes + "m " + seconds + "s";
 
             }, 1000);
-       });
+        });
     </script>
-    <?php
-    // Handle bid submission
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $bid_amount = $_POST['bid_amount'];
-        $user_id = $_SESSION['user_id']; // Assuming user ID is stored in session 
-        if ($bid_amount < $minimum_bid) {
-            $_SESSION['error'] = "Bid must be at least $minimum_bid";
-            header("Location: live_auction.php?auction_id=" . $auction_id);
-            exit();
-        }
-        // Insert bid into database with transaction to ensure data integrity
-        $conn->beginTransaction();
-
-        try {
-            // 1. Mark exisying winning bid as outbid
-            $stmt = $conn->prepare("UPDATE auction_bids SET bid_status = 'outbid' WHERE auction_id = :auction_id AND bid_status = 'winning'");
-            $stmt->execute(['auction_id' => $auction_id]);
-
-            // 2. Insert new bid as winning
-            $stmt = $conn->prepare("INSERT INTO auction_bids (auction_id, bidder_id, amount_bidded, bid_status) VALUES (:auction_id, :user_id, :amount_bidded, 'winning')");
-            $stmt->execute([
-                'auction_id' => $auction_id,
-                'user_id' => $user_id,
-                'amount_bidded' => $bid_amount
-            ]);
-
-            $conn->commit();
-
-            // Redirect
-            header("Location: live_auction.php?auction_id=" . $auction_id);
-            exit();
-
-        } catch (Exception $e) {
-            $conn->rollBack();
-            $_SESSION['error'] = "Error placing bid.";
-        }
-
-
-    } ?>
