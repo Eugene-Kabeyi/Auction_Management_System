@@ -1,20 +1,39 @@
 <?php
 include __DIR__ . '/../header.php';
+include __DIR__ . '/../log_activity.php';
 
 if (isset($_SESSION['user_id']) && $_SESSION['login_type'] === 'admin') {
     // User is logged in and has the admin role, allow access to the page
 } else {
     // User is not logged in or does not have the admin role, redirect to login page
     header("Location: ../staff/staff_login.php");
+    logActivity($conn, $_SESSION['user_id'] ?? null, $_SESSION['username'] ?? 'Unknown', "Failed to access admin dashboard without admin privileges.");
     session_destroy();  
     $_SESSION['error'] = "Please log in as an admin to access this page.";
     exit();
 }
 
 include __DIR__ . '/../config.php';
+// Fetch total number of users for dashboard stats
 $stmt = $conn->prepare('SELECT COUNT(*) FROM users');
 $stmt -> execute();
 $count_users = $stmt ->fetchColumn();
+
+// Fetch total number of items for dashboard stats
+$stmt = $conn->prepare('SELECT COUNT(*) FROM evaluated_items WHERE final_decision = "Approved"');
+$stmt -> execute();
+$count_items = $stmt ->fetchColumn();  
+
+// Fetch live auctions for dashboard display 
+$stmt = $conn->prepare('SELECT * FROM auctions WHERE status = "upcoming" OR status = "ongoing"');
+$stmt -> execute();
+$live_auctions = $stmt ->fetchAll();   
+
+// Fetch payments processed
+$stmt = $conn->prepare("SELECT SUM(amount) FROM payment WHERE payment_status =  'completed' ");
+$stmt -> execute();
+$payments = $stmt -> fetchColumn();
+
 
 ?>
     <?php if (!empty($_SESSION['success'])): ?>
@@ -36,15 +55,17 @@ $count_users = $stmt ->fetchColumn();
     <!-- Admin Stats -->
     <div class="stats-container">
         <div class="stat-card">
+            <a href="../staff/evaluated_list.php" style="text-decoration:none;">
             <div class="stat-icon">📦</div>
-            <div class="stat-value">128</div>
-            <div class="stat-label">Items Listed</div>
+            <div class="stat-value"><?= $count_items ?></div>
+            <div class="stat-label">Items Listed</div></a>
         </div>
-
         <div class="stat-card">
+            <a href="../users/auction_list.php" style="text-decoration:none;">
             <div class="stat-icon">🔨</div>
-            <div class="stat-value">12</div>
+            <div class="stat-value"><?= count($live_auctions) ?></div>
             <div class="stat-label">Active Auctions</div>
+            </a>
         </div>
 
         <div class="stat-card"><a href="user_list.php" style="text-decoration:none;">
@@ -54,9 +75,11 @@ $count_users = $stmt ->fetchColumn();
         </div>
 
         <div class="stat-card">
+            <a href="../staff/payment_list.php" style="text-decoration:none;">
             <div class="stat-icon">💰</div>
-            <div class="stat-value">$98,430</div>
+            <div class="stat-value">Ksh <?= number_format($payments, 2) ?></div>
             <div class="stat-label">Total Revenue</div>
+            </a>
         </div>
     </div>
 
@@ -105,8 +128,10 @@ $count_users = $stmt ->fetchColumn();
             </div>
 
             <div class="action-btn">
-                <div class="action-icon">🧾</div>
-                <div class="action-label">Settlement Processing</div>
+                <a href="system_logs.php">
+                    <div class="action-icon">🧾</div>
+                    <div class="action-label">System Logs</div>
+                </a>
             </div>
 
         </div>

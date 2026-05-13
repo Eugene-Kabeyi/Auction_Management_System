@@ -2,7 +2,7 @@
 include __DIR__ . '/../header.php';
 include __DIR__ . '/../config.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'staff') {
     header('Location: ../staff/staff_login.php');
     session_destroy();
     $_SESSION['error'] = "Please log in as an admin to access this page.";

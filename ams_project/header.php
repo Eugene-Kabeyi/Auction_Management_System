@@ -119,3 +119,25 @@ if (session_status() == PHP_SESSION_NONE) {
 
     </script>
 </nav>
+<?php
+include_once __DIR__ . '/config.php';
+$stmt = $conn->prepare("
+    UPDATE auctions
+    SET status = CASE
+
+        WHEN NOW() < start_time
+            THEN 'upcoming'
+
+        WHEN NOW() BETWEEN start_time AND end_time
+            THEN 'ongoing'
+
+        WHEN NOW() > end_time
+            THEN 'completed'
+
+    END
+
+    WHERE status != 'cancelled'
+");
+
+$stmt->execute();
+?>

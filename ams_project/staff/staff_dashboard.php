@@ -72,7 +72,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
                 <div class="action-label">Manage Inventory</div>
             </a></div>
             
-            <div class="action-btn" ><a href="create_invoices.php">
+            <div class="action-btn" ><a href="invoice_list.php">
                 <div class="action-icon">📊</div>
                 <div class="action-label">Invoices</div></a>
             </div>

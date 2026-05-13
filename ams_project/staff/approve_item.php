@@ -13,13 +13,96 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
 
 
 include __DIR__ . '/../header.php';
+include __DIR__ . '/../config.php';
+include __DIR__ . '/../log_activity.php';
 
 
 
 
 ?>
+<?php
+// Handle form submission
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $item_id = $_POST['item_id'];
+    $action = $_POST['action'];
+    $date = $_POST['evaluation_date'];
+    // format date to yyyy-mm-dd for database storage
+    $date = explode('/', $date);
+    if (count($date) === 3) {
+        $date = $date[2] . '-' . $date[1] . '-' . $date[0];
+    } else {
+        $date = date('Y-m-d'); // Fallback to current date if format is incorrect
+    }
+
+    if (empty($_POST['eval_notes']) || $_POST['reserved_price'] <= 0) {
+        $_SESSION['error'] = "Invalid evaluation data";
+        exit();
+    }
+
+    if ($action === 'approved') {
+        // Insert evaluation data into evaluated_items table
+        $tmt = $conn->prepare("INSERT INTO evaluated_items (item_id, evaluator_id,evaluation_date ,condition_rating, authenticity_status,reserve_price, evaluation_notes,final_decision) VALUES (:item_id, :evaluator_id, :evaluation_date, :condition_rating, :authenticity_status, :reserve_price, :evaluation_notes, :final_decision)");
+        $success = $tmt->execute([
+            ':item_id' => $item_id,
+            ':evaluator_id' => (int) $_SESSION['user_id'],
+            ':evaluation_date' => $date,
+            ':condition_rating' => $_POST['rating'],
+            ':authenticity_status' => $_POST['authenticity'],
+            ':reserve_price' => $_POST['reserved_price'],
+            ':evaluation_notes' => $_POST['eval_notes'],
+            ':final_decision' => $action
+        ]);
+        if (!$success) {
+            $_SESSION['error'] = "Failed to save evaluation data";
+            logActivity($conn, $_SESSION['user_id'] ?? null, $_SESSION['username'] ?? 'Unknown', "Failed to save evaluation data for item ID: " . $item_id);
+            exit();
+        } elseif ($success) {
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Approved item ID: " . $item_id);
+
+            // Update item status to approved in the database
+            $stmt = $conn->prepare("UPDATE consigner_items SET item_status = :action WHERE item_id = :item_id");
+            $stmt->execute([':action' => $action, ':item_id' => $item_id]);
+        }
+
+        $_SESSION['success'] = " Item approved successfully!";
+
+
+    } elseif ($action === 'rejected') {
+        // Insert evaluation details into evaluated_items table with final_decision as 'rejected'
+        $tmt = $conn->prepare("INSERT INTO evaluated_items (item_id, evaluator_id,evaluation_date ,condition_rating, authenticity_status,reserve_price, evaluation_notes,final_decision) VALUES (:item_id, :evaluator_id, :evaluation_date, :condition_rating, :authenticity_status, :reserve_price, :evaluation_notes, :final_decision)");
+        ;
+        $success = $tmt->execute([
+            ':item_id' => $item_id,
+            ':evaluator_id' => (int) $_SESSION['user_id'],
+            ':evaluation_date' => $date,
+            ':condition_rating' => $_POST['rating'],
+            ':authenticity_status' => $_POST['authenticity'],
+            ':reserve_price' => $_POST['reserved_price'],
+            ':evaluation_notes' => $_POST['eval_notes'],
+            ':final_decision' => $action
+        ]);
+        if (!$success) {
+            $_SESSION['error'] = "Failed to save evaluation data";
+            logActivity($conn, $_SESSION['user_id'] ?? null, $_SESSION['username'] ?? 'Unknown', "Failed to save evaluation data for item ID: " . $item_id);
+            exit();
+        } elseif ($success) {
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Rejected item ID: " . $item_id);
+
+            // Update item status to rejected in the database
+            $stmt = $conn->prepare("UPDATE consigner_items SET item_status = 'rejected' WHERE item_id = :item_id");
+            $stmt->execute([':item_id' => $item_id]);
+
+            $_SESSION['success'] = "Item rejected.";
+        }
+
+    }
+    header("Location: staff_dashboard.php");
+    exit();
+}
+?>
 
 <head>
+    <title>Approve Item</title>
     <style>
         .outer_container {
             display: flex;
@@ -118,7 +201,7 @@ include __DIR__ . '/../header.php';
         <div class="f_inner_container">
             <?php
             // Fetch item details from the database based on item_id
-            include __DIR__ . '/../config.php';
+            
             $item_id = $_GET['item_id'] ?? null;
             if ($item_id) {
                 $stmt = $conn->prepare("SELECT * FROM consigner_items WHERE item_id = :item_id ");
@@ -151,18 +234,18 @@ include __DIR__ . '/../header.php';
                 <!--display fetched item_id and make it read-only-->
                 <input type="text" id="item_id" name="item_id"
                     style="border: 1px solid #030303; background-color: #838383; cursor: not-allowed;"
-                    value="<?php echo htmlspecialchars($item['item_id'] ?? ''); ?>" readonly>
+                    value="<?php echo htmlspecialchars($item['item_id'] ?? ''); ?>" >
 
                 <label for="item_name">Item Name:</label>
                 <input type="text" id="item_name" name="item_name"
                     style="border: 1px solid #030303; background-color: #838383; cursor: not-allowed;"
-                    value="<?php echo htmlspecialchars($item['item_name'] ?? ''); ?>" readonly>
+                    value="<?php echo htmlspecialchars($item['item_name'] ?? ''); ?>" >
 
                 <label for="eval_notes">Evaluation notes:</label>
-                <textarea id="eval_notes" name="eval_notes" required></textarea>
+                <textarea id="eval_notes" name="eval_notes" ></textarea>
 
                 <label for="reserved_price">Reserved Price:</label>
-                <input type="number" id="reserved_price" name="reserved_price" required>
+                <input type="text" id="reserved_price" name="reserved_price" >
 
                 <label for="evaluation_date">Evaluation Date:</label>
                 <input type="text" id="evaluation_date" name="evaluation_date" placeholder="dd/mm/yyyy">
@@ -293,6 +376,13 @@ include __DIR__ . '/../header.php';
                 alert("Invalid month");
                 return false;
             }
+            //ensure date is not in the future
+            var today = new Date();
+            var evalDate = new Date(year, month - 1, day);
+            if (evalDate > today) {
+                alert("Evaluation date cannot be in the future");
+                return false;
+            }
 
             return true;
         }
@@ -326,58 +416,4 @@ include __DIR__ . '/../header.php';
     </script>
 </body>
 <?php include __DIR__ . '/../footer.php';
-?>
-<?php
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $item_id = $_POST['item_id'];
-    $action = $_POST['action'];
-    $date = $_POST['evaluation_date'];
-
-    if (empty($_POST['eval_notes']) || $_POST['reserved_price'] <= 0) {
-        $_SESSION['error'] = "Invalid evaluation data";
-        exit();
-    }
-
-    if ($action === 'approved') {
-        // Insert evaluation data into evaluated_items table
-        $tmt = $conn->prepare("INSERT INTO evaluated_items (item_id, evaluator_id,evaluation_date ,condition_rating, authenticity_status,reserve_price, evaluation_notes,final_decision) VALUES (:item_id, :evaluator_id, :evaluation_date, :condition_rating, :authenticity_status, :reserve_price, :evaluation_notes, :final_decision)");
-        $tmt->execute([
-            ':item_id' => $item_id,
-            ':evaluator_id' => (int) $_SESSION['user_id'],
-            ':evaluation_date' => $date,
-            ':condition_rating' => $_POST['rating'],
-            ':authenticity_status' => $_POST['authenticity'],
-            ':reserve_price' => $_POST['reserved_price'],
-            ':evaluation_notes' => $_POST['eval_notes'],
-            ':final_decision' => $action
-        ]);
-
-        // Update item status to approved in the database
-        $stmt = $conn->prepare("UPDATE consigner_items SET item_status = :action WHERE item_id = :item_id");
-        $stmt->execute([':action' => $action, ':item_id' => $item_id]);
-        echo "✅ Item approved successfully!";
-
-
-    } elseif ($action === 'rejected') {
-        // Insert evaluation details into evaluated_items table with final_decision as 'rejected'
-        $tmt = $conn->prepare("INSERT INTO evaluated_items (item_id, evaluator_id,evaluation_date ,condition_rating, authenticity_status,reserve_price, evaluation_notes,final_decision) VALUES (:item_id, :evaluator_id, :evaluation_date, :condition_rating, :authenticity_status, :reserve_price, :evaluation_notes, :final_decision)");
-        ;
-        $tmt->execute([
-            ':item_id' => $item_id,
-            ':evaluator_id' => (int) $_SESSION['user_id'],
-            ':evaluation_date' => $date,
-            ':condition_rating' => $_POST['rating'],
-            ':authenticity_status' => $_POST['authenticity'],
-            ':reserve_price' => $_POST['reserved_price'],
-            ':evaluation_notes' => $_POST['eval_notes'],
-            ':final_decision' => $action
-        ]);
-        // Update item status to rejected in the database
-        $stmt = $conn->prepare("UPDATE consigner_items SET item_status = 'rejected' WHERE item_id = :item_id");
-        $stmt->execute([':item_id' => $item_id]);
-        echo "❌ Item rejected.";
-
-    }
-}
 ?>

@@ -78,7 +78,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                     exit();
                 } elseif ($loginType === 'admin') {
                     logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed admin login attempt: " . $error);
-                    header("Location: ../ams_project/admin/admin_login.php?error=1");
+                    header("Location: ../ams_project/staff/staff_login.php?error=1");
                     exit();
                 } else {
                     logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed user login attempt: " . $error);

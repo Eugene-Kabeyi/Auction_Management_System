@@ -16,19 +16,40 @@ $user_id = $_SESSION['user_id'];
 
 // Get all auctions where this user won but hasn't paid yet
 $stmt = $conn->prepare("
-    SELECT ab.bid_id, ab.auction_id, ab.amount_bidded, a.auction_name
+        SELECT 
+        ab.bid_id,
+        ab.auction_id,
+        ab.amount_bidded,
+        a.auction_name,
+        i.invoice_id,
+        i.invoice_number,
+        i.total_amount,
+        i.status AS invoice_status
+
     FROM auction_bids ab
-    JOIN auctions a ON ab.auction_id = a.auction_id
-    WHERE ab.bidder_id = ? 
+
+    JOIN auctions a
+        ON ab.auction_id = a.auction_id
+
+    JOIN invoices i
+        ON ab.bid_id = i.bid_id
+
+    WHERE ab.bidder_id = ?
     AND ab.result = 'won'
+
+    AND i.status IN ('unpaid', 'overdue')
+
     AND NOT EXISTS (
-        SELECT 1 FROM payment p 
-        WHERE p.bid_id = ab.bid_id 
+        SELECT 1
+        FROM payment p
+        WHERE p.invoice_id = i.invoice_id
         AND p.payment_status IN ('pending', 'completed')
     )
 ");
+
 $stmt->execute([$user_id]);
 $winning_bids = $stmt->fetchAll();
+
 ?>
 
 <?php
@@ -39,16 +60,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['initiate_payment'])) 
     $bid_id = $_POST['bid_id'];
     $amount = $_POST['amount'];
     $payment_method = $_POST['payment_method'];
+    $invoice_id = $_POST['invoice_id'];
     $transaction_reference = !empty($_POST['transaction_reference']) ? trim($_POST['transaction_reference']) : null;
     $check_stmt = $conn->prepare("
-    SELECT bid_id
-    FROM auction_bids
-    WHERE bid_id = ?
-    AND bidder_id = ?
-    AND result = 'won'
+    SELECT i.invoice_id
+    FROM invoices i
+    JOIN auction_bids ab ON i.bid_id = ab.bid_id
+    WHERE ab.bid_id = ?
+    AND ab.bidder_id = ?
+    AND ab.result = 'won'
+    AND i.status IN ('unpaid', 'overdue')
     AND NOT EXISTS (
-        SELECT 1 FROM payment p 
-        WHERE p.bid_id = ab.bid_id 
+        SELECT 1
+        FROM payment p
+        WHERE p.invoice_id = i.invoice_id
         AND p.payment_status IN ('pending', 'completed')
     )
 ");
@@ -60,8 +85,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['initiate_payment'])) 
         // Save payment to database with status 'pending'
         $stmt = $conn->prepare("
             INSERT INTO payment 
-            (bid_id, bidder_id, amount, payment_method, payment_status, transaction_reference, payment_date)
-            VALUES (?, ?, ?, ?, 'pending', ?, NOW())
+            (bid_id, bidder_id, amount, payment_method, payment_status, transaction_reference, payment_date, invoice_id)
+            VALUES (?, ?, ?, ?, 'pending', ?, NOW(), ?)
         ");
 
         try {
@@ -70,7 +95,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['initiate_payment'])) 
                 $user_id,
                 $amount,
                 $payment_method,
-                $transaction_reference
+                $transaction_reference,
+                $invoice_id
             ]);
             logActivity($conn, $user_id, $_SESSION['username'], "Payment initiated for bid ID: " . $bid_id);
 
@@ -79,7 +105,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['initiate_payment'])) 
             exit();
 
         } catch (PDOException $e) {
-            $_SESSION['error'] = "Error initiating payment: " ;
+            $_SESSION['error'] = "Error initiating payment: ";
             logActivity($conn, $user_id, $_SESSION['username'], "Error initiating payment for bid ID: " . $bid_id . " - " . $e->getMessage());
             header('Location: payments.php');
             exit();
@@ -241,6 +267,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['initiate_payment'])) 
 
                 <!-- Amount to pay (auto-filled, cannot change) -->
                 <div class="form-group">
+                    <label for="invoice_id">Invoice ID:</label>
+                    <input type="text" id="invoice_id" name="invoice_id" value = "<?php echo htmlspecialchars ($winning_bids['invoice_id']) ; ?>" >
                     <label>Amount to Pay (Ksh):</label>
                     <input type="text" id="amount" name="amount" placeholder="Select an auction to see amount" readonly>
                     <small style="color: #666;">Amount is fixed based on your winning bid</small>
@@ -276,6 +304,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['initiate_payment'])) 
     <script>
         //make amount readonly
         document.getElementById('amount').setAttribute('readonly', true);
+        document.getElementById('invoice_id').setAttribute('readonly', true);
         // This function runs when user selects an auction
         function updateAmount() {
             const select = document.getElementById('bid_id');

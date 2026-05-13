@@ -24,6 +24,8 @@ $auctionData = $stmt->fetch();
 
 $current_time = date("Y-m-d H:i:s");
 
+
+
 //CHECK IF ALREADY DONE
 
 $stmt = $conn->prepare("
@@ -38,37 +40,90 @@ $alreadyFinalized = $stmt->fetch()['c'];
 // FINALIZE AUCTION
 
 if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
-    
 
     $conn->beginTransaction();
 
     try {
 
-        //SET WINNER + LOSERS
-
-        $stmt = $conn->prepare("
-            UPDATE auction_bids
-            SET result = CASE 
-                WHEN bid_status = 'winning' THEN 'won'
-                ELSE 'lost'
-            END
-            WHERE auction_id = :auction_id
-        ");
+        // MARK WINNER + LOSERS
+        $stmt = $conn->prepare("UPDATE auction_bids SET result = CASE WHEN bid_status = 'winning' THEN 'won' ELSE 'lost' END WHERE auction_id = :auction_id");
         $stmt->execute(['auction_id' => $auction_id]);
 
+
+        // FETCH WINNING BID
+        $winner_stmt = $conn->prepare("SELECT * FROM auction_bids WHERE auction_id = ? AND bid_status = 'winning' LIMIT 1");
+        $winner_stmt->execute([$auction_id]);
+        $winner = $winner_stmt->fetch();
+
+
+
+        // STEP 3: CREATE INVOICE + PAYMENT
+        if ($winner) {
+            $bid_id = $winner['bid_id'];
+            $bidder_id = $winner['bidder_id'];
+            $amount = $winner['amount_bidded'];
+
+
+
+            // CALCULATE TAX + TOTAL
+            $tax_amount = $amount * 0.16;
+            $total_amount = $amount + $tax_amount;
+
+            // GENERATE INVOICE NUMBER
+            $invoice_number = "INV-" . date("Ymd") . "-" . rand(1000, 9999);
+
+            // STEP 4: CREATE INVOICE
+            $invoice_stmt = $conn->prepare("INSERT INTO invoices( invoice_number, bid_id, bidder_id, amount, tax_amount, total_amount, due_date, status, created_by_staff ) VALUES ( ?, ?, ?, ?, ?, ?, DATE_ADD(CURDATE(), INTERVAL 7 DAY), 'unpaid', ? ) ");
+
+            $invoice_stmt->execute([
+                $invoice_number,
+                $bid_id,
+                $bidder_id,
+                $amount,
+                $tax_amount,
+                $total_amount,
+                $_SESSION['user_id']
+            ]);
+        }
+
+        // STEP 7: COMMIT EVERYTHING
         $conn->commit();
-        logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Auction finalized for auction ID: " . $auction_id);
+
+        // STEP 8: LOG ACTIVITY
+        logActivity(
+            $conn,
+            $_SESSION['user_id'],
+            $_SESSION['username'],
+            "Auction finalized for auction ID: " . $auction_id
+        );
 
     } catch (Exception $e) {
+
+        // ROLLBACK EVERYTHING
         $conn->rollBack();
+
         if ($loginType === 'admin' || $loginType === 'staff') {
 
-            $_SESSION['error'] = "Error finalizing auction.";
+            $_SESSION['error'] =
+                "Error finalizing auction.";
         }
-        logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Error finalizing auction for auction ID: " . $auction_id . " - " . $e->getMessage());
-        header("Location: live_auction.php?auction_id=" . $auction_id);
+
+        logActivity(
+            $conn,
+            $_SESSION['user_id'],
+            $_SESSION['username'],
+            "Error finalizing auction for auction ID: "
+            . $auction_id .
+            " - " .
+            $e->getMessage()
+        );
+
+        header(
+            "Location: live_auction.php?auction_id="
+            . $auction_id
+        );
+
         exit();
-       
     }
 }
 ?>
@@ -78,7 +133,7 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
 // Handle bid submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $bid_amount = $_POST['bid_amount'];
-    $user_id = $_SESSION['user_id']; // Assuming user ID is stored in session 
+    $user_id = $_SESSION['user_id']; 
     if ($bid_amount < $minimum_bid) {
         $_SESSION['error'] = "Bid must be at least $minimum_bid";
         header("Location: live_auction.php?auction_id=" . $auction_id);

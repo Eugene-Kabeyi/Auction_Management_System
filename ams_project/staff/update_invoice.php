@@ -1,90 +1,158 @@
 <?php
 include __DIR__ . '/../header.php';
 include __DIR__ . '/../config.php';
+include __DIR__ . '/../log_activity.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
+session_start();
+
+//  AUTH CHECK
+if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'staff') {
+    $_SESSION['error'] = "Please log in as staff to access this page.";
     header('Location: ../staff/staff_login.php');
-    session_destroy();
-    $_SESSION['error'] = "Please log in as an admin to access this page.";
     exit();
+}
+
+//  GET PAYMENT ID
+if (!isset($_GET['payment_id']) || empty($_GET['payment_id'])) {
+    $_SESSION['error'] = "Invalid payment selected.";
+    header('Location: payment_list.php');
+    exit();
+}
+
+$payment_id = intval($_GET['payment_id']);
+
+//  FETCH PAYMENT
+$stmt = $conn->prepare("SELECT * FROM payment WHERE payment_id = ?");
+$stmt->execute([$payment_id]);
+$payment = $stmt->fetch();
+
+if (!$payment) {
+    $_SESSION['error'] = "Payment not found.";
+    header('Location: payment_list.php');
+    exit();
+}
+
+//  CHECK IF INVOICE EXISTS
+$check_stmt = $conn->prepare("SELECT * FROM invoices WHERE payment_id = ?");
+$check_stmt->execute([$payment_id]);
+$invoice = $check_stmt->fetch();
+
+if (!$invoice) {
+    $_SESSION['error'] = "No invoice found to update.";
+    header('Location: invoice_list.php');
+    exit();
+}
+
+//  AUTO CALCULATIONS
+$amount = $payment['amount'];
+$tax_amount = $amount * 0.16;
+$total_amount = $amount + $tax_amount;
+
+$due_date = date("Y-m-d", strtotime("+7 days"));
+
+
+//  HANDLE UPDATE ONLY
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $invoice_id = intval($_POST['invoice_id']);
+    $status = $_POST['status'];
+    $due_date = $_POST['due_date'];
+    $updated_by = $_SESSION['user_id'];
+
+    try {
+
+        $conn->beginTransaction();
+
+        //  UPDATE INVOICE (NOT INSERT)
+        $stmt = $conn->prepare("
+            UPDATE invoices
+            SET 
+                status = ?,
+                due_date = ?,
+                updated_at = NOW()
+            WHERE invoice_id = ?
+        ");
+
+        $stmt->execute([
+            $status,
+            $due_date,
+            $invoice_id
+        ]);
+
+        //  UPDATE PAYMENT STATUS 
+        $payment_stmt = $conn->prepare("
+            UPDATE payment
+            SET payment_status = ?
+            WHERE payment_id = ?
+        ");
+
+        $payment_stmt->execute([
+            $status === 'paid' ? 'completed' : 'pending',
+            $payment_id
+        ]);
+
+        $conn->commit();
+
+        logActivity(
+            $conn,
+            $_SESSION['user_id'],
+            $_SESSION['username'],
+            "Updated invoice ID: $invoice_id"
+        );
+
+        $_SESSION['success'] = "Invoice updated successfully!";
+        header("Location: invoice_list.php");
+        exit();
+
+    } catch (PDOException $e) {
+
+        $conn->rollBack();
+
+        logActivity(
+            $conn,
+            $_SESSION['user_id'],
+            $_SESSION['username'],
+            "Failed invoice update: " . $e->getMessage()
+        );
+
+        $_SESSION['error'] = "Update failed: " . $e->getMessage();
+    }
 }
 ?>
 
 <head>
-    <style>
-        .outer_container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 640px;
-            margin: 0 auto;
-            justify-content: center;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        form label {
-            font-weight: bold;
-        }
-
-        form input,
-        form select {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        form button {
-            padding: 10px;
-            background-color: #1f2933;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .back {
-            border-radius: 5px;
-            color: #ffffff;
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 0 6px 30px;
-            width: 30%;
-        }
-    </style>
+    <title>Create Invoice</title>
+    <link rel="stylesheet" href="../css/form_table_styles.css">
 </head>
 
 <body>
-    <div class="outer_container">
+    <div class="outer_container f_container">
         <h2>Add New Invoice</h2>
         <!-- <a href="invoice_list.php" class="back">Back to Invoice List</a> -->
 
         <form id="invoiceForm" action="" method="POST" onsubmit="return validateInvoice()">
 
             <label>Invoice Number:</label>
-            <input type="text" id="invoice_number" name="invoice_number">
+            <input type="text" id="invoice_number" name="invoice_number" value="<?= htmlspecialchars($invoice_number) ?>">
 
             <label>Bidder ID:</label>
-            <input type="text" id="bidder_id" name="bidder_id">
+            <input type="text" id="bidder_id" name="bidder_id" value="<?= htmlspecialchars($payment['bidder_id']) ?>">
 
             <label>Payment ID:</label>
-            <input type="text" id="payment_id" name="payment_id">
+            <input type="text" id="payment_id" name="payment_id" value="<?= htmlspecialchars($payment['payment_id']) ?>">
 
             <label>Amount:</label>
-            <input type="text" id="amount" name="amount">
+            <input type="text" id="amount" name="amount" value="<?= htmlspecialchars(number_format($amount, 2, '.', '')) ?>">
 
             <label>Tax Amount:</label>
-            <input type="text" id="tax_amount" name="tax_amount" value="0.00">
+            <input type="text" id="tax_amount" name="tax_amount" value="0.00" value="<?= htmlspecialchars(number_format($tax_amount, 2, '.', '')) ?>">
 
             <label>Total Amount:</label>
-            <input type="text" id="total_amount" name="total_amount">
+            <input type="text" id="total_amount" name="total_amount" value="<?= htmlspecialchars(number_format($total_amount, 2, '.', '')) ?>">
 
             <label>Due Date:</label>
-            <input type="text" id="due_date" name="due_date" placeholder="dd/mm/yyyy">
+            <input type="text" id="due_date" name="due_date" placeholder="dd/mm/yyyy" value="<?= htmlspecialchars($due_date) ?>">
 
             <label>Status:</label>
             <select id="status" name="status">
@@ -102,6 +170,21 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
     </div>
 
     <script>
+        var invoiceNum = document.getElementById("invoice_number").value;
+        var amount = document.getElementById("amount").value;
+        var tax = document.getElementById("tax_amount").value;
+        var total = document.getElementById("total_amount").value;
+        var dueDate = document.getElementById("due_date").value;
+        var bidderId = document.getElementById("bidder_id").value;
+        var paymentId = document.getElementById("payment_id").value;
+
+        // make them readonly since we are auto-calculating them
+        invoiceNum.readOnly = true;
+        amount.readOnly = true;
+        tax.readOnly = true;
+        total.readOnly = true;
+        bidderId.readOnly = true;
+        paymentId.readOnly = true;
 
        
         // MAIN VALIDATION CONTROLLER
@@ -260,43 +343,3 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
 </body>
 <?php include __DIR__ . '/../footer.php'; ?>
 
-<?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    $invoice_number = trim($_POST['invoice_number']);
-    $payment_id = !empty($_POST['payment_id']) ? $_POST['payment_id'] : null;
-    $bidder_id = !empty($_POST['bidder_id']) ? $_POST['bidder_id'] : null;
-    $amount = $_POST['amount'];
-    $tax_amount = $_POST['tax_amount'];
-    $total_amount = $_POST['total_amount'];
-    $due_date = !empty($_POST['due_date']) ? $_POST['due_date'] : null;
-    $status = $_POST['status'];
-    $created_by = $_SESSION['user_id'];
-
-    $stmt = $conn->prepare(
-        "INSERT INTO invoices 
-        (invoice_number, payment_id, bidder_id, amount, tax_amount, total_amount, due_date, status, created_by_staff)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)"
-    );
-
-    $success = $stmt->execute([
-        $invoice_number,
-        $payment_id,
-        $bidder_id,
-        $amount,
-        $tax_amount,
-        $total_amount,
-        $due_date,
-        $status,
-        $created_by
-    ]);
-
-    if ($success) {
-        $_SESSION['success'] = "Invoice $invoice_number added successfully";
-        header('Location: invoice_list.php');
-        exit();
-    } else {
-        $_SESSION['error'] = "Failed to add invoice";
-    }
-}
-?>

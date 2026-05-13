@@ -9,32 +9,76 @@ if (empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user') {
 }
 
 include __DIR__ . '/../header.php'; ?>
+<?php
+require '../config.php';
+session_start();
+include __DIR__ . '/../log_activity.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+    $consigner_id = $_SESSION['user_id'];
+
+    $item_name = $_POST['item_name'];
+    $item_quantity = $_POST['item_quantity'];
+    $item_description = $_POST['item_description'];
+    $item_category = $_POST['item_category'];
+    $item_condition = $_POST['item_condition'];
+
+    // Handle image upload
+    $image_path = null;
+
+    //Check if image file is uploaded
+    if (isset($_FILES['item_image']) && $_FILES['item_image']['error'] === UPLOAD_ERR_OK) {
+        $uploadDir = '../uploads/consigned_items/'; //Ensure directory exists
+
+        //Create directory if it doesn't exist
+        if (!is_dir($uploadDir)) {
+            mkdir($uploadDir, 0777, true);//Create directory with permissions
+        }
+        $filename = time() . '_' . basename($_FILES['item_image']['name']);
+        $uploadFile = $uploadDir . $filename; //Set the upload file path
+        //Move the uploaded file to the designated directory
+        if (move_uploaded_file($_FILES['item_image']['tmp_name'], $uploadFile)) {
+            $image_path = $uploadFile; //Store the image path
+            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Uploaded image for consigned item: " . $item_name);
+        } else {
+            echo "Image upload failed."; //Handle upload failure
+            logActivity($conn, $_SESSION['user_id'] ?? null, $_SESSION['username'] ?? 'Unknown', "Failed to upload image for consigned item.");
+        }
+    }
+
+    $sql = "INSERT INTO consigner_items 
+        (item_name, item_quantity, item_description, item_category, item_condition, image_path, consigner_id)
+        VALUES (?, ?, ?, ?, ?, ?, ?)";
+
+    $stmt = $conn->prepare($sql);
+    $success = $stmt->execute([
+        $item_name,
+        $item_quantity,
+        $item_description,
+        $item_category,
+        $item_condition,
+        $image_path,
+        $consigner_id
+    ]);
+
+    if ($success) {
+        $_SESSION['success'] = "Item consigned successfully!";
+        logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Consigned item: " . $item_name);
+        header("Location: user_dashboard.php");
+        exit;
+    } else {
+        $_SESSION['error'] = "Something went wrong. Please try again.";
+        logActivity($conn, $_SESSION['user_id'] ?? null, $_SESSION['username'] ?? 'Unknown', "Failed to consign item.");
+        header("Location: consign_item.php");
+    }
+
+}
+?>
 
 <head>
-    <style>
-        html,
-        body {
-            height: 100%;
-            margin: 0;
-        }
-
-        body {
-            display: flex;
-            flex-direction: column;
-            min-height: 100vh;
-            background-color: #ebe9e9;
-        }
-
-        .outer_container {
-            width: 80%;
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            justify-content: center;
-            margin: 20px auto;
-
-        }
-    </style>
+    <title>Consign Item</title>
+    <link rel="stylesheet" href="../css/form_table_styles.css">
 </head>
 
 <body>
@@ -48,10 +92,11 @@ include __DIR__ . '/../header.php'; ?>
     <h2 style="text-align: center">Consign an Item</h2>
 
     <div class="outer_form_container">
-        <h4 style="text-align:center;">Please fill in the form below to consign an item.</h4>
-        <br>
+
         <!--Form for entering items data-->
         <form action="" method="POST" enctype="multipart/form-data" class="form_data" onsubmit="return validateForm()">
+            <h4 style="text-align:center;">Please fill in the form below to consign an item.</h4>
+
 
             <label>Item Name</label>
             <input type="text" name="item_name" id="name" required>
@@ -153,65 +198,3 @@ include __DIR__ . '/../header.php'; ?>
 
 </script>
 <?php include __DIR__ . '/../footer.php'; ?>
-
-
-<?php
-require '../config.php';
-session_start();
-
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    $consigner_id = $_SESSION['user_id'];
-
-    $item_name = $_POST['item_name'];
-    $item_quantity = $_POST['item_quantity'];
-    $item_description = $_POST['item_description'];
-    $item_category = $_POST['item_category'];
-    $item_condition = $_POST['item_condition'];
-
-    // Handle image upload
-    $image_path = null;
-
-    //Check if image file is uploaded
-    if (isset($_FILES['item_image']) && $_FILES['item_image']['error'] === UPLOAD_ERR_OK) {
-        $uploadDir = '../uploads/consigned_items/'; //Ensure directory exists
-
-        //Create directory if it doesn't exist
-        if (!is_dir($uploadDir)) {
-            mkdir($uploadDir, 0777, true);//Create directory with permissions
-        }
-        $uploadFile = $uploadDir . basename($_FILES['item_image']['name']); //Set the upload file path
-        //Move the uploaded file to the designated directory
-        if (move_uploaded_file($_FILES['item_image']['tmp_name'], $uploadFile)) {
-            $image_path = $uploadFile; //Store the image path
-        } else {
-            echo "❌ Image upload failed."; //Handle upload failure
-        }
-    }
-
-    $sql = "INSERT INTO consigner_items 
-        (item_name, item_quantity, item_description, item_category, item_condition, image_path, consigner_id)
-        VALUES (?, ?, ?, ?, ?, ?, ?)";
-
-    $stmt = $conn->prepare($sql);
-    $success = $stmt->execute([
-        $item_name,
-        $item_quantity,
-        $item_description,
-        $item_category,
-        $item_condition,
-        $image_path,
-        $consigner_id
-    ]);
-
-    if ($success) {
-        $_SESSION['success'] = "Item consigned successfully!";
-        header("Location: user_dashboard.php");
-        exit;
-    } else {
-        $_SESSION['error'] = "Something went wrong. Please try again.";
-        header("Location: consign_item.php");
-    }
-
-}
-?>
