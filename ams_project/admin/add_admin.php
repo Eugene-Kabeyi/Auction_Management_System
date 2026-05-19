@@ -35,7 +35,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin' && $_SES
         <h2>Add New Admin</h2>
         <a href="admin_list.php" class="back">← Back to Admin List</a>
 
-        <form action="" method="POST" onsubmit="return validateAdmin()">
+        <form action="add_admin_handler.php" method="POST" onsubmit="return validateAdmin()">
 
             <label for="firstname">First Name:</label>
             <input type="text" id="firstname" name="firstname" required>
@@ -223,36 +223,3 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin' && $_SES
 
 </script>
 <?php include __DIR__ . '/../footer.php'; ?>
-<?php
-// Handle form submission for adding a new admin
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $firstname = $_POST['firstname'];
-    $secondname = $_POST['secondname'];
-    $surname = $_POST['surname'];
-    $email = $_POST['email'];
-    $username = $_POST['username'];
-    $phone_number = $_POST['phone_number'];
-    $admin_level = $_POST['admin_level'];
-    $password = $_POST['password'];
-
-    try {
-
-        $tmt = $conn->prepare("INSERT INTO admin (firstname, secondname, surname, email, username, phone_number, admin_level, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $success = $tmt->execute([$firstname, $secondname, $surname, $email, $username, $phone_number, $admin_level, $password]);
-    } catch (PDOException $e) {
-        $_SESSION['error'] = "Unexpected error occurred. Please contact support if the issue persists.";
-        header("Location: add_admin.php?error");
-        exit();
-    }
-
-    if ($success) {
-        $_SESSION['success'] = "Admin added successfully.";
-        header("Location: admin_list.php");
-        exit();
-    } else {
-        $_SESSION['error'] = "Failed to add admin. Please try again.";
-        header("Location: add_admin.php?error");
-        exit();
-
-    }
-}

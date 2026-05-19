@@ -57,14 +57,14 @@ class RegisterHandler extends DatabaseConfig
                     ':username' => $username,
                     ':password_hash' => $password // later: hash with password_hash()
                 ]);
-                $_SESSION['success'] = 'Sucessfully create account' . $username ;
+                $_SESSION['success'] = 'Successfully created account for ' . $username ;
                 // Redirect without echo before header
                 header("Location: ../ams_project/users/login.php");
                 exit();
 
             } catch (PDOException $e) {
                 $_SESSION['error'] = "Registration failed."; // Generic error message
-                echo "❌ Registration failed: " . $e->getMessage();
+                echo "Registration failed: " . $e->getMessage();
                 header("Location: ../ams_project/users/register.php");
                 exit();
             }

@@ -28,7 +28,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
         <h2>Add New Department</h2>
         <a href="department_list.php" class="back">Back to Department List</a>
 
-        <form action="" method="POST" onsubmit="return validateDepartment()">
+        <form action="department_add_handler.php" method="POST" onsubmit="return validateDepartment()">
            
 
             <label for="department_name">Department Name:</label>
@@ -59,22 +59,4 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
     }
 </script>
 
-<?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST'){
-    $dept_name = $_POST['department_name'];
-    $dept_desc = $_POST['department_description'];
 
-    $tmt =$conn-> prepare("INSERT INTO department (department_name, department_description) VALUES(?, ?)");
-    $success = $tmt-> execute([$dept_name,$dept_desc]);
-
-    if($success){
-        $_SESSION['success'] = "Successfully added $dept_name department";
-        header('Location: department_list.php');
-        exit();
-    }
-    else
-    {
-        $_SESSION['error'] = "Failed to add $dept_name department";
-    }
-
-}

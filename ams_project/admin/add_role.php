@@ -12,28 +12,6 @@ if (isset($_SESSION['user_id']) && $_SESSION['login_type'] === 'admin') {
 }
 include __DIR__ . '/../config.php';
 ?>
-<?php
-// Handle form submission for adding a new role
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $role_name = $_POST['role_name'];
-    $description = $_POST['description'];
-    // Insert new role name and description into the database
-    $stmt = $conn->prepare("INSERT INTO roles (role_name, role_description) VALUES (:role_name, :description)");
-    $stmt->bindParam(':role_name', $role_name);
-    $stmt->bindParam(':description', $description);
-    $success = $stmt->execute();
-    if ($success) {
-        // Role added successfully, redirect to role list page
-        header("Location: ../role.php");
-        $_SESSION['success'] = "Role added successfully.";
-        exit();
-    } else {
-        // Error occurred while adding role, display error message      
-        $_SESSION['error'] = "Error adding role. Please try again.";
-        $_SESSION['error'] = $stmt->errorInfo()[2]; // Get detailed error message from PDO
-    }
-}
-?>
 
 <head>
     <title>Add New Role</title>
@@ -62,7 +40,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     <!-- .back button -->
     <a href="role.php" class="back">Back to Role List</a>
 
-        <form action="" method="POST" onsubmit="return validateRole()">
+        <form action="add_role_handler.php" method="POST" onsubmit="return validateRole()">
             <label for="role_name">Role Name:</label>
             <input type="text" id="role_name" name="role_name">
             <label for="description">Description:</label>
