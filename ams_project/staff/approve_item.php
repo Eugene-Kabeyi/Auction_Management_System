@@ -20,86 +20,6 @@ include __DIR__ . '/../log_activity.php';
 
 
 ?>
-<?php
-// Handle form submission
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    $item_id = $_POST['item_id'];
-    $action = $_POST['action'];
-    $date = $_POST['evaluation_date'];
-    // format date to yyyy-mm-dd for database storage
-    $date = explode('/', $date);
-    if (count($date) === 3) {
-        $date = $date[2] . '-' . $date[1] . '-' . $date[0];
-    } else {
-        $date = date('Y-m-d'); // Fallback to current date if format is incorrect
-    }
-
-    if (empty($_POST['eval_notes']) || $_POST['reserved_price'] <= 0) {
-        $_SESSION['error'] = "Invalid evaluation data";
-        exit();
-    }
-
-    if ($action === 'approved') {
-        // Insert evaluation data into evaluated_items table
-        $tmt = $conn->prepare("INSERT INTO evaluated_items (item_id, evaluator_id,evaluation_date ,condition_rating, authenticity_status,reserve_price, evaluation_notes,final_decision) VALUES (:item_id, :evaluator_id, :evaluation_date, :condition_rating, :authenticity_status, :reserve_price, :evaluation_notes, :final_decision)");
-        $success = $tmt->execute([
-            ':item_id' => $item_id,
-            ':evaluator_id' => (int) $_SESSION['user_id'],
-            ':evaluation_date' => $date,
-            ':condition_rating' => $_POST['rating'],
-            ':authenticity_status' => $_POST['authenticity'],
-            ':reserve_price' => $_POST['reserved_price'],
-            ':evaluation_notes' => $_POST['eval_notes'],
-            ':final_decision' => $action
-        ]);
-        if (!$success) {
-            $_SESSION['error'] = "Failed to save evaluation data";
-            logActivity($conn, $_SESSION['user_id'] ?? null, $_SESSION['username'] ?? 'Unknown', "Failed to save evaluation data for item ID: " . $item_id);
-            exit();
-        } elseif ($success) {
-            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Approved item ID: " . $item_id);
-
-            // Update item status to approved in the database
-            $stmt = $conn->prepare("UPDATE consigner_items SET item_status = :action WHERE item_id = :item_id");
-            $stmt->execute([':action' => $action, ':item_id' => $item_id]);
-        }
-
-        $_SESSION['success'] = " Item approved successfully!";
-
-
-    } elseif ($action === 'rejected') {
-        // Insert evaluation details into evaluated_items table with final_decision as 'rejected'
-        $tmt = $conn->prepare("INSERT INTO evaluated_items (item_id, evaluator_id,evaluation_date ,condition_rating, authenticity_status,reserve_price, evaluation_notes,final_decision) VALUES (:item_id, :evaluator_id, :evaluation_date, :condition_rating, :authenticity_status, :reserve_price, :evaluation_notes, :final_decision)");
-        ;
-        $success = $tmt->execute([
-            ':item_id' => $item_id,
-            ':evaluator_id' => (int) $_SESSION['user_id'],
-            ':evaluation_date' => $date,
-            ':condition_rating' => $_POST['rating'],
-            ':authenticity_status' => $_POST['authenticity'],
-            ':reserve_price' => $_POST['reserved_price'],
-            ':evaluation_notes' => $_POST['eval_notes'],
-            ':final_decision' => $action
-        ]);
-        if (!$success) {
-            $_SESSION['error'] = "Failed to save evaluation data";
-            logActivity($conn, $_SESSION['user_id'] ?? null, $_SESSION['username'] ?? 'Unknown', "Failed to save evaluation data for item ID: " . $item_id);
-            exit();
-        } elseif ($success) {
-            logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Rejected item ID: " . $item_id);
-
-            // Update item status to rejected in the database
-            $stmt = $conn->prepare("UPDATE consigner_items SET item_status = 'rejected' WHERE item_id = :item_id");
-            $stmt->execute([':item_id' => $item_id]);
-
-            $_SESSION['success'] = "Item rejected.";
-        }
-
-    }
-    header("Location: staff_dashboard.php");
-    exit();
-}
-?>
 
 <head>
     <title>Approve Item</title>
@@ -229,7 +149,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <div class="new_form_container">
             <p style="text-align: center; font-weight: 200;"><i>Please review the item details below and approve or
                     reject the item.</i></p>
-            <form action="" method="post" class="form_data" onsubmit="return validateEvaluation()">
+            <form action="approve_item_handler.php" method="post" class="form_data" onsubmit="return validateEvaluation()">
                 <label for="item_id">Item ID:</label>
                 <!--display fetched item_id and make it read-only-->
                 <input type="text" id="item_id" name="item_id"

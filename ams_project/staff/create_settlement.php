@@ -81,7 +81,7 @@ $records = $stmt->fetchAll();
 
     <h2>Create Settlement</h2>
 
-    <form method="POST" action="" onsubmit="return validateSettlement()">
+    <form method="POST" action="create_settlement_handler.php" onsubmit="return validateSettlement()">
 
         <label>Payment ID:</label>
         <input type="text" id="payment_id" name="payment_id">

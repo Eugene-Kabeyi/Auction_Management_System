@@ -1,29 +1,101 @@
 <?php
-include __DIR__ . '/../config.php';
 include __DIR__ . '/../header.php';
+include __DIR__ . '/../log_activity.php';
 
-if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'staff') {
-    header("Location: ../login.php");
+if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
+    $_SESSION['error'] = "Please log in as an admin to access this page.";
+    header('Location: ../staff/staff_login.php');
+    session_destroy();
+    exit();
+}
+
+include __DIR__ . '/../config.php';
+?>
+
+<head>
+    <title>Review Payment</title>
+    <link rel="stylesheet" href="../css/form_table_styles.css">
+</head>
+
+<body>
+
+<?php if (!empty($_SESSION['success'])): ?>
+    <div class="flash success">
+        <?php echo $_SESSION['success']; unset($_SESSION['success']); ?>
+    </div>
+<?php endif; ?>
+
+<?php if (!empty($_SESSION['error'])): ?>
+    <div class="flash error">
+        <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
+    </div>
+<?php endif; ?>
+
+<div class="outer_container f_container">
+    <h2>Review Payment</h2>
+
+    <a href="payments_list.php" class="back">Back to Payments</a>
+
+<?php
+$payment_id = $_GET['id'] ?? null;
+
+if (!$payment_id) {
+    echo "<p>Invalid payment ID</p>";
     exit();
 }
 
 $stmt = $conn->prepare("
-    SELECT 
-        p.payment_id,
-        p.bid_id,
-        p.bidder_id,
-        p.amount,
-        p.payment_method,
-        p.transaction_reference,
-        p.payment_status,
-        p.payment_date,
-        a.auction_name
-    FROM payment p
-    JOIN auction_bids ab ON ab.bid_id = p.bid_id
-    JOIN auctions a ON a.auction_id = ab.auction_id
-    WHERE p.payment_status = 'pending'
-    ORDER BY p.payment_date DESC
+    SELECT *
+    FROM payment
+    WHERE payment_id = ?
 ");
-$stmt->execute();
-$payments = $stmt->fetchAll();
+
+$stmt->execute([$payment_id]);
+$payment = $stmt->fetch();
+
+if (!$payment) {
+    echo "<p>Payment not found</p>";
+    exit();
+}
 ?>
+
+<form method="post" action="approve_payment_handler.php">
+    <input type="hidden" name="payment_id" value="<?php echo $payment['payment_id']; ?>">
+
+    <label>Amount:</label>
+    <input type="text" value="<?php echo htmlspecialchars($payment['amount']); ?>" disabled>
+
+    <label>Payment Method:</label>
+    <input type="text" value="<?php echo htmlspecialchars($payment['payment_method']); ?>" disabled>
+
+    <label>Transaction Reference:</label>
+    <input type="text" value="<?php echo htmlspecialchars($payment['transaction_reference']); ?>" disabled>
+
+    <label>Current Status:</label>
+    <input type="text" value="<?php echo htmlspecialchars($payment['payment_status']); ?>" disabled>
+
+    <label>Payment Date:</label>
+    <input type="text" value="<?php echo htmlspecialchars($payment['payment_date']); ?>" disabled>
+
+    <label>Action:</label>
+    <select name="action" required>
+        <option value="">-- Select Action --</option>
+        <option value="approve">Approve</option>
+        <option value="reject">Reject</option>
+    </select>
+
+    <button type="submit" formaction="payment_approve_handler.php" class="approve">
+        Approve Payment
+    </button>
+
+    <button type="submit" formaction="payment_reject_handler.php" class="delete"
+        onclick="return confirm('Are you sure you want to reject this payment?')">
+        Reject Payment
+    </button>
+</form>
+
+</div>
+
+</body>
+
+<?php include __DIR__ . '/../footer.php'; ?>
