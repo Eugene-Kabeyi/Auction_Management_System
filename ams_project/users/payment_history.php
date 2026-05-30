@@ -55,6 +55,8 @@ $payments = $stmt->fetchAll();
         </div>
     <?php endif; ?>
     <h2>My Payments</h2>
+    <!-- back button to user_dashboard.php -->
+    <a href="user_dashboard.php" class="back">Back to Dashboard</a></div>
     <div class="outer_container">
         <table>
             <tr>

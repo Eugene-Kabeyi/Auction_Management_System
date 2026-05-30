@@ -223,10 +223,26 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
                 transform: translateX(-30px);
             }
         }
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background-color: #1f2933;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        .back:hover {
+            background-color: white;
+            color: #1f2933;
+            border: 2px solid #1f2933;
+        }
     </style>
 </head>
 
 <body>
+    <!-- back button to user_dashboard.php -->
+    <a href="user_dashboard.php" class="back">Back to Dashboard</a>
     <?php if (!empty($_SESSION['error'])): ?>
         <div class="flash error">
             <?= $_SESSION['error']; ?>

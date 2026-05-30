@@ -45,7 +45,8 @@ if (session_status() == PHP_SESSION_NONE) {
             $link = '../users/login.php';
         }
         ?>
-
+        <!-- Home button to index.php -->
+        <a href="../index.php" class="nav-item">Home</a>
         <a href="<?php echo htmlspecialchars($link); ?>" class="nav-item">Dashboard</a>
         <a href="<?php echo htmlspecialchars($link2); ?>" class="nav-item">Auctions</a>
         <a href="#" class="nav-item">Bidders</a>

@@ -1,4 +1,16 @@
 <?php
+require '../config.php';
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
+if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'user') {
+    $_SESSION['error'] = "Please log in to access this page.";
+    header("Location: login.php");
+    session_destroy();
+    exit();
+}
+include __DIR__ . '/../log_activity.php';
+$user_id = $_SESSION['user_id'];
 // This part runs when form is submitted
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['initiate_payment'])) {
 

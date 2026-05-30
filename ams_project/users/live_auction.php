@@ -15,6 +15,16 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
 include __DIR__ . '/../config.php';
 
 $auction_id = $_GET['auction_id'] ?? null;
+//Ensure the consiger does not bid on their own item
+$stmt = $conn->prepare("SELECT i.consigner_id FROM  auctions a JOIN  consigner_items i ON a.item_id = i.item_id WHERE a.auction_id = ?");
+$stmt->execute([$auction_id]);
+$consigner_id = $stmt->fetchColumn();
+if ($consigner_id == $_SESSION['user_id']) {
+    $_SESSION['error'] = "You cannot bid on your own item.";
+    $_SESSION['person'] = "consigner";
+}
+
+
 // GET AUCTION TIME
 $stmt = $conn->prepare("
     SELECT end_time FROM auctions WHERE auction_id = :auction_id
@@ -90,39 +100,16 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
         $conn->commit();
 
         // STEP 8: LOG ACTIVITY
-        logActivity(
-            $conn,
-            $_SESSION['user_id'],
-            $_SESSION['username'],
-            "Auction finalized for auction ID: " . $auction_id
-        );
+      logActivity( $conn, $_SESSION['user_id'], $_SESSION['username'], "Auction finalized for auction ID: " . $auction_id );
 
     } catch (Exception $e) {
-
         // ROLLBACK EVERYTHING
         $conn->rollBack();
-
         if ($loginType === 'admin' || $loginType === 'staff') {
-
-            $_SESSION['error'] =
-                "Error finalizing auction.";
+            $_SESSION['error'] = "Error finalizing auction.";
         }
-
-        logActivity(
-            $conn,
-            $_SESSION['user_id'],
-            $_SESSION['username'],
-            "Error finalizing auction for auction ID: "
-            . $auction_id .
-            " - " .
-            $e->getMessage()
-        );
-
-        header(
-            "Location: live_auction.php?auction_id="
-            . $auction_id
-        );
-
+        logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Error finalizing auction for auction ID: " . $auction_id . " - " . $e->getMessage());
+        header("Location: live_auction.php?auction_id=" . $auction_id);
         exit();
     }
 }
@@ -411,7 +398,7 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
             <h2>Place Your Bid</h2>
 
             <!--Form bid submission-->
-            <form id="bidForm" action="handle_l_auctions.php" method="post">
+            <form id="bidForm" action="live_auction_handler.php" method="post">
                 <!-- Minimum bid amount is dynamically set based on current highest bid or starting bid -->
                 <label for="bid_amount">Bid Amount (Minimum: ksh <?php echo number_format($minimum_bid, 2); ?>):</label>
                 <input type="text" id="bid_amount" name="bid_amount" placeholder="Enter your bid amount" required
@@ -504,8 +491,9 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
         };
 
         //Disable auctiondetails for admin and staff
+        var person = "<?php echo $_SESSION['person'] ?? ''; ?>";
         var userRole = "<?php echo $_SESSION['login_type']; ?>";
-        if (userRole === 'staff' || userRole === 'admin') {
+        if (userRole === 'staff' || userRole === 'admin' || person === 'consigner') {
             auctionDetails.style.display = "none";
             auctionDetails.style.pointerEvents = "none";
         }

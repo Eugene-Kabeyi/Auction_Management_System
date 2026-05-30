@@ -88,11 +88,26 @@ $settlements = $stmt->fetchAll();
         .status-processing { color: blue; font-weight: bold; }
         .status-completed { color: green; font-weight: bold; }
         .status-cancelled { color: red; font-weight: bold; }
+        .back {
+            display: inline-block;
+            margin: 10px 0;
+            padding: 8px 16px;
+            background-color: #1f2933;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        .back:hover {
+            background-color: #111827;
+            color: white;
+        }
     </style>
 </head>
 
 <body>
     <h2>My Settlements</h2>
+    <!-- back button to user_dashboard.php -->
+    <a href="user_dashboard.php" class="back">Back to Dashboard</a>
 
     <div class="outer_container">
         <table>

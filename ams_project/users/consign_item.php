@@ -29,7 +29,7 @@ include __DIR__ . '/../header.php'; ?>
     <div class="outer_form_container">
 
         <!--Form for entering items data-->
-        <form action="handle_consign.php" method="POST" enctype="multipart/form-data" class="form_data" onsubmit="return validateForm()">
+        <form action="consign_item_handler.php" method="POST" enctype="multipart/form-data" class="form_data" onsubmit="return validateForm()">
             <h4 style="text-align:center;">Please fill in the form below to consign an item.</h4>
 
 

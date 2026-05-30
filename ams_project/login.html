@@ -51,17 +51,30 @@
                 font-size: 24px;
                 font-weight: bold;
                 color: #ffffff;
-            }   
+            }  
+        .back{
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: #1f1e1e;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 5px;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        } 
 
     </style>
 </head>
 <body>
     <div class="outer_container">
-    <!--AMS LOGO-->
-    <div class="logo-container">
-        <p>AMS</p>
-    </div>
-    <!--Help user choose their loging Portal)-->
+        <!-- Adding back button to index.php -->
+        <a href="index.php" class="login-link back">Back to Home</a>
+        <!--AMS LOGO-->
+        <div class="logo-container">
+            <p>AMS</p>
+        </div>
+        <!--Help user choose their loging Portal)-->
     <div class="login-portal">
         <h2>Select Login Portal</h2>
         <a href="staff/staff_login.php" class="login-link">Staff Login</a>

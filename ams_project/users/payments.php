@@ -179,7 +179,7 @@ $winning_bids = $stmt->fetchAll();
         <?php else: ?>
 
             <!-- Payment Form -->
-            <form method="POST" action="handle_payment.php" onsubmit="return validateForm()">
+            <form method="POST" action="payments_handler.php" onsubmit="return validateForm()">
 
                 <!-- Select which auction to pay for -->
                 <div class="form-group">
