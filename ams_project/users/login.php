@@ -125,7 +125,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
         .hide_show {
             position: absolute;
             right: 60px;
-            top: 305px;
+            top: 360px;
             cursor: pointer;
             font-size: 12px;
             color: #1f2933;
@@ -195,13 +195,27 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
                 transform: translateX(-30px);
             }
         }
+        .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background-color: #1f2933;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        .back:hover {
+            background-color: white;
+            color: #1f2933;
+            border: 2px solid #1f2933;
+        }
     </style>
 </head>
 
 <body>
 
     <div class="login_container">
-        
+        <a href="../index.php" class="back">Back to Home</a>
 
         <?php if (!empty($_SESSION['error'])): ?>
             <div class="flash error">

@@ -10,7 +10,7 @@ if (empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user') {
 
 include __DIR__ . ('/../config.php');
 
-$stmt = $conn->prepare("
+$stmt = mysqli_prepare($conn, "
     SELECT 
         a.auction_id,
         a.bidder_id,
@@ -20,16 +20,14 @@ $stmt = $conn->prepare("
     FROM auction_bids a
     JOIN users b ON a.bidder_id = b.UID
     JOIN auctions c ON a.auction_id = c.auction_id
-    WHERE a.bidder_id = :user_id
+    WHERE a.bidder_id = ?
     GROUP BY auction_name;
 ");
 
-$stmt->execute([
-    ':user_id' => $_SESSION['user_id']
-]);
-
-$results = $stmt->fetchAll();
-
+mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 ?>
 
 <head>
@@ -106,11 +104,11 @@ $results = $stmt->fetchAll();
                 <th>Auction Code</th>
 
             </tr>
-            <?php foreach ($results as $result): ?>
+            <?php foreach ($auctions as $auction): ?>
                 <tr>
-                    <td><?= htmlspecialchars($result['auction_id']) ?></td>
-                    <td><?= htmlspecialchars($result['auction_name']) ?></td>
-                    <td><?= htmlspecialchars($result['auction_code']) ?></td>
+                    <td><?= htmlspecialchars($auction['auction_id']) ?></td>
+                    <td><?= htmlspecialchars($auction['auction_name']) ?></td>
+                    <td><?= htmlspecialchars($auction['auction_code']) ?></td>
                 </tr>
 
             <?php endforeach ?>

@@ -9,7 +9,7 @@ if (empty($_SESSION['user_id']) || $_SESSION['login_type'] !== 'user') {
 
 include __DIR__ . ('/../config.php');
 
-$stmt = $conn->prepare("
+$stmt = mysqli_prepare($conn, "
     SELECT 
         s.settlement_id,
         s.auction_item_id,
@@ -26,15 +26,17 @@ $stmt = $conn->prepare("
         a.item_name AS item_title
     FROM settlement s
     JOIN consigner_items a ON s.auction_item_id = a.item_id
-    WHERE a.consigner_id = :seller_id
+    WHERE a.consigner_id = ?
     ORDER BY s.created_at DESC
 ");
 
-$stmt->execute([
-    ':seller_id' => $_SESSION['user_id']
-]);
+mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
+mysqli_stmt_execute($stmt);
+var_dump($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$settlements = mysqli_fetch_all($result, MYSQLI_ASSOC);
+mysqli_stmt_close($stmt);
 
-$settlements = $stmt->fetchAll();
 ?>
 
 <head>

@@ -13,12 +13,32 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
 }
 
 include __DIR__ . '/../config.php';
+$stmt = $conn->prepare("
+    UPDATE auctions
+    SET status = CASE
+
+        WHEN NOW() < start_time
+            THEN 'upcoming'
+
+        WHEN NOW() BETWEEN start_time AND end_time
+            THEN 'ongoing'
+
+        WHEN NOW() > end_time
+            THEN 'completed'
+
+    END
+
+    WHERE status != 'cancelled'
+");
+$stmt->execute();
 
 $auction_id = $_GET['auction_id'] ?? null;
 //Ensure the consiger does not bid on their own item
-$stmt = $conn->prepare("SELECT i.consigner_id FROM  auctions a JOIN  consigner_items i ON a.item_id = i.item_id WHERE a.auction_id = ?");
-$stmt->execute([$auction_id]);
-$consigner_id = $stmt->fetchColumn();
+$sql = "SELECT i.consigner_id FROM  auctions a JOIN  consigner_items i ON a.item_id = i.item_id WHERE a.auction_id = ?";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_bind_param($stmt, "i", $auction_id);
+mysqli_stmt_execute($stmt);
+$consigner_id = mysqli_stmt_get_result($stmt)->fetch_column();
 if ($consigner_id == $_SESSION['user_id']) {
     $_SESSION['error'] = "You cannot bid on your own item.";
     $_SESSION['person'] = "consigner";

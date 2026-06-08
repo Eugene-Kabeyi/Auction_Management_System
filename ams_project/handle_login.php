@@ -1,6 +1,6 @@
 <?php
 session_start();
-include 'config.php'; 
+require 'config.php'; 
 include 'log_activity.php';
 
 $error = '';
@@ -15,18 +15,19 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     } else {
         try {
             if ($loginType === 'staff') {
-                $sql = "SELECT * FROM staff WHERE username = :username";
+                $sql = "SELECT * FROM staff WHERE username = ?";
             } elseif ($loginType === 'admin') {
-                $sql = "SELECT * FROM admin WHERE username = :username";
+                $sql = "SELECT * FROM admin WHERE username = ?";
             } else {
-                $sql = "SELECT * FROM users WHERE username = :username";
+                $sql = "SELECT * FROM users WHERE username = ?";
             }
 
-            $stmt = $conn->prepare($sql);
-            $stmt->bindParam(':username', $username);
-            $stmt->execute();
+            $stmt = mysqli_prepare($conn, $sql);
+            mysqli_stmt_bind_param($stmt, "s", $username);
+            mysqli_stmt_execute($stmt);
 
-            $user = $stmt->fetch();
+            $result = mysqli_stmt_get_result($stmt);
+            $user = mysqli_fetch_assoc($result);
             if ($user === false) {
                 $user = null; // No user found
                 $error = "Invalid username.";

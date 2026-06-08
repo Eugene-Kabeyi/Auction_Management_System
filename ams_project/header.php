@@ -34,24 +34,25 @@ if (session_status() == PHP_SESSION_NONE) {
         $link = '';
         $link2 = '../users/auction_list.php';
         if ($_SESSION['login_type'] === 'staff') {
-            $link = '../staff/staff_dashboard.php';
-            $link2 = '../staff/list_items.php';
+            $link = '../ams_project/staff/staff_dashboard.php';
+            $link2 = '../ams_project/staff/list_items.php';
         } elseif ($_SESSION['login_type'] === 'user') {
-            $link = '../users/user_dashboard.php';
+            $link = '../ams_project/users/user_dashboard.php';
         } else if ($_SESSION['login_type'] === 'admin') {
-            $link = '../admin/admin_dashboard.php';
+            $link = '../ams_project/admin/admin_dashboard.php';
 
         } else {
-            $link = '../users/login.php';
+            $link = '../ams_project/users/login.php';
+            $link2 = '../ams_project/users/auction_list.php';
         }
         ?>
         <!-- Home button to index.php -->
-        <a href="../index.php" class="nav-item">Home</a>
+        <a href="../ams_project/index.php" class="nav-item">Home</a>
         <a href="<?php echo htmlspecialchars($link); ?>" class="nav-item">Dashboard</a>
         <a href="<?php echo htmlspecialchars($link2); ?>" class="nav-item">Auctions</a>
-        <a href="#" class="nav-item">Bidders</a>
+        <!-- <a href="#" class="nav-item">Bidders</a>
         <a href="#" class="nav-item">Reports</a>
-        <a href="#" class="nav-item">Settings</a>
+        <a href="#" class="nav-item">Settings</a> -->
     </div>
 
     <div class="login-container">
@@ -62,12 +63,12 @@ if (session_status() == PHP_SESSION_NONE) {
             <span class="dropdown-arrow" id="dropdownArrow">▼</span>
 
             <div id="userDropdown" class="dropdown-menu">
-                <a href="profile.php">Profile</a>
+                <a href="/../ams_project/profile.php">Profile</a>
                 <a href="/../ams_project/logout.php">Logout</a>
             </div>
         </div>
         <!--Login by -->
-        <button id="loginBtn" class="login-btn"><a href="../login.html">Login</a></button>
+        <button id="loginBtn" class="login-btn"><a href="login.html">Login</a></button>
     </div>
 
     <script>
@@ -83,7 +84,7 @@ if (session_status() == PHP_SESSION_NONE) {
             dropdown.style.display = isOpen ? "none" : "block";
             arrow.classList.toggle("rotate");
         });
-
+        
         document.addEventListener("click", function (e) {
             if (!userInfo.contains(e.target)) {
                 dropdown.style.display = "none";
@@ -120,25 +121,6 @@ if (session_status() == PHP_SESSION_NONE) {
 
     </script>
 </nav>
-<?php
-include_once __DIR__ . '/config.php';
-$stmt = $conn->prepare("
-    UPDATE auctions
-    SET status = CASE
 
-        WHEN NOW() < start_time
-            THEN 'upcoming'
 
-        WHEN NOW() BETWEEN start_time AND end_time
-            THEN 'ongoing'
 
-        WHEN NOW() > end_time
-            THEN 'completed'
-
-    END
-
-    WHERE status != 'cancelled'
-");
-
-$stmt->execute();
-?>

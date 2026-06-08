@@ -14,24 +14,37 @@ if ($_SESSION['login_type'] !== 'user' || !isset($_SESSION['user_id']) || empty(
 
 include __DIR__. '/../config.php';
 // Fetch stats for the dashboard
-$stmt = $conn->prepare("SELECT COUNT(*) FROM consigner_items WHERE consigner_id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$items_consigned = $stmt->fetchColumn();
+$stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM consigner_items WHERE consigner_id = ?");
+mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
+mysqli_stmt_execute($stmt);
+mysqli_stmt_bind_result($stmt, $items_consigned);
+mysqli_stmt_fetch($stmt);
+mysqli_stmt_close($stmt);
 
 // Count distinct auctions participated in
-$stmt = $conn->prepare("SELECT COUNT(DISTINCT auction_id) FROM auction_bids WHERE bidder_id = ?");
-$stmt->execute([$_SESSION['user_id']]);
-$auctions_participated = $stmt->fetchColumn();
+$stmt = mysqli_prepare($conn, "SELECT COUNT(DISTINCT auction_id) FROM auction_bids WHERE bidder_id = ?");
+mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
+mysqli_stmt_execute($stmt);
+mysqli_stmt_bind_result($stmt, $auctions_participated);
+mysqli_stmt_fetch($stmt);
+mysqli_stmt_close($stmt);
+;
 
 // Count bids won
-$stmt = $conn->prepare("SELECT COUNT(*) FROM auction_bids WHERE bidder_id = ? AND result = 'won'");
-$stmt->execute([$_SESSION['user_id']]);
-$bids_won = $stmt->fetchColumn();
+$stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM auction_bids WHERE bidder_id = ? AND result = 'won'");
+mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
+mysqli_stmt_execute($stmt);
+mysqli_stmt_bind_result($stmt, $bids_won);
+mysqli_stmt_fetch($stmt);
+mysqli_stmt_close($stmt);
 
 // Calculate total payments made by the user
-$stmt = $conn->prepare("SELECT IFNULL(SUM(amount),0) FROM payment WHERE bidder_id = ? AND payment_status='completed'");
-$stmt->execute([$_SESSION['user_id']]);
-$total_payments = $stmt->fetchColumn();
+$stmt = mysqli_prepare($conn, "SELECT IFNULL(SUM(amount),0) FROM payment WHERE bidder_id = ? AND payment_status='completed'");
+mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
+mysqli_stmt_execute($stmt);
+mysqli_stmt_bind_result($stmt, $total_payments);
+mysqli_stmt_fetch($stmt);
+mysqli_stmt_close($stmt);
 ?>
 
 <head>

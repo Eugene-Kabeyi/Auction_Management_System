@@ -102,9 +102,7 @@
     
 }
 
-/* =========================
-   HAMBURGER MENU
-========================= */
+/* HAMBURGER MENU */
 .menu-toggle {
     display: none;
     font-size: 28px;
@@ -112,9 +110,7 @@
     user-select: none;
 }
 
-/* =========================
-   MOBILE RESPONSIVE
-========================= */
+/*   MOBILE RESPONSIVE */
 @media screen and (max-width:768px) {
 
     /* NAVBAR */

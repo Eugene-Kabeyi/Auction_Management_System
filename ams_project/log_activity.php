@@ -6,20 +6,19 @@ function logActivity($conn, $user_id, $username, $action)
 
     $ip = $_SERVER['REMOTE_ADDR'];
     try {
-    $stmt = $conn->prepare("
+    $stmt = mysqli_prepare($conn, "
         INSERT INTO activity_logs
         (user_id, username, action, page_name, ip_address)
         VALUES (?, ?, ?, ?, ?)
     ");
-
-    $stmt->execute([
-        $user_id,
-        $username,
-        $action,
-        $page,
-        $ip
-    ]);
-} catch (PDOException $e) {
+    if (!$stmt) {
+        throw new Exception("Prepare failed: " . mysqli_error($conn));
+    }
+    mysqli_stmt_bind_param($stmt, "issss", $user_id, $username, $action, $page, $ip);
+    mysqli_stmt_execute($stmt);
+    mysqli_stmt_close($stmt);
+        
+} catch (Exception $e) {
     error_log("Failed to log activity: " . $e->getMessage());
 }
 }

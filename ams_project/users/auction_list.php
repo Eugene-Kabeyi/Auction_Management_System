@@ -5,7 +5,7 @@ include __DIR__ . '/../header.php';
 include __DIR__ . '/../config.php';
 if (empty($_SESSION['user_id']) || !isset($_SESSION['user_id'])) {
     if (empty($_SESSION['login_type']) || $_SESSION['login_type'] !== 'user') {
-        header('Location: ../staff/staff_login.php');
+        header('Location: ../users/login.php');
         session_destroy();
         $_SESSION['error'] = "Please log in to view auction listings.";
         exit();
@@ -48,9 +48,10 @@ elseif ($type === 'past') {
 $query .= " ORDER BY start_time DESC";
 
 
-$stmt = $conn->prepare($query);
-$stmt->execute();
-$auctions = $stmt->fetchAll();
+$stmt = mysqli_prepare($conn, $query);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 ?>
 
 

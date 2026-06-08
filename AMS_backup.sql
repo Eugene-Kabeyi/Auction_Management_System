@@ -25,6 +25,52 @@ CREATE DATABASE /*!32312 IF NOT EXISTS*/ `AMS` /*!40100 DEFAULT CHARACTER SET ut
 USE `AMS`;
 
 --
+-- Table structure for table `activity_logs`
+--
+
+DROP TABLE IF EXISTS `activity_logs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8mb4 */;
+CREATE TABLE `activity_logs` (
+  `log_id` int(11) NOT NULL AUTO_INCREMENT,
+  `user_id` int(11) NOT NULL,
+  `username` varchar(100) DEFAULT NULL,
+  `action` varchar(255) NOT NULL,
+  `page_name` varchar(255) DEFAULT NULL,
+  `ip_address` varchar(100) DEFAULT NULL,
+  `created_at` timestamp NULL DEFAULT current_timestamp(),
+  PRIMARY KEY (`log_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=18 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `activity_logs`
+--
+
+LOCK TABLES `activity_logs` WRITE;
+/*!40000 ALTER TABLE `activity_logs` DISABLE KEYS */;
+INSERT INTO `activity_logs` VALUES
+(1,51,'jmtunda','User logged in','/ams_project/handle_login.php','127.0.0.1','2026-05-11 01:22:17'),
+(2,51,'jmtunda','Error initiating payment for bid ID: 64 - SQLSTATE[23000]: Integrity constraint violation: 1048 Column \'amount\' cannot be null','/ams_project/users/payments.php','127.0.0.1','2026-05-11 01:36:08'),
+(3,51,'jmtunda','Payment initiated for bid ID: 64','/ams_project/users/payments.php','127.0.0.1','2026-05-11 01:36:31'),
+(4,51,'jmtunda','Payment initiated for bid ID: 64','/ams_project/users/payments.php','127.0.0.1','2026-05-11 01:38:13'),
+(5,1,'sysadmin','Admin logged in','/ams_project/handle_login.php','127.0.0.1','2026-05-11 01:53:42'),
+(6,51,'jmtunda','User logged in','/ams_project/handle_login.php','127.0.0.1','2026-05-11 02:07:41'),
+(7,1,'sysadmin','Admin logged in','/ams_project/handle_login.php','127.0.0.1','2026-05-11 02:08:26'),
+(8,1,'sysadmin','Admin logged in','/ams_project/handle_login.php','127.0.0.1','2026-05-11 05:03:47'),
+(9,1,'sysadmin','Admin logged in','/ams_project/handle_login.php','127.0.0.1','2026-05-11 06:21:53'),
+(10,51,'jmtunda','User logged in','/ams_project/handle_login.php','127.0.0.1','2026-05-11 06:37:56'),
+(11,50,'raymond_m','Staff logged in','/ams_project/handle_login.php','127.0.0.1','2026-05-11 07:01:47'),
+(12,50,'raymond_m','Approved item ID: 53','/ams_project/staff/approve_item.php','127.0.0.1','2026-05-11 07:18:01'),
+(13,50,'raymond_m','Created auction: MACKBOOK AIR AUCTION','/ams_project/staff/create_auction.php','127.0.0.1','2026-05-11 07:35:15'),
+(14,50,'raymond_m','Staff logged in','/ams_project/handle_login.php','127.0.0.1','2026-05-11 07:38:36'),
+(15,50,'raymond_m','Staff logged in','/ams_project/handle_login.php','127.0.0.1','2026-05-11 07:40:33'),
+(16,50,'raymond_m','Staff logged in','/ams_project/handle_login.php','127.0.0.1','2026-05-12 05:17:18'),
+(17,50,'raymond_m','Staff logged in','/ams_project/handle_login.php','127.0.0.1','2026-05-12 06:48:31');
+/*!40000 ALTER TABLE `activity_logs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `admin`
 --
 
@@ -168,7 +214,7 @@ INSERT INTO `auction_bids` VALUES
 (61,52,51,60000.00,'active','lost','2026-02-07 00:09:09'),
 (62,52,51,7000.00,'active','lost','2026-04-15 16:36:16'),
 (63,52,51,7000.00,'active','lost','2026-04-15 16:36:27'),
-(64,52,51,70000.00,'active','lost','2026-04-15 17:59:39'),
+(64,52,51,70000.00,'active','won','2026-04-15 17:59:39'),
 (65,52,51,100.00,'active','lost','2026-04-15 18:14:37'),
 (66,52,51,100.00,'active','lost','2026-04-15 18:14:43'),
 (67,52,51,100.00,'active','lost','2026-04-15 18:14:50'),
@@ -201,7 +247,7 @@ CREATE TABLE `auctions` (
   KEY `created_by_staff` (`created_by_staff`),
   CONSTRAINT `auctions_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `evaluated_items` (`eval_id`),
   CONSTRAINT `auctions_ibfk_3` FOREIGN KEY (`created_by_staff`) REFERENCES `staff` (`staff_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -236,32 +282,33 @@ INSERT INTO `auctions` VALUES
 (23,'Musical Instruments Auction 2','MUSIC-2024-002','timed',23,'2024-03-23 00:00:00','2024-03-27 23:59:59','completed',6,'2024-03-18 16:00:00',NULL),
 (24,'Luxury Watches Auction 2','WATCH-2024-002','timed',24,'2024-03-24 00:00:00','2024-03-28 23:59:59','completed',6,'2024-03-19 09:00:00',NULL),
 (25,'Perfume Collection Auction','PERF-2024-001','timed',25,'2024-03-25 00:00:00','2024-03-29 23:59:59','completed',6,'2024-03-20 10:00:00',NULL),
-(26,'Fitness Equipment Auction','FIT-2024-001','timed',26,'2024-06-01 00:00:00','2024-06-07 23:59:59','upcoming',6,'2024-05-25 11:00:00',NULL),
-(27,'Art Supplies Auction','ART-2024-002','timed',27,'2024-06-02 00:00:00','2024-06-08 23:59:59','upcoming',6,'2024-05-26 12:00:00',NULL),
-(28,'Antique Collection Auction','ANTQ-2024-002','timed',28,'2024-06-03 00:00:00','2024-06-09 23:59:59','upcoming',6,'2024-05-27 13:00:00',NULL),
-(29,'Coin Collection Auction','COIN-2024-001','timed',29,'2024-06-04 00:00:00','2024-06-10 23:59:59','upcoming',6,'2024-05-28 14:00:00',NULL),
-(30,'Vintage Camera Auction','CAM-2024-002','timed',30,'2024-06-05 00:00:00','2024-06-11 23:59:59','upcoming',6,'2024-05-29 15:00:00',NULL),
-(31,'Sports Memorabilia Auction','SPORT-2024-002','timed',31,'2024-05-20 00:00:00','2024-05-30 23:59:59','ongoing',6,'2024-05-15 16:00:00',NULL),
-(32,'Doll Collection Auction','DOLL-2024-001','timed',32,'2024-05-21 00:00:00','2024-05-31 23:59:59','ongoing',6,'2024-05-16 09:00:00',NULL),
-(33,'Electric Vehicles Auction','EV-2024-001','timed',33,'2024-05-22 00:00:00','2024-06-01 23:59:59','ongoing',6,'2024-05-17 10:00:00',NULL),
-(34,'Designer Accessories Auction','ACC-2024-001','timed',34,'2024-05-23 00:00:00','2024-06-02 23:59:59','ongoing',6,'2024-05-18 11:00:00',NULL),
-(35,'Smart Home Auction','SMART-2024-001','timed',35,'2024-05-24 00:00:00','2024-06-03 23:59:59','ongoing',6,'2024-05-19 12:00:00',NULL),
-(36,'Drone & Tech Auction','DRONE-2024-001','timed',36,'2024-05-25 00:00:00','2024-06-04 23:59:59','ongoing',6,'2024-05-20 13:00:00',NULL),
-(37,'Kitchen Appliances Auction','KITCH-2024-001','timed',37,'2024-05-26 00:00:00','2024-06-05 23:59:59','ongoing',6,'2024-05-21 14:00:00',NULL),
-(38,'Musical Instruments Live','MUSIC-2024-003','live',38,'2024-06-10 14:00:00','2024-06-10 16:00:00','upcoming',6,'2024-06-01 15:00:00',NULL),
-(39,'Shoe Collection Auction','SHOE-2024-001','timed',39,'2024-06-11 00:00:00','2024-06-17 23:59:59','upcoming',6,'2024-06-02 16:00:00',NULL),
-(40,'Commercial Mixer Auction','COMM-2024-002','timed',40,'2024-06-12 00:00:00','2024-06-18 23:59:59','upcoming',6,'2024-06-03 09:00:00',NULL),
-(41,'Home Theater Auction','HT-2024-001','timed',41,'2024-06-13 00:00:00','2024-06-19 23:59:59','upcoming',6,'2024-06-04 10:00:00',NULL),
-(42,'Fine Wine Auction','WINE-2024-002','live',42,'2024-06-14 15:00:00','2024-06-14 17:00:00','upcoming',6,'2024-06-05 11:00:00',NULL),
-(43,'Sports Collectibles Auction','SPORT-2024-003','timed',43,'2024-06-15 00:00:00','2024-06-21 23:59:59','upcoming',6,'2024-06-06 12:00:00',NULL),
-(44,'Luxury Bedding Auction','BED-2024-001','timed',44,'2024-06-16 00:00:00','2024-06-22 23:59:59','upcoming',6,'2024-06-07 13:00:00',NULL),
-(45,'Photography Equipment Auction','PHOTO-2024-001','timed',45,'2024-06-17 00:00:00','2024-06-23 23:59:59','upcoming',6,'2024-06-08 14:00:00',NULL),
-(46,'Antique Furniture Auction','FURN-2024-001','timed',46,'2024-06-18 00:00:00','2024-06-24 23:59:59','upcoming',6,'2024-06-09 15:00:00',NULL),
-(47,'Smart Watches Auction','WATCH-2024-003','timed',47,'2024-06-19 00:00:00','2024-06-25 23:59:59','upcoming',6,'2024-06-10 16:00:00',NULL),
-(48,'Summer Electronics Auction','ELEC-2024-002','timed',48,'2024-07-01 00:00:00','2024-07-07 23:59:59','draft',6,'2024-06-20 09:00:00',NULL),
-(49,'Back to School Auction','SCHOOL-2024-001','timed',49,'2024-07-02 00:00:00','2024-07-08 23:59:59','draft',6,'2024-06-21 10:00:00',NULL),
-(50,'Holiday Special Auction','HOLIDAY-2024-001','live',50,'2024-12-15 18:00:00','2024-12-15 20:00:00','draft',6,'2024-06-22 11:00:00',NULL),
-(52,'Lenov Monitor Auction','#55547','live',52,'2026-02-07 12:30:00','2026-02-08 12:30:00','upcoming',50,'2026-02-06 15:19:58',NULL);
+(26,'Fitness Equipment Auction','FIT-2024-001','timed',26,'2024-06-01 00:00:00','2024-06-07 23:59:59','completed',6,'2024-05-25 11:00:00','2026-05-13 09:42:07'),
+(27,'Art Supplies Auction','ART-2024-002','timed',27,'2024-06-02 00:00:00','2024-06-08 23:59:59','completed',6,'2024-05-26 12:00:00','2026-05-13 09:42:07'),
+(28,'Antique Collection Auction','ANTQ-2024-002','timed',28,'2024-06-03 00:00:00','2024-06-09 23:59:59','completed',6,'2024-05-27 13:00:00','2026-05-13 09:42:07'),
+(29,'Coin Collection Auction','COIN-2024-001','timed',29,'2024-06-04 00:00:00','2024-06-10 23:59:59','completed',6,'2024-05-28 14:00:00','2026-05-13 09:42:07'),
+(30,'Vintage Camera Auction','CAM-2024-002','timed',30,'2024-06-05 00:00:00','2024-06-11 23:59:59','completed',6,'2024-05-29 15:00:00','2026-05-13 09:42:07'),
+(31,'Sports Memorabilia Auction','SPORT-2024-002','timed',31,'2024-05-20 00:00:00','2024-05-30 23:59:59','completed',6,'2024-05-15 16:00:00','2026-05-13 09:42:07'),
+(32,'Doll Collection Auction','DOLL-2024-001','timed',32,'2024-05-21 00:00:00','2024-05-31 23:59:59','completed',6,'2024-05-16 09:00:00','2026-05-13 09:42:07'),
+(33,'Electric Vehicles Auction','EV-2024-001','timed',33,'2024-05-22 00:00:00','2024-06-01 23:59:59','completed',6,'2024-05-17 10:00:00','2026-05-13 09:42:07'),
+(34,'Designer Accessories Auction','ACC-2024-001','timed',34,'2024-05-23 00:00:00','2024-06-02 23:59:59','completed',6,'2024-05-18 11:00:00','2026-05-13 09:42:07'),
+(35,'Smart Home Auction','SMART-2024-001','timed',35,'2024-05-24 00:00:00','2024-06-03 23:59:59','completed',6,'2024-05-19 12:00:00','2026-05-13 09:42:07'),
+(36,'Drone & Tech Auction','DRONE-2024-001','timed',36,'2024-05-25 00:00:00','2024-06-04 23:59:59','completed',6,'2024-05-20 13:00:00','2026-05-13 09:42:07'),
+(37,'Kitchen Appliances Auction','KITCH-2024-001','timed',37,'2024-05-26 00:00:00','2024-06-05 23:59:59','completed',6,'2024-05-21 14:00:00','2026-05-13 09:42:07'),
+(38,'Musical Instruments Live','MUSIC-2024-003','live',38,'2024-06-10 14:00:00','2024-06-10 16:00:00','completed',6,'2024-06-01 15:00:00','2026-05-13 09:42:07'),
+(39,'Shoe Collection Auction','SHOE-2024-001','timed',39,'2024-06-11 00:00:00','2024-06-17 23:59:59','completed',6,'2024-06-02 16:00:00','2026-05-13 09:42:07'),
+(40,'Commercial Mixer Auction','COMM-2024-002','timed',40,'2024-06-12 00:00:00','2024-06-18 23:59:59','completed',6,'2024-06-03 09:00:00','2026-05-13 09:42:07'),
+(41,'Home Theater Auction','HT-2024-001','timed',41,'2024-06-13 00:00:00','2024-06-19 23:59:59','completed',6,'2024-06-04 10:00:00','2026-05-13 09:42:07'),
+(42,'Fine Wine Auction','WINE-2024-002','live',42,'2024-06-14 15:00:00','2024-06-14 17:00:00','completed',6,'2024-06-05 11:00:00','2026-05-13 09:42:07'),
+(43,'Sports Collectibles Auction','SPORT-2024-003','timed',43,'2024-06-15 00:00:00','2024-06-21 23:59:59','completed',6,'2024-06-06 12:00:00','2026-05-13 09:42:07'),
+(44,'Luxury Bedding Auction','BED-2024-001','timed',44,'2024-06-16 00:00:00','2024-06-22 23:59:59','completed',6,'2024-06-07 13:00:00','2026-05-13 09:42:07'),
+(45,'Photography Equipment Auction','PHOTO-2024-001','timed',45,'2024-06-17 00:00:00','2024-06-23 23:59:59','completed',6,'2024-06-08 14:00:00','2026-05-13 09:42:07'),
+(46,'Antique Furniture Auction','FURN-2024-001','timed',46,'2024-06-18 00:00:00','2024-06-24 23:59:59','completed',6,'2024-06-09 15:00:00','2026-05-13 09:42:07'),
+(47,'Smart Watches Auction','WATCH-2024-003','timed',47,'2024-06-19 00:00:00','2024-06-25 23:59:59','completed',6,'2024-06-10 16:00:00','2026-05-13 09:42:07'),
+(48,'Summer Electronics Auction','ELEC-2024-002','timed',48,'2024-07-01 00:00:00','2024-07-07 23:59:59','completed',6,'2024-06-20 09:00:00','2026-05-13 09:42:07'),
+(49,'Back to School Auction','SCHOOL-2024-001','timed',49,'2024-07-02 00:00:00','2024-07-08 23:59:59','completed',6,'2024-06-21 10:00:00','2026-05-13 09:42:07'),
+(50,'Holiday Special Auction','HOLIDAY-2024-001','live',50,'2024-12-15 18:00:00','2024-12-15 20:00:00','completed',6,'2024-06-22 11:00:00','2026-05-13 09:42:07'),
+(52,'Lenov Monitor Auction','#55547','live',52,'2026-02-07 12:30:00','2026-02-08 12:30:00','completed',50,'2026-02-06 15:19:58','2026-05-13 09:42:07'),
+(53,'MACKBOOK AIR AUCTION','#576553','live',53,'2026-05-11 12:00:00','2026-05-13 23:59:00','completed',50,'2026-05-11 10:35:15','2026-05-19 07:53:10');
 /*!40000 ALTER TABLE `auctions` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -287,7 +334,7 @@ CREATE TABLE `consigner_items` (
   PRIMARY KEY (`item_id`),
   KEY `consigner_id` (`consigner_id`),
   CONSTRAINT `consigner_items_ibfk_1` FOREIGN KEY (`consigner_id`) REFERENCES `users` (`UID`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -348,7 +395,8 @@ INSERT INTO `consigner_items` VALUES
 (49,'Antique Jewelry Box',1,'Hand-carved wooden jewelry box','Antiques','antique',34,'approved','2024-03-12 09:00:00',NULL,NULL),
 (50,'Smart Watch Collection',5,'Latest smart watches from top brands','Wearables','new',35,'approved','2024-03-13 10:00:00',NULL,NULL),
 (51,'Monitor',1,'Lenovo','Electronics','used',51,'approved','2026-02-02 03:53:42','2026-02-05 09:42:43','../uploads/consigned_items/images.jpeg'),
-(52,'Monitor',1,'Lenovo','Electronics','used',51,'approved','2026-02-02 03:59:15','2026-02-05 11:10:10','../uploads/consigned_items/images.jpeg');
+(52,'Monitor',1,'Lenovo','Electronics','used',51,'approved','2026-02-02 03:59:15','2026-02-05 11:10:10','../uploads/consigned_items/images.jpeg'),
+(53,'Laptop',1,'Macbook AIR 2020 ','Electronics','used',51,'approved','2026-05-11 09:42:01','2026-05-11 10:18:01','../uploads/consigned_items/istockphoto-514564579-612x612.jpg');
 /*!40000 ALTER TABLE `consigner_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -413,7 +461,7 @@ CREATE TABLE `evaluated_items` (
   KEY `evaluator_id` (`evaluator_id`),
   CONSTRAINT `evaluated_items_ibfk_1` FOREIGN KEY (`item_id`) REFERENCES `consigner_items` (`item_id`),
   CONSTRAINT `evaluated_items_ibfk_2` FOREIGN KEY (`evaluator_id`) REFERENCES `staff` (`staff_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=54 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -473,7 +521,8 @@ INSERT INTO `evaluated_items` VALUES
 (48,48,13,'2024-05-08','excellent','authentic',2800.00,'Complete with accessories','Approved','2024-05-08 11:00:00'),
 (49,49,14,'2024-05-10','good','authentic',200.00,'Hand-carved, minor repairs needed','Approved','2024-05-10 14:00:00'),
 (50,50,15,'2024-05-12','excellent','authentic',900.00,'Latest models, sealed','Approved','2024-05-12 15:00:00'),
-(52,52,50,'2026-02-05','excellent','authentic',5000.00,'good','Approved','2026-02-05 11:10:10');
+(52,52,50,'2026-02-05','excellent','authentic',5000.00,'good','Approved','2026-02-05 11:10:10'),
+(53,53,50,'2025-05-04','excellent','authentic',50000.00,'The Laptop was in top condition','Approved','2026-05-11 10:18:01');
 /*!40000 ALTER TABLE `evaluated_items` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -487,7 +536,7 @@ DROP TABLE IF EXISTS `invoices`;
 CREATE TABLE `invoices` (
   `invoice_id` int(11) NOT NULL AUTO_INCREMENT,
   `invoice_number` varchar(255) NOT NULL,
-  `payment_id` int(11) DEFAULT NULL,
+  `bid_id` int(11) DEFAULT NULL,
   `bidder_id` int(11) DEFAULT NULL,
   `amount` decimal(10,2) NOT NULL,
   `tax_amount` decimal(10,2) DEFAULT 0.00,
@@ -497,12 +546,13 @@ CREATE TABLE `invoices` (
   `status` enum('draft','unpaid','paid','cancelled','overdue') DEFAULT 'unpaid',
   `created_by_staff` int(11) DEFAULT NULL,
   `created_at` datetime DEFAULT current_timestamp(),
+  `updated_at` datetime DEFAULT NULL ON UPDATE current_timestamp(),
   PRIMARY KEY (`invoice_id`),
   UNIQUE KEY `invoice_number` (`invoice_number`),
-  KEY `payment_id` (`payment_id`),
   KEY `bidder_id` (`bidder_id`),
   KEY `created_by_staff` (`created_by_staff`),
-  CONSTRAINT `invoices_ibfk_1` FOREIGN KEY (`payment_id`) REFERENCES `payment` (`payment_id`),
+  KEY `fk_invoice_bid` (`bid_id`),
+  CONSTRAINT `fk_invoice_bid` FOREIGN KEY (`bid_id`) REFERENCES `auction_bids` (`bid_id`) ON DELETE CASCADE,
   CONSTRAINT `invoices_ibfk_2` FOREIGN KEY (`bidder_id`) REFERENCES `users` (`UID`),
   CONSTRAINT `invoices_ibfk_3` FOREIGN KEY (`created_by_staff`) REFERENCES `staff` (`staff_id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
@@ -515,56 +565,56 @@ CREATE TABLE `invoices` (
 LOCK TABLES `invoices` WRITE;
 /*!40000 ALTER TABLE `invoices` DISABLE KEYS */;
 INSERT INTO `invoices` VALUES
-(1,'INV-2024-001',1,5,3200.00,320.00,3520.00,'2024-03-02','2024-03-16','paid',20,'2024-03-02 10:35:00'),
-(2,'INV-2024-002',2,9,8500.00,850.00,9350.00,'2024-03-03','2024-03-17','paid',20,'2024-03-03 11:20:00'),
-(3,'INV-2024-003',3,13,52000.00,5200.00,57200.00,'2024-03-04','2024-03-18','paid',45,'2024-03-04 09:50:00'),
-(4,'INV-2024-004',4,16,1800.00,180.00,1980.00,'2024-03-05','2024-03-19','paid',45,'2024-03-05 14:25:00'),
-(5,'INV-2024-005',5,18,12500.00,1250.00,13750.00,'2024-03-06','2024-03-20','paid',20,'2024-03-06 10:35:00'),
-(6,'INV-2024-006',6,20,3000.00,300.00,3300.00,'2024-03-07','2024-03-21','paid',20,'2024-03-07 11:20:00'),
-(7,'INV-2024-007',7,12,6500.00,650.00,7150.00,'2024-03-08','2024-03-22','paid',45,'2024-03-08 15:35:00'),
-(8,'INV-2024-008',8,13,13000.00,1300.00,14300.00,'2024-03-09','2024-03-23','paid',45,'2024-03-09 09:25:00'),
-(9,'INV-2024-009',9,14,22000.00,2200.00,24200.00,'2024-03-10','2024-03-24','paid',20,'2024-03-10 14:50:00'),
-(10,'INV-2024-010',10,15,7000.00,700.00,7700.00,'2024-03-11','2024-03-25','paid',20,'2024-03-11 11:20:00'),
-(11,'INV-2024-011',11,2,28000.00,2800.00,30800.00,'2024-03-16','2024-03-30','paid',45,'2024-03-16 10:35:00'),
-(12,'INV-2024-012',12,3,40000.00,4000.00,44000.00,'2024-03-17','2024-03-31','paid',45,'2024-03-17 14:25:00'),
-(13,'INV-2024-013',13,4,480000.00,48000.00,528000.00,'2024-03-21','2024-04-04','paid',20,'2024-03-21 09:50:00'),
-(14,'INV-2024-014',14,5,14000.00,1400.00,15400.00,'2024-03-19','2024-04-02','paid',20,'2024-03-19 15:20:00'),
-(15,'INV-2024-015',15,6,32000.00,3200.00,35200.00,'2024-03-20','2024-04-03','paid',45,'2024-03-20 11:35:00'),
-(16,'INV-2024-016',16,7,35000.00,3500.00,38500.00,'2024-03-22','2024-04-05','paid',45,'2024-03-22 14:25:00'),
-(17,'INV-2024-017',17,8,22000.00,2200.00,24200.00,'2024-03-23','2024-04-06','paid',20,'2024-03-23 10:20:00'),
-(18,'INV-2024-018',18,9,1100.00,110.00,1210.00,'2024-03-24','2024-04-07','paid',20,'2024-03-24 15:35:00'),
-(19,'INV-2024-019',19,10,700.00,70.00,770.00,'2024-03-25','2024-04-08','paid',45,'2024-03-25 11:20:00'),
-(20,'INV-2024-020',20,11,1800.00,180.00,1980.00,'2024-03-26','2024-04-09','paid',45,'2024-03-26 14:25:00'),
-(21,'INV-2024-021',21,12,1400.00,140.00,1540.00,'2024-03-27','2024-04-10','paid',20,'2024-03-27 10:35:00'),
-(22,'INV-2024-022',22,13,2800.00,280.00,3080.00,'2024-03-28','2024-04-11','paid',20,'2024-03-28 15:20:00'),
-(23,'INV-2024-023',23,14,700.00,70.00,770.00,'2024-03-29','2024-04-12','paid',45,'2024-03-29 11:25:00'),
-(24,'INV-2024-024',24,15,1300.00,130.00,1430.00,'2024-03-30','2024-04-13','paid',45,'2024-03-30 14:35:00'),
-(25,'INV-2024-025',25,16,450.00,45.00,495.00,'2024-03-31','2024-04-14','paid',20,'2024-03-31 10:20:00'),
-(26,'INV-2024-026',26,18,400.00,40.00,440.00,'2024-05-27','2024-06-10','unpaid',20,'2024-05-27 14:05:00'),
-(27,'INV-2024-027',27,19,1300.00,130.00,1430.00,'2024-05-28','2024-06-11','unpaid',45,'2024-05-28 11:05:00'),
-(28,'INV-2024-028',28,20,500.00,50.00,550.00,'2024-05-29','2024-06-12','unpaid',45,'2024-05-29 15:05:00'),
-(29,'INV-2024-029',29,1,350.00,35.00,385.00,'2024-05-30','2024-06-13','unpaid',20,'2024-05-30 10:05:00'),
-(30,'INV-2024-030',30,2,2200.00,220.00,2420.00,'2024-05-31','2024-06-14','unpaid',20,'2024-05-31 14:05:00'),
-(31,'INV-2024-031',31,3,1500.00,150.00,1650.00,'2024-06-02','2024-06-16','draft',45,'2024-06-02 11:05:00'),
-(32,'INV-2024-032',32,4,1000.00,100.00,1100.00,'2024-06-03','2024-06-17','draft',45,'2024-06-03 15:05:00'),
-(33,'INV-2024-033',33,5,900.00,90.00,990.00,'2024-06-04','2024-06-18','draft',20,'2024-06-04 10:05:00'),
-(34,'INV-2024-034',34,6,1500.00,150.00,1650.00,'2024-06-05','2024-06-19','draft',20,'2024-06-05 14:05:00'),
-(35,'INV-2024-035',35,7,1200.00,120.00,1320.00,'2024-06-06','2024-06-20','draft',45,'2024-06-06 11:05:00'),
-(36,'INV-2024-036',36,8,1800.00,180.00,1980.00,'2024-04-10','2024-04-24','overdue',45,'2024-04-10 14:05:00'),
-(37,'INV-2024-037',37,9,3000.00,300.00,3300.00,'2024-04-12','2024-04-26','overdue',20,'2024-04-12 15:05:00'),
-(38,'INV-2024-038',38,10,800.00,80.00,880.00,'2024-04-14','2024-04-28','overdue',20,'2024-04-14 09:05:00'),
-(39,'INV-2024-039',39,11,2500.00,250.00,2750.00,'2024-04-16','2024-04-30','overdue',45,'2024-04-16 14:05:00'),
-(40,'INV-2024-040',40,12,3500.00,350.00,3850.00,'2024-04-18','2024-05-02','overdue',45,'2024-04-18 11:05:00'),
-(41,'INV-2024-041',41,13,300.00,30.00,330.00,'2024-04-20','2024-05-04','cancelled',20,'2024-04-20 15:05:00'),
-(42,'INV-2024-042',42,14,1200.00,120.00,1320.00,'2024-04-22','2024-05-06','cancelled',20,'2024-04-22 10:05:00'),
-(43,'INV-2024-043',43,15,26000.00,2600.00,28600.00,'2024-04-24','2024-05-08','cancelled',45,'2024-04-24 14:05:00'),
-(44,'INV-2024-044',44,16,38000.00,3800.00,41800.00,'2024-04-26','2024-05-10','cancelled',45,'2024-04-26 11:05:00'),
-(45,'INV-2024-045',45,17,3200.00,320.00,3520.00,'2024-04-28','2024-05-12','cancelled',20,'2024-04-28 15:05:00'),
-(46,'INV-2024-046',NULL,18,450.00,45.00,495.00,'2024-05-01','2024-05-15','draft',20,'2024-05-01 10:00:00'),
-(47,'INV-2024-047',NULL,19,600.00,60.00,660.00,'2024-05-02','2024-05-16','draft',45,'2024-05-02 11:00:00'),
-(48,'INV-2024-048',NULL,20,750.00,75.00,825.00,'2024-05-03','2024-05-17','draft',45,'2024-05-03 12:00:00'),
-(49,'INV-2024-049',NULL,21,900.00,90.00,990.00,'2024-05-04','2024-05-18','draft',20,'2024-05-04 13:00:00'),
-(50,'INV-2024-050',NULL,22,1200.00,120.00,1320.00,'2024-05-05','2024-05-19','draft',20,'2024-05-05 14:00:00');
+(1,'INV-2024-001',NULL,5,3200.00,320.00,3520.00,'2024-03-02','2024-03-16','paid',20,'2024-03-02 10:35:00',NULL),
+(2,'INV-2024-002',NULL,9,8500.00,850.00,9350.00,'2024-03-03','2024-03-17','paid',20,'2024-03-03 11:20:00',NULL),
+(3,'INV-2024-003',NULL,13,52000.00,5200.00,57200.00,'2024-03-04','2024-03-18','paid',45,'2024-03-04 09:50:00',NULL),
+(4,'INV-2024-004',NULL,16,1800.00,180.00,1980.00,'2024-03-05','2024-03-19','paid',45,'2024-03-05 14:25:00',NULL),
+(5,'INV-2024-005',NULL,18,12500.00,1250.00,13750.00,'2024-03-06','2024-03-20','paid',20,'2024-03-06 10:35:00',NULL),
+(6,'INV-2024-006',NULL,20,3000.00,300.00,3300.00,'2024-03-07','2024-03-21','paid',20,'2024-03-07 11:20:00',NULL),
+(7,'INV-2024-007',NULL,12,6500.00,650.00,7150.00,'2024-03-08','2024-03-22','paid',45,'2024-03-08 15:35:00',NULL),
+(8,'INV-2024-008',NULL,13,13000.00,1300.00,14300.00,'2024-03-09','2024-03-23','paid',45,'2024-03-09 09:25:00',NULL),
+(9,'INV-2024-009',NULL,14,22000.00,2200.00,24200.00,'2024-03-10','2024-03-24','paid',20,'2024-03-10 14:50:00',NULL),
+(10,'INV-2024-010',NULL,15,7000.00,700.00,7700.00,'2024-03-11','2024-03-25','paid',20,'2024-03-11 11:20:00',NULL),
+(11,'INV-2024-011',NULL,2,28000.00,2800.00,30800.00,'2024-03-16','2024-03-30','paid',45,'2024-03-16 10:35:00',NULL),
+(12,'INV-2024-012',NULL,3,40000.00,4000.00,44000.00,'2024-03-17','2024-03-31','paid',45,'2024-03-17 14:25:00',NULL),
+(13,'INV-2024-013',NULL,4,480000.00,48000.00,528000.00,'2024-03-21','2024-04-04','paid',20,'2024-03-21 09:50:00',NULL),
+(14,'INV-2024-014',NULL,5,14000.00,1400.00,15400.00,'2024-03-19','2024-04-02','paid',20,'2024-03-19 15:20:00',NULL),
+(15,'INV-2024-015',NULL,6,32000.00,3200.00,35200.00,'2024-03-20','2024-04-03','paid',45,'2024-03-20 11:35:00',NULL),
+(16,'INV-2024-016',NULL,7,35000.00,3500.00,38500.00,'2024-03-22','2024-04-05','paid',45,'2024-03-22 14:25:00',NULL),
+(17,'INV-2024-017',NULL,8,22000.00,2200.00,24200.00,'2024-03-23','2024-04-06','paid',20,'2024-03-23 10:20:00',NULL),
+(18,'INV-2024-018',NULL,9,1100.00,110.00,1210.00,'2024-03-24','2024-04-07','paid',20,'2024-03-24 15:35:00',NULL),
+(19,'INV-2024-019',NULL,10,700.00,70.00,770.00,'2024-03-25','2024-04-08','paid',45,'2024-03-25 11:20:00',NULL),
+(20,'INV-2024-020',NULL,11,1800.00,180.00,1980.00,'2024-03-26','2024-04-09','paid',45,'2024-03-26 14:25:00',NULL),
+(21,'INV-2024-021',NULL,12,1400.00,140.00,1540.00,'2024-03-27','2024-04-10','paid',20,'2024-03-27 10:35:00',NULL),
+(22,'INV-2024-022',NULL,13,2800.00,280.00,3080.00,'2024-03-28','2024-04-11','paid',20,'2024-03-28 15:20:00',NULL),
+(23,'INV-2024-023',NULL,14,700.00,70.00,770.00,'2024-03-29','2024-04-12','paid',45,'2024-03-29 11:25:00',NULL),
+(24,'INV-2024-024',NULL,15,1300.00,130.00,1430.00,'2024-03-30','2024-04-13','paid',45,'2024-03-30 14:35:00',NULL),
+(25,'INV-2024-025',NULL,16,450.00,45.00,495.00,'2024-03-31','2024-04-14','paid',20,'2024-03-31 10:20:00',NULL),
+(26,'INV-2024-026',NULL,18,400.00,40.00,440.00,'2024-05-27','2024-06-10','unpaid',20,'2024-05-27 14:05:00',NULL),
+(27,'INV-2024-027',NULL,19,1300.00,130.00,1430.00,'2024-05-28','2024-06-11','unpaid',45,'2024-05-28 11:05:00',NULL),
+(28,'INV-2024-028',NULL,20,500.00,50.00,550.00,'2024-05-29','2024-06-12','unpaid',45,'2024-05-29 15:05:00',NULL),
+(29,'INV-2024-029',NULL,1,350.00,35.00,385.00,'2024-05-30','2024-06-13','unpaid',20,'2024-05-30 10:05:00',NULL),
+(30,'INV-2024-030',NULL,2,2200.00,220.00,2420.00,'2024-05-31','2024-06-14','unpaid',20,'2024-05-31 14:05:00',NULL),
+(31,'INV-2024-031',NULL,3,1500.00,150.00,1650.00,'2024-06-02','2024-06-16','draft',45,'2024-06-02 11:05:00',NULL),
+(32,'INV-2024-032',NULL,4,1000.00,100.00,1100.00,'2024-06-03','2024-06-17','draft',45,'2024-06-03 15:05:00',NULL),
+(33,'INV-2024-033',NULL,5,900.00,90.00,990.00,'2024-06-04','2024-06-18','draft',20,'2024-06-04 10:05:00',NULL),
+(34,'INV-2024-034',NULL,6,1500.00,150.00,1650.00,'2024-06-05','2024-06-19','draft',20,'2024-06-05 14:05:00',NULL),
+(35,'INV-2024-035',NULL,7,1200.00,120.00,1320.00,'2024-06-06','2024-06-20','draft',45,'2024-06-06 11:05:00',NULL),
+(36,'INV-2024-036',NULL,8,1800.00,180.00,1980.00,'2024-04-10','2024-04-24','overdue',45,'2024-04-10 14:05:00',NULL),
+(37,'INV-2024-037',NULL,9,3000.00,300.00,3300.00,'2024-04-12','2024-04-26','overdue',20,'2024-04-12 15:05:00',NULL),
+(38,'INV-2024-038',NULL,10,800.00,80.00,880.00,'2024-04-14','2024-04-28','overdue',20,'2024-04-14 09:05:00',NULL),
+(39,'INV-2024-039',NULL,11,2500.00,250.00,2750.00,'2024-04-16','2024-04-30','overdue',45,'2024-04-16 14:05:00',NULL),
+(40,'INV-2024-040',NULL,12,3500.00,350.00,3850.00,'2024-04-18','2024-05-02','overdue',45,'2024-04-18 11:05:00',NULL),
+(41,'INV-2024-041',NULL,13,300.00,30.00,330.00,'2024-04-20','2024-05-04','cancelled',20,'2024-04-20 15:05:00',NULL),
+(42,'INV-2024-042',NULL,14,1200.00,120.00,1320.00,'2024-04-22','2024-05-06','cancelled',20,'2024-04-22 10:05:00',NULL),
+(43,'INV-2024-043',NULL,15,26000.00,2600.00,28600.00,'2024-04-24','2024-05-08','cancelled',45,'2024-04-24 14:05:00',NULL),
+(44,'INV-2024-044',NULL,16,38000.00,3800.00,41800.00,'2024-04-26','2024-05-10','cancelled',45,'2024-04-26 11:05:00',NULL),
+(45,'INV-2024-045',NULL,17,3200.00,320.00,3520.00,'2024-04-28','2024-05-12','cancelled',20,'2024-04-28 15:05:00',NULL),
+(46,'INV-2024-046',NULL,18,450.00,45.00,495.00,'2024-05-01','2024-05-15','draft',20,'2024-05-01 10:00:00',NULL),
+(47,'INV-2024-047',NULL,19,600.00,60.00,660.00,'2024-05-02','2024-05-16','draft',45,'2024-05-02 11:00:00',NULL),
+(48,'INV-2024-048',NULL,20,750.00,75.00,825.00,'2024-05-03','2024-05-17','draft',45,'2024-05-03 12:00:00',NULL),
+(49,'INV-2024-049',NULL,21,900.00,90.00,990.00,'2024-05-04','2024-05-18','draft',20,'2024-05-04 13:00:00',NULL),
+(50,'INV-2024-050',NULL,22,1200.00,120.00,1320.00,'2024-05-05','2024-05-19','draft',20,'2024-05-05 14:00:00',NULL);
 /*!40000 ALTER TABLE `invoices` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -577,6 +627,7 @@ DROP TABLE IF EXISTS `payment`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `payment` (
   `payment_id` int(11) NOT NULL AUTO_INCREMENT,
+  `invoice_id` int(11) DEFAULT NULL,
   `bid_id` int(11) DEFAULT NULL,
   `bidder_id` int(11) DEFAULT NULL,
   `amount` decimal(10,2) NOT NULL,
@@ -590,10 +641,12 @@ CREATE TABLE `payment` (
   KEY `bid_id` (`bid_id`),
   KEY `bidder_id` (`bidder_id`),
   KEY `processed_by_staff` (`processed_by_staff`),
+  KEY `fk_payment_invoice` (`invoice_id`),
+  CONSTRAINT `fk_payment_invoice` FOREIGN KEY (`invoice_id`) REFERENCES `invoices` (`invoice_id`) ON DELETE CASCADE,
   CONSTRAINT `payment_ibfk_1` FOREIGN KEY (`bid_id`) REFERENCES `auction_bids` (`bid_id`),
   CONSTRAINT `payment_ibfk_2` FOREIGN KEY (`bidder_id`) REFERENCES `users` (`UID`),
   CONSTRAINT `payment_ibfk_3` FOREIGN KEY (`processed_by_staff`) REFERENCES `staff` (`staff_id`)
-) ENGINE=InnoDB AUTO_INCREMENT=53 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=55 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -603,55 +656,57 @@ CREATE TABLE `payment` (
 LOCK TABLES `payment` WRITE;
 /*!40000 ALTER TABLE `payment` DISABLE KEYS */;
 INSERT INTO `payment` VALUES
-(1,5,5,3200.00,'bank_transfer','completed',18,'TRX-001-ANTQ','2024-03-02 07:00:00','2024-03-02 10:30:00'),
-(2,9,9,8500.00,'credit_card','completed',18,'TRX-002-JEWL','2024-03-03 08:00:00','2024-03-03 11:15:00'),
-(3,13,13,52000.00,'bank_transfer','completed',19,'TRX-003-CAR','2024-03-04 06:00:00','2024-03-04 09:45:00'),
-(4,16,16,1800.00,'mobile_money','completed',19,'TRX-004-ART','2024-03-05 11:00:00','2024-03-05 14:20:00'),
-(5,18,18,12500.00,'credit_card','completed',18,'TRX-005-WATCH','2024-03-06 07:00:00','2024-03-06 10:30:00'),
-(6,20,20,3000.00,'mobile_money','completed',19,'TRX-006-COLL','2024-03-07 08:00:00','2024-03-07 11:15:00'),
-(7,51,12,6500.00,'bank_transfer','completed',18,'TRX-007-JEWL2','2024-03-08 12:00:00','2024-03-08 15:30:00'),
-(8,52,13,13000.00,'credit_card','completed',19,'TRX-008-MUSIC','2024-03-09 06:00:00','2024-03-09 09:20:00'),
-(9,53,14,22000.00,'bank_transfer','completed',18,'TRX-009-COMM','2024-03-10 11:00:00','2024-03-10 14:45:00'),
-(10,54,15,7000.00,'mobile_money','completed',19,'TRX-010-OFFICE','2024-03-11 08:00:00','2024-03-11 11:15:00'),
-(12,23,3,40000.00,'credit_card','completed',19,'TRX-012-LAPTOP','2024-03-17 11:00:00','2024-03-17 14:20:00'),
-(13,24,4,480000.00,'bank_transfer','completed',18,'TRX-013-RE','2024-03-21 06:00:00','2024-03-21 09:45:00'),
-(14,25,5,14000.00,'credit_card','completed',19,'TRX-014-WINE','2024-03-19 12:00:00','2024-03-19 15:15:00'),
-(15,26,6,32000.00,'bank_transfer','completed',18,'TRX-015-FARM','2024-03-20 08:00:00','2024-03-20 11:30:00'),
-(16,27,7,35000.00,'credit_card','completed',19,'TRX-016-HTL','2024-03-22 11:00:00','2024-03-22 14:20:00'),
-(17,28,8,22000.00,'mobile_money','completed',18,'TRX-017-REST','2024-03-23 07:00:00','2024-03-23 10:15:00'),
-(18,29,9,1100.00,'credit_card','completed',19,'TRX-018-PHONE','2024-03-24 12:00:00','2024-03-24 15:30:00'),
-(19,30,10,700.00,'mobile_money','completed',18,'TRX-019-FASH','2024-03-25 08:00:00','2024-03-25 11:15:00'),
-(20,31,11,1800.00,'credit_card','completed',19,'TRX-020-GAME','2024-03-26 11:00:00','2024-03-26 14:20:00'),
-(21,32,12,1400.00,'bank_transfer','completed',18,'TRX-021-SPORT','2024-03-27 07:00:00','2024-03-27 10:30:00'),
-(22,33,13,2800.00,'credit_card','completed',19,'TRX-022-CAM','2024-03-28 12:00:00','2024-03-28 15:15:00'),
-(23,34,14,700.00,'mobile_money','completed',18,'TRX-023-MUSIC2','2024-03-29 08:00:00','2024-03-29 11:20:00'),
-(24,35,15,1300.00,'credit_card','completed',19,'TRX-024-WATCH2','2024-03-30 11:00:00','2024-03-30 14:30:00'),
-(25,36,16,450.00,'mobile_money','completed',18,'TRX-025-PERF','2024-03-31 07:00:00','2024-03-31 10:15:00'),
-(26,38,18,400.00,'credit_card','pending',NULL,'TRX-026-SPORT2','2024-05-27 11:00:00',NULL),
-(27,39,19,1300.00,'bank_transfer','pending',NULL,'TRX-027-DOLL','2024-05-28 08:00:00',NULL),
-(28,40,20,500.00,'mobile_money','pending',NULL,'TRX-028-EV','2024-05-29 12:00:00',NULL),
-(29,41,1,350.00,'credit_card','pending',NULL,'TRX-029-ACC','2024-05-30 07:00:00',NULL),
-(31,55,16,2700.00,'credit_card','failed',18,'TRX-031-FAIL1','2024-03-02 11:30:00',NULL),
-(32,56,17,2900.00,'bank_transfer','failed',19,'TRX-032-FAIL2','2024-03-02 11:40:00',NULL),
-(33,57,18,7800.00,'mobile_money','failed',18,'TRX-033-FAIL3','2024-03-03 12:30:00',NULL),
-(34,58,19,8200.00,'credit_card','refunded',19,'TRX-034-REF1','2024-03-03 12:40:00','2024-03-04 10:00:00'),
-(35,59,20,47000.00,'bank_transfer','refunded',18,'TRX-035-REF2','2024-03-04 07:30:00','2024-03-05 09:00:00'),
-(36,60,1,50000.00,'credit_card','refunded',19,'TRX-036-REF3','2024-03-04 07:45:00','2024-03-05 10:00:00'),
-(37,1,1,2100.00,'mobile_money','completed',18,'TRX-037-BID1','2024-03-01 11:06:00','2024-03-01 14:10:00'),
-(39,3,3,2500.00,'bank_transfer','completed',18,'TRX-039-BID3','2024-03-01 11:16:00','2024-03-01 14:20:00'),
-(40,4,4,2800.00,'mobile_money','completed',19,'TRX-040-BID4','2024-03-01 11:21:00','2024-03-01 14:25:00'),
-(41,6,6,7000.00,'credit_card','completed',18,'TRX-041-BID6','2024-03-02 12:06:00','2024-03-02 15:10:00'),
-(42,7,7,7500.00,'bank_transfer','completed',19,'TRX-042-BID7','2024-03-02 12:11:00','2024-03-02 15:15:00'),
-(43,8,8,8000.00,'mobile_money','completed',18,'TRX-043-BID8','2024-03-02 12:16:00','2024-03-02 15:20:00'),
-(44,10,10,42000.00,'credit_card','completed',19,'TRX-044-BID10','2024-03-03 07:06:00','2024-03-03 10:15:00'),
-(45,11,11,45000.00,'bank_transfer','completed',18,'TRX-045-BID11','2024-03-03 07:16:00','2024-03-03 10:25:00'),
-(46,12,12,48000.00,'mobile_money','completed',19,'TRX-046-BID12','2024-03-03 07:26:00','2024-03-03 10:35:00'),
-(47,14,14,1300.00,'credit_card','completed',18,'TRX-047-BID14','2024-03-04 11:06:00','2024-03-04 14:10:00'),
-(48,15,15,1500.00,'bank_transfer','completed',19,'TRX-048-BID15','2024-03-04 11:11:00','2024-03-04 14:15:00'),
-(49,17,17,11000.00,'mobile_money','completed',18,'TRX-049-BID17','2024-03-05 08:06:00','2024-03-05 11:15:00'),
-(50,19,19,2600.00,'credit_card','completed',19,'TRX-050-BID19','2024-03-06 12:06:00','2024-03-06 15:10:00'),
-(51,22,2,28000.00,'credit_card','pending',NULL,'MTET6979R','2026-03-11 07:11:52',NULL),
-(52,22,2,28000.00,'credit_card','pending',NULL,'MTET6979R','2026-03-11 07:12:01',NULL);
+(1,NULL,5,5,3200.00,'bank_transfer','completed',18,'TRX-001-ANTQ','2024-03-02 07:00:00','2024-03-02 10:30:00'),
+(2,NULL,9,9,8500.00,'credit_card','completed',18,'TRX-002-JEWL','2024-03-03 08:00:00','2024-03-03 11:15:00'),
+(3,NULL,13,13,52000.00,'bank_transfer','completed',19,'TRX-003-CAR','2024-03-04 06:00:00','2024-03-04 09:45:00'),
+(4,NULL,16,16,1800.00,'mobile_money','completed',19,'TRX-004-ART','2024-03-05 11:00:00','2024-03-05 14:20:00'),
+(5,NULL,18,18,12500.00,'credit_card','completed',18,'TRX-005-WATCH','2024-03-06 07:00:00','2024-03-06 10:30:00'),
+(6,NULL,20,20,3000.00,'mobile_money','completed',19,'TRX-006-COLL','2024-03-07 08:00:00','2024-03-07 11:15:00'),
+(7,NULL,51,12,6500.00,'bank_transfer','completed',18,'TRX-007-JEWL2','2024-03-08 12:00:00','2024-03-08 15:30:00'),
+(8,NULL,52,13,13000.00,'credit_card','completed',19,'TRX-008-MUSIC','2024-03-09 06:00:00','2024-03-09 09:20:00'),
+(9,NULL,53,14,22000.00,'bank_transfer','completed',18,'TRX-009-COMM','2024-03-10 11:00:00','2024-03-10 14:45:00'),
+(10,NULL,54,15,7000.00,'mobile_money','completed',19,'TRX-010-OFFICE','2024-03-11 08:00:00','2024-03-11 11:15:00'),
+(12,NULL,23,3,40000.00,'credit_card','completed',19,'TRX-012-LAPTOP','2024-03-17 11:00:00','2024-03-17 14:20:00'),
+(13,NULL,24,4,480000.00,'bank_transfer','completed',18,'TRX-013-RE','2024-03-21 06:00:00','2024-03-21 09:45:00'),
+(14,NULL,25,5,14000.00,'credit_card','completed',19,'TRX-014-WINE','2024-03-19 12:00:00','2024-03-19 15:15:00'),
+(15,NULL,26,6,32000.00,'bank_transfer','completed',18,'TRX-015-FARM','2024-03-20 08:00:00','2024-03-20 11:30:00'),
+(16,NULL,27,7,35000.00,'credit_card','completed',19,'TRX-016-HTL','2024-03-22 11:00:00','2024-03-22 14:20:00'),
+(17,NULL,28,8,22000.00,'mobile_money','completed',18,'TRX-017-REST','2024-03-23 07:00:00','2024-03-23 10:15:00'),
+(18,NULL,29,9,1100.00,'credit_card','completed',19,'TRX-018-PHONE','2024-03-24 12:00:00','2024-03-24 15:30:00'),
+(19,NULL,30,10,700.00,'mobile_money','completed',18,'TRX-019-FASH','2024-03-25 08:00:00','2024-03-25 11:15:00'),
+(20,NULL,31,11,1800.00,'credit_card','completed',19,'TRX-020-GAME','2024-03-26 11:00:00','2024-03-26 14:20:00'),
+(21,NULL,32,12,1400.00,'bank_transfer','completed',18,'TRX-021-SPORT','2024-03-27 07:00:00','2024-03-27 10:30:00'),
+(22,NULL,33,13,2800.00,'credit_card','completed',19,'TRX-022-CAM','2024-03-28 12:00:00','2024-03-28 15:15:00'),
+(23,NULL,34,14,700.00,'mobile_money','completed',18,'TRX-023-MUSIC2','2024-03-29 08:00:00','2024-03-29 11:20:00'),
+(24,NULL,35,15,1300.00,'credit_card','completed',19,'TRX-024-WATCH2','2024-03-30 11:00:00','2024-03-30 14:30:00'),
+(25,NULL,36,16,450.00,'mobile_money','completed',18,'TRX-025-PERF','2024-03-31 07:00:00','2024-03-31 10:15:00'),
+(26,NULL,38,18,400.00,'credit_card','pending',NULL,'TRX-026-SPORT2','2024-05-27 11:00:00',NULL),
+(27,NULL,39,19,1300.00,'bank_transfer','pending',NULL,'TRX-027-DOLL','2024-05-28 08:00:00',NULL),
+(28,NULL,40,20,500.00,'mobile_money','pending',NULL,'TRX-028-EV','2024-05-29 12:00:00',NULL),
+(29,NULL,41,1,350.00,'credit_card','pending',NULL,'TRX-029-ACC','2024-05-30 07:00:00',NULL),
+(31,NULL,55,16,2700.00,'credit_card','failed',18,'TRX-031-FAIL1','2024-03-02 11:30:00',NULL),
+(32,NULL,56,17,2900.00,'bank_transfer','failed',19,'TRX-032-FAIL2','2024-03-02 11:40:00',NULL),
+(33,NULL,57,18,7800.00,'mobile_money','failed',18,'TRX-033-FAIL3','2024-03-03 12:30:00',NULL),
+(34,NULL,58,19,8200.00,'credit_card','refunded',19,'TRX-034-REF1','2024-03-03 12:40:00','2024-03-04 10:00:00'),
+(35,NULL,59,20,47000.00,'bank_transfer','refunded',18,'TRX-035-REF2','2024-03-04 07:30:00','2024-03-05 09:00:00'),
+(36,NULL,60,1,50000.00,'credit_card','refunded',19,'TRX-036-REF3','2024-03-04 07:45:00','2024-03-05 10:00:00'),
+(37,NULL,1,1,2100.00,'mobile_money','completed',18,'TRX-037-BID1','2024-03-01 11:06:00','2024-03-01 14:10:00'),
+(39,NULL,3,3,2500.00,'bank_transfer','completed',18,'TRX-039-BID3','2024-03-01 11:16:00','2024-03-01 14:20:00'),
+(40,NULL,4,4,2800.00,'mobile_money','completed',19,'TRX-040-BID4','2024-03-01 11:21:00','2024-03-01 14:25:00'),
+(41,NULL,6,6,7000.00,'credit_card','completed',18,'TRX-041-BID6','2024-03-02 12:06:00','2024-03-02 15:10:00'),
+(42,NULL,7,7,7500.00,'bank_transfer','completed',19,'TRX-042-BID7','2024-03-02 12:11:00','2024-03-02 15:15:00'),
+(43,NULL,8,8,8000.00,'mobile_money','completed',18,'TRX-043-BID8','2024-03-02 12:16:00','2024-03-02 15:20:00'),
+(44,NULL,10,10,42000.00,'credit_card','completed',19,'TRX-044-BID10','2024-03-03 07:06:00','2024-03-03 10:15:00'),
+(45,NULL,11,11,45000.00,'bank_transfer','completed',18,'TRX-045-BID11','2024-03-03 07:16:00','2024-03-03 10:25:00'),
+(46,NULL,12,12,48000.00,'mobile_money','completed',19,'TRX-046-BID12','2024-03-03 07:26:00','2024-03-03 10:35:00'),
+(47,NULL,14,14,1300.00,'credit_card','completed',18,'TRX-047-BID14','2024-03-04 11:06:00','2024-03-04 14:10:00'),
+(48,NULL,15,15,1500.00,'bank_transfer','completed',19,'TRX-048-BID15','2024-03-04 11:11:00','2024-03-04 14:15:00'),
+(49,NULL,17,17,11000.00,'mobile_money','completed',18,'TRX-049-BID17','2024-03-05 08:06:00','2024-03-05 11:15:00'),
+(50,NULL,19,19,2600.00,'credit_card','completed',19,'TRX-050-BID19','2024-03-06 12:06:00','2024-03-06 15:10:00'),
+(51,NULL,22,2,28000.00,'credit_card','pending',NULL,'MTET6979R','2026-03-11 07:11:52',NULL),
+(52,NULL,22,2,28000.00,'credit_card','pending',NULL,'MTET6979R','2026-03-11 07:12:01',NULL),
+(53,NULL,64,51,70000.00,'credit_card','pending',NULL,'UAFTNN333','2026-05-11 01:36:31',NULL),
+(54,NULL,64,51,70000.00,'credit_card','pending',NULL,'UAFTNN333','2026-05-11 01:38:13',NULL);
 /*!40000 ALTER TABLE `payment` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -741,6 +796,7 @@ DROP TABLE IF EXISTS `settlement`;
 /*!40101 SET character_set_client = utf8mb4 */;
 CREATE TABLE `settlement` (
   `settlement_id` int(11) NOT NULL AUTO_INCREMENT,
+  `payment_id` int(11) DEFAULT NULL,
   `auction_item_id` int(11) NOT NULL,
   `amount_due` decimal(10,2) NOT NULL,
   `commission_rate` decimal(5,2) NOT NULL DEFAULT 15.00,
@@ -768,56 +824,56 @@ CREATE TABLE `settlement` (
 LOCK TABLES `settlement` WRITE;
 /*!40000 ALTER TABLE `settlement` DISABLE KEYS */;
 INSERT INTO `settlement` VALUES
-(1,1,3200.00,15.00,480.00,2720.00,'2024-03-05','completed',20,'bank_transfer','SET-001-ANTQ','2024-03-03 10:00:00',NULL),
-(2,3,8500.00,15.00,1275.00,7225.00,'2024-03-06','completed',20,'bank_transfer','SET-002-JEWL','2024-03-04 11:00:00',NULL),
-(3,5,52000.00,10.00,5200.00,46800.00,'2024-03-07','completed',20,'cheque','SET-003-CAR','2024-03-05 09:00:00',NULL),
-(4,2,1800.00,15.00,270.00,1530.00,'2024-03-08','completed',45,'mobile_money','SET-004-ART','2024-03-06 14:00:00',NULL),
-(5,7,12500.00,15.00,1875.00,10625.00,'2024-03-09','completed',45,'bank_transfer','SET-005-WATCH','2024-03-07 10:00:00',NULL),
-(6,4,3000.00,15.00,450.00,2550.00,'2024-03-10','completed',20,'mobile_money','SET-006-COLL','2024-03-08 11:00:00',NULL),
-(7,9,6500.00,15.00,975.00,5525.00,'2024-03-11','completed',45,'bank_transfer','SET-007-JEWL2','2024-03-09 15:00:00',NULL),
-(8,10,13000.00,10.00,1300.00,11700.00,'2024-03-12','completed',20,'cheque','SET-008-MUSIC','2024-03-10 09:00:00',NULL),
-(9,11,22000.00,12.00,2640.00,19360.00,'2024-03-13','completed',45,'bank_transfer','SET-009-COMM','2024-03-11 14:00:00',NULL),
-(10,12,7000.00,12.00,840.00,6160.00,'2024-03-14','completed',20,'mobile_money','SET-010-OFFICE','2024-03-12 11:00:00',NULL),
-(11,14,28000.00,12.00,3360.00,24640.00,'2024-03-19','completed',45,'bank_transfer','SET-011-ELEC','2024-03-17 10:00:00',NULL),
-(12,15,40000.00,12.00,4800.00,35200.00,'2024-03-20','completed',20,'cheque','SET-012-LAPTOP','2024-03-18 14:00:00',NULL),
-(13,16,480000.00,8.00,38400.00,441600.00,'2024-03-24','completed',45,'bank_transfer','SET-013-RE','2024-03-22 09:00:00',NULL),
-(14,17,14000.00,15.00,2100.00,11900.00,'2024-03-22','completed',20,'bank_transfer','SET-014-WINE','2024-03-20 15:00:00',NULL),
-(15,18,32000.00,12.00,3840.00,28160.00,'2024-03-23','completed',45,'cheque','SET-015-FARM','2024-03-21 11:00:00',NULL),
-(16,19,35000.00,12.00,4200.00,30800.00,'2024-03-25','completed',20,'bank_transfer','SET-016-HTL','2024-03-23 14:00:00',NULL),
-(17,20,22000.00,12.00,2640.00,19360.00,'2024-03-26','completed',45,'mobile_money','SET-017-REST','2024-03-24 10:00:00',NULL),
-(18,21,1100.00,15.00,165.00,935.00,'2024-03-27','completed',20,'bank_transfer','SET-018-PHONE','2024-03-25 15:00:00',NULL),
-(19,22,700.00,15.00,105.00,595.00,'2024-03-28','completed',45,'mobile_money','SET-019-FASH','2024-03-26 11:00:00',NULL),
-(20,23,1800.00,15.00,270.00,1530.00,'2024-03-29','completed',20,'bank_transfer','SET-020-GAME','2024-03-27 14:00:00',NULL),
-(21,24,1400.00,15.00,210.00,1190.00,'2024-03-30','completed',45,'mobile_money','SET-021-SPORT','2024-03-28 10:00:00',NULL),
-(22,25,2800.00,15.00,420.00,2380.00,'2024-03-31','completed',20,'bank_transfer','SET-022-CAM','2024-03-29 15:00:00',NULL),
-(23,26,700.00,15.00,105.00,595.00,'2024-04-01','completed',45,'mobile_money','SET-023-MUSIC2','2024-03-30 11:00:00',NULL),
-(24,27,1300.00,15.00,195.00,1105.00,'2024-04-02','completed',20,'bank_transfer','SET-024-WATCH2','2024-03-31 14:00:00',NULL),
-(25,28,450.00,15.00,67.50,382.50,'2024-04-03','completed',45,'mobile_money','SET-025-PERF','2024-04-01 10:00:00',NULL),
-(26,34,400.00,15.00,60.00,340.00,NULL,'pending',NULL,NULL,NULL,'2024-05-28 14:00:00',NULL),
-(27,35,1300.00,15.00,195.00,1105.00,NULL,'pending',NULL,NULL,NULL,'2024-05-29 11:00:00',NULL),
-(28,36,500.00,15.00,75.00,425.00,NULL,'pending',NULL,NULL,NULL,'2024-05-30 15:00:00',NULL),
-(29,37,350.00,15.00,52.50,297.50,NULL,'pending',NULL,NULL,NULL,'2024-05-31 10:00:00',NULL),
-(30,38,2200.00,15.00,330.00,1870.00,NULL,'pending',NULL,NULL,NULL,'2024-06-01 14:00:00',NULL),
-(31,39,1500.00,15.00,225.00,1275.00,NULL,'processing',20,'bank_transfer','SET-031-DRONE','2024-06-02 11:00:00',NULL),
-(32,40,1000.00,15.00,150.00,850.00,NULL,'processing',45,'mobile_money','SET-032-KITCH','2024-06-03 15:00:00',NULL),
-(33,41,900.00,15.00,135.00,765.00,NULL,'processing',20,NULL,NULL,'2024-06-04 10:00:00',NULL),
-(34,42,1500.00,15.00,225.00,1275.00,NULL,'processing',45,NULL,NULL,'2024-06-05 14:00:00',NULL),
-(35,43,1200.00,15.00,180.00,1020.00,NULL,'processing',20,NULL,NULL,'2024-06-06 11:00:00',NULL),
-(36,44,1800.00,15.00,270.00,1530.00,'2024-04-10','completed',45,'bank_transfer','SET-036-HT','2024-04-08 14:00:00',NULL),
-(37,45,3000.00,15.00,450.00,2550.00,'2024-04-12','completed',20,'cheque','SET-037-WINE2','2024-04-10 15:00:00',NULL),
-(38,46,800.00,15.00,120.00,680.00,'2024-04-14','completed',45,'mobile_money','SET-038-SPORT3','2024-04-12 09:00:00',NULL),
-(39,47,2500.00,12.00,300.00,2200.00,'2024-04-16','completed',20,'bank_transfer','SET-039-BED','2024-04-14 14:00:00',NULL),
-(40,48,3500.00,15.00,525.00,2975.00,'2024-04-18','completed',45,'cheque','SET-040-PHOTO','2024-04-16 11:00:00',NULL),
-(41,49,300.00,15.00,45.00,255.00,'2024-04-20','completed',20,'mobile_money','SET-041-FURN','2024-04-18 15:00:00',NULL),
-(42,50,1200.00,15.00,180.00,1020.00,'2024-04-22','completed',45,'bank_transfer','SET-042-WATCH3','2024-04-20 10:00:00',NULL),
-(43,14,26000.00,12.00,3120.00,22880.00,'2024-04-24','completed',20,'cheque','SET-043-ELEC2','2024-04-22 14:00:00',NULL),
-(44,15,38000.00,12.00,4560.00,33440.00,'2024-04-26','completed',45,'bank_transfer','SET-044-SCHOOL','2024-04-24 11:00:00',NULL),
-(45,1,3200.00,15.00,480.00,2720.00,'2024-04-28','completed',20,'mobile_money','SET-045-HOLIDAY','2024-04-26 15:00:00',NULL),
-(46,31,400.00,15.00,60.00,340.00,NULL,'cancelled',45,NULL,NULL,'2024-04-10 09:00:00',NULL),
-(47,32,2000.00,15.00,300.00,1700.00,NULL,'cancelled',20,NULL,NULL,'2024-04-12 14:00:00',NULL),
-(48,33,1200.00,15.00,180.00,1020.00,NULL,'cancelled',45,NULL,NULL,'2024-04-14 11:00:00',NULL),
-(49,34,300.00,15.00,45.00,255.00,NULL,'cancelled',20,NULL,NULL,'2024-04-16 15:00:00',NULL),
-(50,35,1500.00,15.00,225.00,1275.00,NULL,'cancelled',45,NULL,NULL,'2024-04-18 10:00:00',NULL);
+(1,NULL,1,3200.00,15.00,480.00,2720.00,'2024-03-05','completed',20,'bank_transfer','SET-001-ANTQ','2024-03-03 10:00:00',NULL),
+(2,NULL,3,8500.00,15.00,1275.00,7225.00,'2024-03-06','completed',20,'bank_transfer','SET-002-JEWL','2024-03-04 11:00:00',NULL),
+(3,NULL,5,52000.00,10.00,5200.00,46800.00,'2024-03-07','completed',20,'cheque','SET-003-CAR','2024-03-05 09:00:00',NULL),
+(4,NULL,2,1800.00,15.00,270.00,1530.00,'2024-03-08','completed',45,'mobile_money','SET-004-ART','2024-03-06 14:00:00',NULL),
+(5,NULL,7,12500.00,15.00,1875.00,10625.00,'2024-03-09','completed',45,'bank_transfer','SET-005-WATCH','2024-03-07 10:00:00',NULL),
+(6,NULL,4,3000.00,15.00,450.00,2550.00,'2024-03-10','completed',20,'mobile_money','SET-006-COLL','2024-03-08 11:00:00',NULL),
+(7,NULL,9,6500.00,15.00,975.00,5525.00,'2024-03-11','completed',45,'bank_transfer','SET-007-JEWL2','2024-03-09 15:00:00',NULL),
+(8,NULL,10,13000.00,10.00,1300.00,11700.00,'2024-03-12','completed',20,'cheque','SET-008-MUSIC','2024-03-10 09:00:00',NULL),
+(9,NULL,11,22000.00,12.00,2640.00,19360.00,'2024-03-13','completed',45,'bank_transfer','SET-009-COMM','2024-03-11 14:00:00',NULL),
+(10,NULL,12,7000.00,12.00,840.00,6160.00,'2024-03-14','completed',20,'mobile_money','SET-010-OFFICE','2024-03-12 11:00:00',NULL),
+(11,NULL,14,28000.00,12.00,3360.00,24640.00,'2024-03-19','completed',45,'bank_transfer','SET-011-ELEC','2024-03-17 10:00:00',NULL),
+(12,NULL,15,40000.00,12.00,4800.00,35200.00,'2024-03-20','completed',20,'cheque','SET-012-LAPTOP','2024-03-18 14:00:00',NULL),
+(13,NULL,16,480000.00,8.00,38400.00,441600.00,'2024-03-24','completed',45,'bank_transfer','SET-013-RE','2024-03-22 09:00:00',NULL),
+(14,NULL,17,14000.00,15.00,2100.00,11900.00,'2024-03-22','completed',20,'bank_transfer','SET-014-WINE','2024-03-20 15:00:00',NULL),
+(15,NULL,18,32000.00,12.00,3840.00,28160.00,'2024-03-23','completed',45,'cheque','SET-015-FARM','2024-03-21 11:00:00',NULL),
+(16,NULL,19,35000.00,12.00,4200.00,30800.00,'2024-03-25','completed',20,'bank_transfer','SET-016-HTL','2024-03-23 14:00:00',NULL),
+(17,NULL,20,22000.00,12.00,2640.00,19360.00,'2024-03-26','completed',45,'mobile_money','SET-017-REST','2024-03-24 10:00:00',NULL),
+(18,NULL,21,1100.00,15.00,165.00,935.00,'2024-03-27','completed',20,'bank_transfer','SET-018-PHONE','2024-03-25 15:00:00',NULL),
+(19,NULL,22,700.00,15.00,105.00,595.00,'2024-03-28','completed',45,'mobile_money','SET-019-FASH','2024-03-26 11:00:00',NULL),
+(20,NULL,23,1800.00,15.00,270.00,1530.00,'2024-03-29','completed',20,'bank_transfer','SET-020-GAME','2024-03-27 14:00:00',NULL),
+(21,NULL,24,1400.00,15.00,210.00,1190.00,'2024-03-30','completed',45,'mobile_money','SET-021-SPORT','2024-03-28 10:00:00',NULL),
+(22,NULL,25,2800.00,15.00,420.00,2380.00,'2024-03-31','completed',20,'bank_transfer','SET-022-CAM','2024-03-29 15:00:00',NULL),
+(23,NULL,26,700.00,15.00,105.00,595.00,'2024-04-01','completed',45,'mobile_money','SET-023-MUSIC2','2024-03-30 11:00:00',NULL),
+(24,NULL,27,1300.00,15.00,195.00,1105.00,'2024-04-02','completed',20,'bank_transfer','SET-024-WATCH2','2024-03-31 14:00:00',NULL),
+(25,NULL,28,450.00,15.00,67.50,382.50,'2024-04-03','completed',45,'mobile_money','SET-025-PERF','2024-04-01 10:00:00',NULL),
+(26,NULL,34,400.00,15.00,60.00,340.00,NULL,'pending',NULL,NULL,NULL,'2024-05-28 14:00:00',NULL),
+(27,NULL,35,1300.00,15.00,195.00,1105.00,NULL,'pending',NULL,NULL,NULL,'2024-05-29 11:00:00',NULL),
+(28,NULL,36,500.00,15.00,75.00,425.00,NULL,'pending',NULL,NULL,NULL,'2024-05-30 15:00:00',NULL),
+(29,NULL,37,350.00,15.00,52.50,297.50,NULL,'pending',NULL,NULL,NULL,'2024-05-31 10:00:00',NULL),
+(30,NULL,38,2200.00,15.00,330.00,1870.00,NULL,'pending',NULL,NULL,NULL,'2024-06-01 14:00:00',NULL),
+(31,NULL,39,1500.00,15.00,225.00,1275.00,NULL,'processing',20,'bank_transfer','SET-031-DRONE','2024-06-02 11:00:00',NULL),
+(32,NULL,40,1000.00,15.00,150.00,850.00,NULL,'processing',45,'mobile_money','SET-032-KITCH','2024-06-03 15:00:00',NULL),
+(33,NULL,41,900.00,15.00,135.00,765.00,NULL,'processing',20,NULL,NULL,'2024-06-04 10:00:00',NULL),
+(34,NULL,42,1500.00,15.00,225.00,1275.00,NULL,'processing',45,NULL,NULL,'2024-06-05 14:00:00',NULL),
+(35,NULL,43,1200.00,15.00,180.00,1020.00,NULL,'processing',20,NULL,NULL,'2024-06-06 11:00:00',NULL),
+(36,NULL,44,1800.00,15.00,270.00,1530.00,'2024-04-10','completed',45,'bank_transfer','SET-036-HT','2024-04-08 14:00:00',NULL),
+(37,NULL,45,3000.00,15.00,450.00,2550.00,'2024-04-12','completed',20,'cheque','SET-037-WINE2','2024-04-10 15:00:00',NULL),
+(38,NULL,46,800.00,15.00,120.00,680.00,'2024-04-14','completed',45,'mobile_money','SET-038-SPORT3','2024-04-12 09:00:00',NULL),
+(39,NULL,47,2500.00,12.00,300.00,2200.00,'2024-04-16','completed',20,'bank_transfer','SET-039-BED','2024-04-14 14:00:00',NULL),
+(40,NULL,48,3500.00,15.00,525.00,2975.00,'2024-04-18','completed',45,'cheque','SET-040-PHOTO','2024-04-16 11:00:00',NULL),
+(41,NULL,49,300.00,15.00,45.00,255.00,'2024-04-20','completed',20,'mobile_money','SET-041-FURN','2024-04-18 15:00:00',NULL),
+(42,NULL,50,1200.00,15.00,180.00,1020.00,'2024-04-22','completed',45,'bank_transfer','SET-042-WATCH3','2024-04-20 10:00:00',NULL),
+(43,NULL,14,26000.00,12.00,3120.00,22880.00,'2024-04-24','completed',20,'cheque','SET-043-ELEC2','2024-04-22 14:00:00',NULL),
+(44,NULL,15,38000.00,12.00,4560.00,33440.00,'2024-04-26','completed',45,'bank_transfer','SET-044-SCHOOL','2024-04-24 11:00:00',NULL),
+(45,NULL,1,3200.00,15.00,480.00,2720.00,'2024-04-28','completed',20,'mobile_money','SET-045-HOLIDAY','2024-04-26 15:00:00',NULL),
+(46,NULL,31,400.00,15.00,60.00,340.00,NULL,'cancelled',45,NULL,NULL,'2024-04-10 09:00:00',NULL),
+(47,NULL,32,2000.00,15.00,300.00,1700.00,NULL,'cancelled',20,NULL,NULL,'2024-04-12 14:00:00',NULL),
+(48,NULL,33,1200.00,15.00,180.00,1020.00,NULL,'cancelled',45,NULL,NULL,'2024-04-14 11:00:00',NULL),
+(49,NULL,34,300.00,15.00,45.00,255.00,NULL,'cancelled',20,NULL,NULL,'2024-04-16 15:00:00',NULL),
+(50,NULL,35,1500.00,15.00,225.00,1275.00,NULL,'cancelled',45,NULL,NULL,'2024-04-18 10:00:00',NULL);
 /*!40000 ALTER TABLE `settlement` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -857,7 +913,7 @@ CREATE TABLE `staff` (
   KEY `department_id` (`department_id`),
   CONSTRAINT `staff_ibfk_1` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`) ON UPDATE CASCADE,
   CONSTRAINT `staff_ibfk_2` FOREIGN KEY (`department_id`) REFERENCES `department` (`department_id`) ON UPDATE CASCADE
-) ENGINE=InnoDB AUTO_INCREMENT=51 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
+) ENGINE=InnoDB AUTO_INCREMENT=52 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
@@ -869,7 +925,7 @@ LOCK TABLES `staff` WRITE;
 INSERT INTO `staff` VALUES
 (1,301001,'EMP-MGT-001',1,1,'Robert','James','Smith','CEO','+254711001001','robert.smith@auction.co.ke','robert_s','hash001','2018-06-15','active',450000.00,'2018-06-15 09:00:00',NULL),
 (2,301002,'EMP-MGT-002',1,1,'Jennifer','Anne','Johnson','COO','+254711001002','jennifer.j@auction.co.ke','jennifer_j','hash002','2019-01-20','active',380000.00,'2019-01-20 10:00:00',NULL),
-(3,301003,'EMP-MGT-003',1,1,'Richard',NULL,'Williams','CFO','+254711001003','richard.w@auction.co.ke','richard_w','hash003','2019-03-10','active',360000.00,'2019-03-10 11:00:00',NULL),
+(3,301003,'EMP-MGT-003',1,1,'Richard','Jeff','Williams','CFO','+254711001003','richard.w@auction.co.ke','richard_w','hash003','2019-03-10','active',360000.00,'2019-03-10 11:00:00','2026-05-10 21:34:23'),
 (4,301004,'EMP-MGT-004',1,1,'Patricia','Marie','Jones','HR Director','+254711001004','patricia.j@auction.co.ke','patricia_j','hash004','2019-04-05','active',320000.00,'2019-04-05 12:00:00',NULL),
 (5,301005,'EMP-MGT-005',1,1,'John','Michael','Brown','Marketing Director','+254711001005','john.b@auction.co.ke','john_b','hash005','2019-05-12','active',310000.00,'2019-05-12 13:00:00',NULL),
 (6,301006,'EMP-AUC-001',2,2,'Mary','Elizabeth','Davis','Auction Director','+254711001006','mary.d@auction.co.ke','mary_d','hash006','2019-06-18','active',290000.00,'2019-06-18 14:00:00',NULL),
@@ -916,7 +972,8 @@ INSERT INTO `staff` VALUES
 (47,301047,'EMP-AUC-007',5,2,'Shirley',NULL,'Collins','Auctioneer','+254711001047','shirley.c@auction.co.ke','shirley_c','hash047','2023-01-20','active',140000.00,'2023-01-20 15:00:00',NULL),
 (48,301048,'EMP-LOG-003',1,7,'Harold',NULL,'Stewart','Shipping Coordinator','+254711001048','harold.s@auction.co.ke','harold_s','hash048','2023-02-25','active',110000.00,'2023-02-25 16:00:00',NULL),
 (49,301049,'EMP-FIN-008',7,4,'Deborah',NULL,'Sanchez','Payment Processor','+254711001049','deborah.s@auction.co.ke','deborah_s','hash049','2023-03-30','terminated',105000.00,'2023-03-30 17:00:00',NULL),
-(50,301050,'EMP-IT-007',1,8,'Raymoond','','Morris','IT Support','+254711001050','raymond.m@auction.co.ke','raymond_m','hash050','2023-04-10','active',115000.00,'2023-04-10 18:00:00','2026-02-09 08:55:09');
+(50,301050,'EMP-IT-007',1,8,'Raymoond','','Morris','IT Support','+254711001050','raymond.m@auction.co.ke','raymond_m','hash050','2023-04-10','active',115000.00,'2023-04-10 18:00:00','2026-02-09 08:55:09'),
+(51,56372462,'EMP-SNV-057',3,3,'Adama','Kali','Lacey','Senior Evaluator','0745563729','adamalac@auction.co.ke','adamalac','$3y$staffhash002','2024-08-25','active',NULL,'2026-05-10 20:40:34',NULL);
 /*!40000 ALTER TABLE `staff` ENABLE KEYS */;
 UNLOCK TABLES;
 
@@ -1024,4 +1081,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2026-05-06 12:38:20
+-- Dump completed on 2026-05-30 11:01:41

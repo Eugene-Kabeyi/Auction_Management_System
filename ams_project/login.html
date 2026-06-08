@@ -41,7 +41,7 @@
             color: #1d1c1c;
         }
             .logo-container {
-                margin-top: -200px;
+                
                 display: flex;
                 justify-content: center;
                 align-items: center;
@@ -51,11 +51,10 @@
                 font-size: 24px;
                 font-weight: bold;
                 color: #ffffff;
+                margin: 50px;
             }  
         .back{
-            position: absolute;
-            top: 20px;
-            left: 20px;
+            display: inline-block;
             background-color: #1f1e1e;
             color: white;
             padding: 10px 15px;
@@ -71,11 +70,12 @@
         <!-- Adding back button to index.php -->
         <a href="index.php" class="login-link back">Back to Home</a>
         <!--AMS LOGO-->
+        
+        <!--Help user choose their loging Portal)-->
+    <div class="login-portal">
         <div class="logo-container">
             <p>AMS</p>
         </div>
-        <!--Help user choose their loging Portal)-->
-    <div class="login-portal">
         <h2>Select Login Portal</h2>
         <a href="staff/staff_login.php" class="login-link">Staff Login</a>
         <a href="users/login.php" class="login-link">User Login</a>

@@ -48,8 +48,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         (item_name, item_quantity, item_description, item_category, item_condition, image_path, consigner_id)
         VALUES (?, ?, ?, ?, ?, ?, ?)";
 
-    $stmt = $conn->prepare($sql);
-    $success = $stmt->execute([
+    $stmt = mysqli_prepare($conn, $sql);
+    mysqli_stmt_bind_param($stmt, "ssssss", 
         $item_name,
         $item_quantity,
         $item_description,
@@ -57,7 +57,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $item_condition,
         $image_path,
         $consigner_id
-    ]);
+    );
+    $success = mysqli_stmt_execute($stmt);
+
 
     if ($success) {
         $_SESSION['success'] = "Item consigned successfully!";

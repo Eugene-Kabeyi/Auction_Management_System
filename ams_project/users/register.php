@@ -242,7 +242,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
 
 <body>
     <!-- back button to user_dashboard.php -->
-    <a href="user_dashboard.php" class="back">Back to Dashboard</a>
+    
     <?php if (!empty($_SESSION['error'])): ?>
         <div class="flash error">
             <?= $_SESSION['error']; ?>
@@ -251,9 +251,10 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
     <?php endif; ?>
 
     <div class="register_container">
+        <a href="../index.php" class="back">Back to Home</a>
        <h2>Register for AMS</h2>
             <span class="logo">AMS</span>
-        <form action="../handle_register.php" method="post">
+        <form action="../handle_register.php" method="post" onsubmit="return validateForm()">
             <label>National ID</label>
             <input type="text" id="national_id" name="national_id">
             <span class="error" id="nidErr"></span>
