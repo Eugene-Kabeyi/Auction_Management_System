@@ -10,6 +10,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
 if($_SERVER['REQUEST_METHOD'] === 'POST') {
     $tax_rate = $_POST['tax_rate'];
     $commission_rate = $_POST['commission_rate'];
+    try{
     $stmt = mysqli_prepare($conn, "
         UPDATE auction_settings
         SET tax_rate = ?, commission_rate = ?
@@ -26,5 +27,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['error'] = "Failed to update auction settings";
         header('Location: admin_dashboard.php');
         exit();
+    }}catch (Exception $e) {
+        $_SESSION['error'] = "Something went wrong. Please try again.";
+
+        header("Location: admin_dashboard.php");
+        exit();
     }
+
 }

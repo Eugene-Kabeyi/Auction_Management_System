@@ -14,6 +14,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
 <head>
     <title>Add New Department</title>
     <link rel="stylesheet" href="../css/form_table_styles.css">
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
 
 </head>
 

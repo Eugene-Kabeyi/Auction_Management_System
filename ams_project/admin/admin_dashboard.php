@@ -27,7 +27,7 @@ $results = mysqli_stmt_get_result($stmt);
 $count_items = mysqli_fetch_array($results)[0]; 
 
 // Fetch live auctions for dashboard display 
-$stmt = mysqli_prepare($conn, 'SELECT * FROM auctions WHERE status = "upcoming" OR status = "ongoing"');
+$stmt = mysqli_prepare($conn, 'SELECT * FROM auctions WHERE status = "upcoming" ');
 mysqli_stmt_execute($stmt);
 $results = mysqli_stmt_get_result($stmt);
 $live_auctions = mysqli_fetch_all($results, MYSQLI_ASSOC);  
@@ -64,9 +64,13 @@ $pending_items = mysqli_fetch_array($results)[0];
             <?php echo $_SESSION['error']; unset($_SESSION['error']); ?>
         </div>
     <?php endif; ?>
+<head>
+    <title>Admin Dashboard</title>
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
+</head>
 <main class="dashboard-container">
     <div class="dashboard-header">
-        <h1 class="dashboard-title">Admin Dashboard</h1>
+        <h1 class="dashboard-title"><?= $_SESSION['f_name']. " " . $_SESSION['l_name'] ?>'s Dashboard</h1>
         <p class="dashboard-subtitle">System overview and management</p>
     </div>
 
@@ -82,7 +86,7 @@ $pending_items = mysqli_fetch_array($results)[0];
             <a href="../users/auction_list.php" style="text-decoration:none;">
             <div class="stat-icon">🔨</div>
             <div class="stat-value"><?= count($live_auctions) ?></div>
-            <div class="stat-label">Active Auctions</div>
+            <div class="stat-label">Upcoming Auctions</div>
             </a>
         </div>
 
@@ -142,7 +146,7 @@ $pending_items = mysqli_fetch_array($results)[0];
 
             <div class="action-btn">
                 <div class="action-icon">⏳</div>
-                <div class="action-label">Pending Approvals <span><?= $pending_approvals ?></span></div>
+                <div class="action-label">Pending Approvals <span><?= $pending_items?></span></div>
             </div>
 
             <div class="action-btn">

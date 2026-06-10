@@ -130,7 +130,7 @@ try {
         "Payment error ID $payment_id: " . $e->getMessage()
     );
 
-    header("Location: payment_review.php?id=" . $payment_id);
+    header("Location: staff_dashboard.php?id=" . $payment_id);
     exit();
 }
 ?>

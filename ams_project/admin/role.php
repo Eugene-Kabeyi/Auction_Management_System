@@ -15,6 +15,7 @@ include __DIR__ . '/../config.php';
 <head>
     <title>Roles Management</title>
     <link rel="stylesheet" href="../css/form_table_styles.css">
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
 
 </head>
 

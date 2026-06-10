@@ -4,13 +4,13 @@ include __DIR__ . '/../log_activity.php';
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
     $_SESSION['error'] = "Please log in as an admin to access this page.";
     header("Location: ../staff/staff_login.php");
     session_destroy();
     exit();
 }
-include __DIR__ . '/../log_activity.php';
+
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $dept_id = $_POST['department_id'];
     $dept_name = $_POST['department_name'];
@@ -19,7 +19,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     if (isset($_POST['update'])) {
 
         $stmt = mysqli_prepare($conn, "UPDATE department SET department_name = ?, department_description = ? WHERE department_id = ?");
-        mysqli_stmt_bind_param($stmt, "sssi", $dept_name, $dept_desc, $dept_id);
+        mysqli_stmt_bind_param($stmt, "ssi", $dept_name, $dept_desc, $dept_id);
         $success = mysqli_stmt_execute($stmt);
 
         if ($success) {

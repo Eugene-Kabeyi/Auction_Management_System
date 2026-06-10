@@ -5,7 +5,7 @@ include __DIR__ . '/../header.php';
 include __DIR__ . '/../config.php';
 
 // GET FILTER VALUES FIRST
-$type = $_GET['type'] ?? 'upcoming';
+$type = $_GET['type'] ?? 'ongoing';
 $range = $_GET['range'] ?? '';
 
 //  BUILD QUERY

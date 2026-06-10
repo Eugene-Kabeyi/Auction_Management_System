@@ -48,6 +48,9 @@ if (!$settlement) {
     <div class="outer_container f_container">
 
         <h2>Update Settlement</h2>
+        <a href="invoice_list.php" style="margin:auto" class="back">
+            Back 
+        </a>
 
         <form method="POST" action="update_settlement_handler.php" onsubmit="return validateSettlement()">
             <input type="hidden" name="settlement_id" value="<?= $settlement['settlement_id']; ?>">

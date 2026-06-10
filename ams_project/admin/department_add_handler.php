@@ -3,7 +3,7 @@ require '../config.php';
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
     $_SESSION['error'] = "Please log in as an admin to access this page.";
     header("Location: ../staff/staff_login.php");
     session_destroy();

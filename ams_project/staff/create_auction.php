@@ -29,7 +29,7 @@ include __DIR__ . '/../log_activity.php';
 
     <h2>Create Auction</h2>
 
-    <a href="staff_dashboard.php" style="margin:auto" class="back">
+    <a href="staff_dashboard.php" style="margin: 5px auto" class="back">
         Back to Dashboard
     </a>
     <br>

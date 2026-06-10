@@ -14,6 +14,7 @@ include __DIR__ . '/../config.php';
 <head>
     <title>Admin List</title>
     <link rel="stylesheet" href="../css/form_table_styles.css">
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
     
 </head>
 
@@ -22,6 +23,12 @@ include __DIR__ . '/../config.php';
         <div class="flash success">
             <?php echo $_SESSION['success'];
             unset($_SESSION['success']); ?>
+        </div>
+    <?php endif; ?>
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?php echo $_SESSION['error'];
+            unset($_SESSION['error']); ?>
         </div>
     <?php endif; ?>
     

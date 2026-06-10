@@ -31,6 +31,7 @@ if (!$admin) {
 <head>
     <title>Edit Admin Details</title>
     <link rel="stylesheet" href="../css/form_table_styles.css">
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
     
 
 </head>
@@ -56,7 +57,7 @@ if (!$admin) {
             <input type="text" id="username" name="username" value="<?php echo  ($admin['username']); ?>" >
 
             <label for="phone_number">Phone Number:</label>
-            <input type="text" id="phone_number" name="phone_number" value="<?php echo  ($admin['phone_number']); ?>" required>
+            <input type="text" id="phone_number" name="phone_number" value="<?php echo  ($admin['phone_number']); ?>" >
 
             <label for="admin_level">Admin Level:</label>
             <select name="admin_level" id="admin_level">
@@ -69,7 +70,7 @@ if (!$admin) {
 
       
             <input type="hidden" name="admin_id" value="<?php echo  ($admin['admin_id']); ?>">
-            <button type="submit" class="delete" name="delete">Delete Admin</button>
+            <button type="submit" class="delete" name="delete" onclick="return confirm('Are you sure you want to delete this admin?')">Delete Admin</button>
         </form>
         
     </div>
@@ -98,7 +99,7 @@ if (!$admin) {
             alert("Username is required");
             return false;
         }
-        if (phone_number.length == 0) {
+        if (phone_number.length == 0 || phone_number.length < 9 ) {
             alert("Phone number is required");
             return false;
         }

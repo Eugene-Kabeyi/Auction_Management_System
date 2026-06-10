@@ -1,13 +1,13 @@
 <?php
 require '../config.php';
 if (session_status() == PHP_SESSION_NONE) {
-    session_start();    
+    session_start();
 }
-if (!isset($_SESSION['user_id']) || $_SESSION['role'] !== 'admin') {
+if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
     $_SESSION['error'] = "Please log in as an admin to access this page.";
     header("Location: ../staff/staff_login.php");
     session_destroy();
-    exit(); 
+    exit();
 }
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Retrieve and sanitize form inputs
@@ -29,18 +29,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $date_parts = explode("/", $hire_date);
     if (count($date_parts) == 3) {
         $hire_date = $date_parts[2] . "-" . $date_parts[1] . "-" . $date_parts[0];
-    }else {
+    } else {
         $hire_date = null; // Invalid date format, set to null
     }
 
 
-
+    try{
 
     // Prepare and execute the insert statement
-    $stmt = mysqli_prepare($conn, "INSERT INTO staff (firstname, secondname, surname, email, phone_number, job_title, department_id, role_id, employee_id, national_id, username, password_hash, hire_date, employment_status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-    mysqli_stmt_bind_param($stmt, "ssssssssssssss", $firstname, $secondname, $surname, $email, $phone_number, $job_title, $department_id, $role_id, $employee_id, $national_id, $username, $password, $hire_date, $employment_status);
+    $stmt = mysqli_prepare(
+        $conn,
+        "INSERT INTO staff (
+        firstname,
+        secondname,
+        surname,
+        email,
+        phone_number,
+        department_id,
+        role_id,
+        employee_id,
+        national_id,
+        username,
+        password_hash,
+        hire_date,
+        employment_status
+    ) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?)"
+    );
+
+    mysqli_stmt_bind_param(
+        $stmt,
+        "sssssiisissss",
+        $firstname,
+        $secondname,
+        $surname,
+        $email,
+        $phone_number,
+        $department_id,
+        $role_id,
+        $employee_id,
+        $national_id,
+        $username,
+        $password,
+        $hire_date,
+        $employment_status
+    );
+
     $success = mysqli_stmt_execute($stmt);
-       
+  
+
     if ($success) {
         $_SESSION['success'] = "Staff member added successfully!";
     } else {
@@ -49,5 +85,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Redirect to staff list after successful addition
     header("Location: staff_list.php");
     exit();
+    }catch (Exception $e) {
+        $_SESSION['error'] = "Something went wrong. Please try again.";
+
+        header("Location: admin_dashboard.php");
+        exit();
+}
+
 }
 ?>

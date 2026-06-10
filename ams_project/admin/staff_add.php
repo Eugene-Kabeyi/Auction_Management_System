@@ -12,9 +12,10 @@ include __DIR__ . '/../config.php';
 
 
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
     <title>Add Staff Member</title>
     <link rel="stylesheet" href="../css/form_table_styles.css">
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
     <style>
         #togglePassword {
             cursor: pointer;
@@ -35,13 +36,13 @@ include __DIR__ . '/../config.php';
 <body>
     <?php if (!empty($_SESSION['success'])): ?>
         <div class="flash success">
-            <?=  ($_SESSION['success']); ?>
+            <?= ($_SESSION['success']); ?>
         </div>
         <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
     <?php if (!empty($_SESSION['error'])): ?>
         <div class="flash error">
-            <?=  ($_SESSION['error']); ?>
+            <?= ($_SESSION['error']); ?>
         </div>
         <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
@@ -51,36 +52,38 @@ include __DIR__ . '/../config.php';
         <form action="staff_add_handler.php" method="POST" onsubmit="return validateStaff()">
 
             <label for="firstname">First Name:</label>
-            <input type="text" id="firstname" name="firstname" >
+            <input type="text" id="firstname" name="firstname">
 
             <label for="secondname">Second Name:</label>
             <input type="text" id="secondname" name="secondname">
 
             <label for="surname">Surname:</label>
-            <input type="text" id="surname" name="surname" >
+            <input type="text" id="surname" name="surname">
 
             <label for="email">Email:</label>
-            <input type="text" id="email" name="email" required>
+            <input type="text" id="email" name="email" >
 
             <label for="phone_number">Phone Number:</label>
             <input type="text" id="phone_number" name="phone_number">
 
-            <label for="job_title">Job Title:</label>
-            <input type="text" id="job_title" name="job_title">
 
             <label for="department_id">Department ID:</label>
+            <!--  -->
             <?php
+
             $tmt = mysqli_prepare($conn, "SELECT * FROM department");
             mysqli_stmt_execute($tmt);
             $departments = mysqli_fetch_all(mysqli_stmt_get_result($tmt), MYSQLI_ASSOC);
+
             ?>
+
             <select id="department_id" name="department_id">
                 <option value="">--Select Department--</option>
                 <?php foreach ($departments as $department): ?>
                     <option value="<?= $department['department_id'] ?>"><?= $department['department_name'] ?></option>
                 <?php endforeach; ?>
             </select>
-            
+
             <label for="role_id">Role:</label>
             <?php
             $stmt = mysqli_prepare($conn, "SELECT * FROM roles");
@@ -100,10 +103,10 @@ include __DIR__ . '/../config.php';
             <input type="text" id="national_id" name="national_id">
 
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="username" name="username" >
 
             <label for="password">Password:</label>
-            <input type="text" id="password" name="password" >
+            <input type="text" id="password" name="password">
             <span id="togglePassword" onclick="togglePasswordVisibility()">Show/Hide</span>
 
             <label for="hire_date">Hire Date:</label>
@@ -117,17 +120,6 @@ include __DIR__ . '/../config.php';
                 <option value="suspended">Suspended</option>
             </select>
 
-            <label for="department">Department:</label>
-            <?php
-            $stmt = mysqli_prepare($conn, "SELECT * FROM department");
-            mysqli_stmt_execute($stmt);
-            $departments = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
-            ?>
-            <select id="department" name="department_id" required>
-                <?php foreach ($departments as $department): ?>
-                    <option value="<?= $department['department_id'] ?>"><?= $department['department_name'] ?></option>
-                <?php endforeach; ?>
-            </select>
 
             <button type="submit">Add Staff Member</button>
         </form>
@@ -136,19 +128,19 @@ include __DIR__ . '/../config.php';
 <script>
     function togglePasswordVisibility() {
 
-                // Fetch the password field and the toggle text element
-                var passwordField = document.getElementById("password");
-                var toggleText = document.getElementById("togglePassword");
+        // Fetch the password field and the toggle text element
+        var passwordField = document.getElementById("password");
+        var toggleText = document.getElementById("togglePassword");
 
-                // Toggle the class to switch between text and password styles
-                if (passwordField.classList.contains("pass_w")) {
-                    passwordField.classList.remove("pass_w");
-                    toggleText.textContent = "Hide";
-                } else {
-                    passwordField.classList.add("pass_w");
-                    toggleText.textContent = "Show";
-                }
-            }
+        // Toggle the class to switch between text and password styles
+        if (passwordField.classList.contains("pass_w")) {
+            passwordField.classList.remove("pass_w");
+            toggleText.textContent = "Hide";
+        } else {
+            passwordField.classList.add("pass_w");
+            toggleText.textContent = "Show";
+        }
+    }
 
     function validateStaff() {
 
@@ -312,7 +304,7 @@ include __DIR__ . '/../config.php';
     function validateDropdowns() {
 
         var role = document.getElementById("role_id").selectedIndex;
-        var dept = document.getElementById("department").selectedIndex;
+        var dept = document.getElementById("department_id").selectedIndex;
 
         if (role == 0) {
             alert("Please select a role");

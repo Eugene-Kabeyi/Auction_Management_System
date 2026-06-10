@@ -17,6 +17,7 @@ $settings = mysqli_fetch_assoc($result);
 <head>
     <title>Auction Settings</title>
     <link rel="stylesheet" href="../css/form_table_styles.css">
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
 </head>
 <body>
     <div class="outer_container f_container">
@@ -27,10 +28,10 @@ $settings = mysqli_fetch_assoc($result);
         <!-- form action to update settings -->
         <form action="auction_settings_handler.php" method="post">
             <label for="tax_rate">Tax Rate (%)</label>
-            <input type="text" name="tax_rate" id="tax_rate" value="<?= $settings['tax_rate'] ?>" required>
+            <input type="text" name="tax_rate" id="tax_rate" value="<?= $settings['tax_rate'] ?>" >
 
             <label for="commission_rate">Commission Rate (%)</label>
-            <input type="text" name="commission_rate" id="commission_rate" value="<?= $settings['commission_rate'] ?>" required>
+            <input type="text" name="commission_rate" id="commission_rate" value="<?= $settings['commission_rate'] ?>" >
 
            
 

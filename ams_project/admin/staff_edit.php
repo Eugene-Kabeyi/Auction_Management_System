@@ -15,6 +15,7 @@ include __DIR__ . '/../config.php';
 <head>
     <title>Edit Staff Member</title>
     <link rel="stylesheet" href="../css/form_table_styles.css">
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
 </head>
 
 <body>
@@ -38,11 +39,14 @@ include __DIR__ . '/../config.php';
         <?php
 
         $_GET['id'];
-
-        $stmt = mysqli_prepare($conn, "SELECT s.staff_id, s.firstname, s.secondname, s.surname, s.username, s.national_id, s.hire_date, s.employment_status, s.job_title, s.email, s.employee_id, r.role_name AS role, s.phone_number FROM staff s JOIN roles r ON s.role_id = r.role_id WHERE s.staff_id = ?");
+        try{
+        $stmt = mysqli_prepare($conn, "SELECT s.staff_id, s.firstname, s.secondname, s.surname, s.username, s.national_id, s.hire_date, s.employment_status,  s.email, s.employee_id, r.role_name AS role, s.phone_number FROM staff s JOIN roles r ON s.role_id = r.role_id WHERE s.staff_id = ?");
         mysqli_stmt_bind_param($stmt, "i", $_GET['id']);
         mysqli_stmt_execute($stmt);
         $staff_members = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
+        } catch(Exception $e){
+            $_SESSION = "Something went wrong";
+        }
 
         ?>
 
@@ -74,9 +78,6 @@ include __DIR__ . '/../config.php';
             <input type="text" id="phone_number" name="phone_number"
                 value="<?php echo  ($staff_members[0]['phone_number'] ?? ''); ?>">
 
-            <label for="job_title">Job Title:</label>
-            <input type="text" id="job_title" name="job_title"
-                value="<?php echo  ($staff_members[0]['job_title'] ?? ''); ?>">
 
             <label for="role">Role:</label>
 
@@ -109,13 +110,3 @@ include __DIR__ . '/../config.php';
     </div>
 </body>
 <?php include __DIR__ . '/../footer.php'; ?>
-<script>
-    //show warning before deleting a staff member
-    const deleteButton = document.querySelector('.delete');
-    deleteButton.addEventListener('click', function (event) {
-        const confirmDelete = confirm("Are you sure you want to delete this staff member? This action cannot be undone.");
-        if (!confirmDelete) {
-            event.preventDefault(); // Prevent form submission if user cancels
-        }
-    });
-</script>

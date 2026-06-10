@@ -60,7 +60,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = mysqli_prepare($conn, "
             UPDATE consigner_items
             SET 
-                item_status = 'auctioned',
+                item_status = 'auctioned'
                 
             WHERE item_id = ?
         ");
@@ -88,10 +88,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $conn,
             $_SESSION['user_id'],
             $_SESSION['username'],
-            "Failed to create auction: $auction_name"
+            "Failed to create auction: $auction_name". $e->getMessage()
         );
 
-        $_SESSION['error'] = "Error creating auction: " . $e->getMessage();
+        $_SESSION['error'] = "Error creating auction: " ;
         header("Location: create_auction.php");
         exit();
     }

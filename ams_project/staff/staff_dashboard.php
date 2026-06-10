@@ -69,7 +69,7 @@ $total_users = mysqli_fetch_assoc($result)['count'];
     <?php endif; ?>
 
     <div class="dashboard-header">
-        <h1 class="dashboard-title">Dashboard Overview</h1>
+        <h1 class="dashboard-title"><?= $_SESSION['f_name']. " " . $_SESSION['l_name'] ?>'s Dashboard </h1>
         <p class="dashboard-subtitle">Welcome to your Auctioneer Management System dashboard</p>
     </div>
 
@@ -83,7 +83,7 @@ $total_users = mysqli_fetch_assoc($result)['count'];
 
         <div class="stat-card">
             <div class="stat-icon icon-bid">💰</div>
-            <div class="stat-value" id="totalBids">1,247</div>
+            <div class="stat-value" id="totalBids"><?= $total_bids ?></div>
             <div class="stat-label">Total Bids Today</div>
         </div>
 
@@ -119,15 +119,10 @@ $total_users = mysqli_fetch_assoc($result)['count'];
 
             <div class="action-btn"><a href="invoice_list.php">
                     <div class="action-icon">📊</div>
-                    <div class="action-label">Invoices</div>
+                    <div class="action-label">Invoices , Payments and Settlements</div>
                 </a>
             </div>
 
-            <div class="action-btn"><a href="create_settlement.php">
-                    <div class="action-icon">🎯</div>
-                    <div class="action-label">Settlements</div>
-                </a>
-            </div>
             <!-- Manage auctions via auctionlist -->
             <div class="action-btn"><a href="auction_list.php">
                     <div class="action-icon">📋</div>

@@ -33,13 +33,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } catch (Exception $e) {
         $_SESSION['error'] = "Something went wrong. Please try again.";
 
-        logActivity(
-            $conn,
-            $_SESSION['user_id'],
-            $_SESSION['username'],
-            "System error in role handler: " . $e->getMessage()
-        );
-
         header("Location: role.php");
         exit();
     }

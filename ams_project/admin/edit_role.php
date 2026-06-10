@@ -30,6 +30,7 @@ if (!$role) {
 <head>
     <title>Edit Role Details</title>
     <link rel="stylesheet" href="../css/form_table_styles.css">
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
 
 </head>
 
@@ -58,7 +59,7 @@ if (!$role) {
                 <textarea id="role_description"
                     name="role_description"><?php echo  ($role['role_description']); ?></textarea>
                 <button type="submit" name="update_role">Update Role</button>
-                <button type="submit" name="delete_role" value="delete" class="delete">Delete</button>
+                <button type="submit" name="delete_role" value="delete" class="delete" onclick="return confirm('Are you sure you want to delete this role?')">Delete</button>
 
             </form>
         </div>

@@ -22,7 +22,7 @@ $range = $_GET['range'] ?? '';
 $query = "SELECT * FROM auctions ";
 
 // UPCOMING / FUTURE
-if ($type === 'upcoming' || $type === 'future') {
+if ($type === 'upcoming') {
     $query .= " WHERE start_time > NOW()";
 }
 
@@ -58,7 +58,7 @@ $auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 <head>
     <title>Auction List</title>
     <style>
-                  html,
+        html,
         body {
             height: 100%;
             margin: 0;
@@ -72,11 +72,12 @@ $auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
         }
 
         .outer_container {
-            width: 80%;            
+            width: 80%;
             margin: 0px auto;
             overflow: auto;
 
         }
+
         table {
             width: 100%;
             border-collapse: collapse;
@@ -145,10 +146,62 @@ $auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
             color: #000000;
             border: 1px solid #1f2933;
         }
+
+        .back {
+            display: inline-block;
+            margin-bottom: 10px;
+            padding: 8px 16px;
+            background-color: #1f2933;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+            max-width: fit-content;
+        }
+
+        .back:hover {
+            background-color: white;
+            color: #1f2933;}
+             .flash {
+     position: fixed;
+     top: 20px;
+     left: 20px;
+     min-width: 260px;
+     padding: 14px 18px;
+     border-radius: 6px;
+     font-size: 14px;
+     z-index: 9999;
+     animation: slideIn 0.4s ease, fadeOut 0.4s ease 4s forwards;
+ }
+
+ .flash.success {
+     background-color: #ecfdf5;
+     color: #065f46;
+     border-left: 5px solid #10b981;
+ }
+
+ .flash.error {
+     background-color: #fef2f2;
+     color: #991b1b;
+     border-left: 5px solid #ef4444;
+ }
     </style>
 </head>
 
 <body>
+
+    <?php if (!empty($_SESSION['success'])): ?>
+        <div class="flash success">
+            <?php echo $_SESSION['success'];
+            unset($_SESSION['success']); ?>
+        </div>
+    <?php endif; ?>
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?php echo $_SESSION['error'];
+            unset($_SESSION['error']); ?>
+        </div>
+    <?php endif; ?>
+
     <form method="GET" style="margin:20px;" class="form_class">
         <label>View:</label>
 
@@ -156,7 +209,6 @@ $auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
             <option value="upcoming" <?= ($type === 'upcoming') ? 'selected' : '' ?>>Upcoming</option>
             <option value="ongoing" <?= ($type === 'ongoing') ? 'selected' : '' ?>>Ongoing</option>
             <option value="past" <?= ($type === 'past') ? 'selected' : '' ?>>Past</option>
-            <option value="future" <?= ($type === 'future') ? 'selected' : '' ?>>Future</option>
         </select>
 
         <label>Range (for past):</label>
@@ -169,6 +221,10 @@ $auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
         <button type="submit">Filter</button>
     </form>
+    
+    <a href="staff_dashboard.php" style="margin:auto" class="back">
+        Back to Dashboard
+    </a>
     <h2 style="color: red;">
         <?php
         if ($type === 'past') {
@@ -197,10 +253,10 @@ $auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     <?php $start_time = date("F j, Y, g:i a", strtotime($auction['start_time'])); // Format start time for display
                         $end_time = date("F j, Y, g:i a", strtotime($auction['end_time'])); // Format end time for display ?>
                     <tr>
-                        <td><?=  ($auction['auction_id']) ?></td>
-                        <td><?=  ($auction['auction_name']) ?></td>
-                        <td><?=  ($start_time) ?></td>
-                        <td><?=  ($end_time) ?></td>
+                        <td><?= ($auction['auction_id']) ?></td>
+                        <td><?= ($auction['auction_name']) ?></td>
+                        <td><?= ($start_time) ?></td>
+                        <td><?= ($end_time) ?></td>
 
                         <td><a href="update_auctions.php?auction_id=<?= $auction['auction_id'] ?>">Edit</a></td>
                     </tr>

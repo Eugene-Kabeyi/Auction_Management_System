@@ -37,8 +37,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         }
     } catch (Exception $e) {
-        $_SESSION['error'] = "Unexpected error occurred. Please contact support if the issue persists.";
-        header("Location: add_admin.php?error");
+        $_SESSION['error'] = "Unexpected error occurred.";
+        header("Location: add_admin.php");
         exit();
     }
 

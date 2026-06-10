@@ -25,7 +25,7 @@ $items = mysqli_stmt_get_result($stmt)->fetch_all(MYSQLI_ASSOC);
 <head>
     <title>Consigner Items List</title>
     <link rel="stylesheet" href="../css/form_table_styles.css">
-        
+
     </style>
 </head>
 
@@ -35,20 +35,21 @@ $items = mysqli_stmt_get_result($stmt)->fetch_all(MYSQLI_ASSOC);
     <a href="staff_dashboard.php" style="margin:auto" class="back">
         Back to Dashboard
     </a>
-     <a href="evaluated_list.php" style="margin:4px auto" class="back">
+    <a href="evaluated_list.php" style="margin:4px auto" class="back">
         To Evaluated Items
     </a>
     <!--Filter button-->
-    <form method="GET" style="display:flex; flex-direction: row; background-color: transparent !important; border: none; ; margin:auto; max-width: fit-content; gap:10px;">
-        
+    <form method="GET"
+        style="display:flex; flex-direction: row; background-color: transparent !important; border: none; ; margin:auto; max-width: fit-content; gap:10px;">
+
         <input type="hidden" name="filter" value="pending">
-        
+
         <button type="submit" class="filter_button pending">Show Pending</button>
         <button type="submit" name="filter" value="all" class="filter_button show_all">Show All</button>
-        
+
     </form>
 
-   
+
 
     <?php
     //Filter functionality
@@ -63,40 +64,53 @@ $items = mysqli_stmt_get_result($stmt)->fetch_all(MYSQLI_ASSOC);
     }
     ?>
     <div class="outer_container">
-    <div class="inner_container">
-    <table border="1">
-        <tr>
-            <th>Item ID</th>
-            <th>Item Name</th>
-            <th>Description</th>
-            <th>Category</th>
-            <th>Condition</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-        <?php foreach ($items as $item) { ?>
+        <?php if (!empty($_SESSION['success'])): ?>
+            <div class="flash success">
+                <?php echo $_SESSION['success'];
+                unset($_SESSION['success']); ?>
+            </div>
+        <?php endif; ?>
+        <?php if (!empty($_SESSION['error'])): ?>
+            <div class="flash error">
+                <?php echo $_SESSION['error'];
+                unset($_SESSION['error']); ?>
+            </div>
+        <?php endif; ?>
+        <div class="inner_container">
+            <table border="1">
+                <tr>
+                    <th>Item ID</th>
+                    <th>Item Name</th>
+                    <th>Description</th>
+                    <th>Category</th>
+                    <th>Condition</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+                <?php foreach ($items as $item) { ?>
 
 
-            <tr>
-                <td><?php echo  ($item['item_id']); ?></td>
-                <td><?php echo  ($item['item_name']); ?></td>
-                <td><?php echo  ($item['item_description']); ?></td>
-                <td><?php echo  ($item['item_category']); ?></td>
-                <td><?php echo  ($item['item_condition']); ?></td>
-                <td><?php echo  ($item['item_status']); ?></td>
-                <td>
-                    <?php if ($item['item_status'] === 'approved'): ?>
-                        <span>No action needed</span>
-                    <?php else: ?>
-                        <a href="approve_item.php?item_id=<?= $item['item_id']; ?>">
-                            Approve / Reject
-                        </a>
-                    <?php endif; ?>
-                </td>
-            </tr>
-        <?php } ?>
-    </table>
-    </div>
+                    <tr>
+                        <td><?php echo htmlspecialchars($item['item_id']); ?></td>
+                        <td><?php echo htmlspecialchars($item['item_name']); ?></td>
+                        <td><?php echo htmlspecialchars($item['item_description']); ?></td>
+                        <td><?php echo htmlspecialchars($item['item_category']); ?></td>
+                        <td><?php echo htmlspecialchars($item['item_condition']); ?></td>
+                        <td><?php echo htmlspecialchars($item['item_status']); ?></td>
+                        <td>
+                            <?php if ($item['item_status'] === 'pending'): ?>
+                                <a href="approve_item.php?item_id=<?= $item['item_id']; ?>">
+                                    Approve / Reject
+                                </a>
+
+                            <?php else: ?>
+                                <span>No action needed</span>
+                            <?php endif; ?>
+                        </td>
+                    </tr>
+                <?php } ?>
+            </table>
+        </div>
     </div>
 </body>
 <?php include __DIR__ . '/../footer.php'; ?>

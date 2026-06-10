@@ -344,8 +344,8 @@
 }
 
 .stat-label {
-    font-size: 13px;
-    color: #6b7280;
+    font-size: 15px;
+    color: #1b212f;
     margin-top: 4px;
 }
 
@@ -390,9 +390,9 @@
 }
 
 .action-label {
-    font-size: 14px;
+    font-size: 15px;
     font-weight: 500;
-    color: #374151;
+    color: #141922;
 }
 
 .action-label span {

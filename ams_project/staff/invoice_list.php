@@ -38,6 +38,18 @@ $payments = $results->fetch_all(MYSQLI_ASSOC);
 <body>
 
     <div class="outer_container">
+        <?php if (!empty($_SESSION['success'])): ?>
+        <div class="flash success">
+            <?php echo $_SESSION['success'];
+            unset($_SESSION['success']); ?>
+        </div>
+    <?php endif; ?>
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?php echo $_SESSION['error'];
+            unset($_SESSION['error']); ?>
+        </div>
+    <?php endif; ?>
 
         <h2>Payments List</h2>
         <a href="staff_dashboard.php" style="margin:auto" class="back">

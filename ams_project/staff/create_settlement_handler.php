@@ -21,14 +21,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $settlement_date = $settlement_date[2] . "-" . $settlement_date[1] . "-" . $settlement_date[0]; 
 
 
-    
+    try{
     $stmt = mysqli_prepare($conn, "
-        INSERT INTO settlement
-        (auction_item_id, amount_due, commission_rate, commission_amount, net_amount,
-         settlement_date, status, processed_by_staff, payment_method, transaction_reference)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-    ");
-    mysqli_stmt_bind_param($stmt, "iddddssiss", $auction_item_id, $amount_due, $commission_rate, $commission_amount, $net_amount, $settlement_date, $status, $staff_id, $payment_method, $tx_reference);
+    INSERT INTO settlement (
+        payment_id,
+        auction_item_id,
+        amount_due,
+        commission_rate,
+        commission_amount,
+        net_amount,
+        settlement_date,
+        status,
+        processed_by_staff,
+        payment_method,
+        transaction_reference
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+");
+    mysqli_stmt_bind_param(
+    $stmt,
+    "iiddddssiss",
+    $payment_id,
+    $auction_item_id,
+    $amount_due,
+    $commission_rate,
+    $commission_amount,
+    $net_amount,
+    $settlement_date,
+    $status,
+    $staff_id,
+    $payment_method,
+    $tx_reference
+);
     $success = mysqli_stmt_execute($stmt);
 
     if ($success) {
@@ -36,8 +59,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         logActivity($conn, $staff_id,$_SESSION['username'] ,"Created settlement for payment ID: $payment_id, item ID: $auction_item_id");
         header('Location: invoice_list.php');
         exit();
-    } else {
-        $_SESSION['error'] = "Failed to add settlement";
+    
+        
+    }}
+    catch (Exception $e){
+    $_SESSION['error'] = "Failed to add settlement";
         logActivity($conn, $staff_id,$_SESSION['username'] ,"Failed to create settlement for payment ID: $payment_id, item ID: $auction_item_id");
         header('Location: create_settlement.php?payment_id=' . $payment_id);
         exit();

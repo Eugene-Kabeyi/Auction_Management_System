@@ -13,7 +13,25 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin' && $_SES
 <head>
     <title>Add New Admin</title>
     <link rel="stylesheet" href="../css/form_table_styles.css">
-    
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
+    <style>
+        .pass_w {
+            -webkit-text-security: disc;
+            font-size: 16px;
+            letter-spacing: 2px;
+        }
+
+        /* Hide/Show Password inside the password field */
+        .hide_show {
+            position: absolute;
+            top: 880px;
+            left: 840px;
+            color: #6b7280;
+            cursor: pointer;
+            user-select: none;
+        }
+    </style>
+     
 
 </head>
 <?php if (!empty($_SESSION['success'])): ?>
@@ -38,22 +56,22 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin' && $_SES
         <form action="add_admin_handler.php" method="POST" onsubmit="return validateAdmin()">
 
             <label for="firstname">First Name:</label>
-            <input type="text" id="firstname" name="firstname" required>
+            <input type="text" id="firstname" name="firstname" >
 
             <label for="secondname">Second Name:</label>
             <input type="text" id="secondname" name="secondname">
 
             <label for="surname">Surname:</label>
-            <input type="text" id="surname" name="surname" required>
+            <input type="text" id="surname" name="surname" >
 
             <label for="email">Email:</label>
-            <input type="text" id="email" name="email" required>
+            <input type="text" id="email" name="email" >
 
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="username" name="username" >
 
             <label for="phone_number">Phone Number:</label>
-            <input type="text" id="phone_number" name="phone_number" required>
+            <input type="text" id="phone_number" name="phone_number">
 
             <label for="admin_level">Admin Level:</label>
             <select name="admin_level">

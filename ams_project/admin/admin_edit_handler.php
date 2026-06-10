@@ -58,7 +58,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
     } catch (Exception $e) {
         $_SESSION['error'] = "Unexpected error occurred.";
-        header("Location: add_admin.php?error");
+        header("Location: admin_list.php");
         exit();
     }
 } ?>

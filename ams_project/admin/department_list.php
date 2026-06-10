@@ -13,6 +13,7 @@ include __DIR__ . ('/../config.php');
 <head>
     <title>Department List</title>
     <link rel="stylesheet" href="../css/form_table_styles.css">
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
 </head>
 
 <body>
@@ -30,6 +31,7 @@ include __DIR__ . ('/../config.php');
     <?php endif; ?>
     <div class="outer_container f_container">
         <h2>Department List</h2>
+        <a href="admin_dashboard.php" class="back" >Back to Dashboard </a>
         <a href="department_add.php" class="back">Add Department </a>
         <div class="inner-container">
             <table>

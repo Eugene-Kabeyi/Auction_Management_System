@@ -238,9 +238,12 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
             </div>
             <?php unset($_SESSION['error']); ?>
         <?php endif; ?>
+
+
         <h2>Welcome to AMS</h2>
         <span class="logo">AMS</span>
         <h3>Log In</h3>
+
         <form action="../handle_login.php" method="post" class="login_form">
             <input type="hidden" name="login_type" value="user">
             <label for="username">Username:</label>
@@ -252,6 +255,8 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
 
             <button type="submit">Log In</button>
         </form>
+
+        
         <span class="dont">Don't have an account? <a href="register.php">Register</a></span>
     </div>
     <script>
@@ -272,7 +277,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
             }
         }
         document.getElementById("togglePassword").addEventListener("click", togglePasswordVisibility);
-        
+
         function validateLogin() {
 
             if (!validateUsername()) return false;
