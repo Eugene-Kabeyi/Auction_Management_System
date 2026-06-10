@@ -39,24 +39,24 @@ if (!$admin) {
         <h2>Edit Admin Details</h2>
         <a href="admin_list.php" class="back">Back </a>
         <form action="admin_edit_handler.php" method="POST" onsubmit="return validateAdmin()">
-            <input type="hidden" name="admin_id" value="<?php echo htmlspecialchars($admin['admin_id']); ?>">
+            <input type="hidden" name="admin_id" value="<?php echo  ($admin['admin_id']); ?>">
             <label for="firstname">First Name:</label>
-            <input type="text" id="firstname" name="firstname" value="<?php echo htmlspecialchars($admin['firstname']); ?>" >
+            <input type="text" id="firstname" name="firstname" value="<?php echo  ($admin['firstname']); ?>" >
 
             <label for="secondname">Second Name:</label>
-            <input type="text" id="secondname" name="secondname" value="<?php echo htmlspecialchars($admin['secondname']); ?>">
+            <input type="text" id="secondname" name="secondname" value="<?php echo  ($admin['secondname']); ?>">
 
             <label for="surname">Surname:</label>
-            <input type="text" id="surname" name="surname" value="<?php echo htmlspecialchars($admin['surname']); ?>">
+            <input type="text" id="surname" name="surname" value="<?php echo  ($admin['surname']); ?>">
 
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($admin['email']); ?>" >
+            <input type="email" id="email" name="email" value="<?php echo  ($admin['email']); ?>" >
 
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" value="<?php echo htmlspecialchars($admin['username']); ?>" >
+            <input type="text" id="username" name="username" value="<?php echo  ($admin['username']); ?>" >
 
             <label for="phone_number">Phone Number:</label>
-            <input type="text" id="phone_number" name="phone_number" value="<?php echo htmlspecialchars($admin['phone_number']); ?>" required>
+            <input type="text" id="phone_number" name="phone_number" value="<?php echo  ($admin['phone_number']); ?>" required>
 
             <label for="admin_level">Admin Level:</label>
             <select name="admin_level" id="admin_level">
@@ -68,7 +68,7 @@ if (!$admin) {
             <button type="submit" name="update">Update Admin</button>
 
       
-            <input type="hidden" name="admin_id" value="<?php echo htmlspecialchars($admin['admin_id']); ?>">
+            <input type="hidden" name="admin_id" value="<?php echo  ($admin['admin_id']); ?>">
             <button type="submit" class="delete" name="delete">Delete Admin</button>
         </form>
         

@@ -11,9 +11,7 @@ function logActivity($conn, $user_id, $username, $action)
         (user_id, username, action, page_name, ip_address)
         VALUES (?, ?, ?, ?, ?)
     ");
-    if (!$stmt) {
-        throw new Exception("Prepare failed: " . mysqli_error($conn));
-    }
+   
     mysqli_stmt_bind_param($stmt, "issss", $user_id, $username, $action, $page, $ip);
     mysqli_stmt_execute($stmt);
     mysqli_stmt_close($stmt);

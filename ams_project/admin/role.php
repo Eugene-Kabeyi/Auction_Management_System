@@ -41,6 +41,7 @@ include __DIR__ . '/../config.php';
     ?>
     <div class="outer_container">
         <h2>Roles List</h2>
+        <a href="admin_dashboard.php" class="back" >Back to Dashboard </a> 
          <a href="add_role.php" class = "back">Add Role</a>
         <div class="inner_container">
         <table>
@@ -52,9 +53,9 @@ include __DIR__ . '/../config.php';
             </tr>
             <?php foreach ($roles as $role): ?>
                 <tr>
-                    <td><?php echo htmlspecialchars($role['role_id']); ?></td>
-                    <td><?php echo htmlspecialchars($role['role_name'])?></td>
-                    <td><?php echo htmlspecialchars($role['role_description']); ?></td>
+                    <td><?php echo  ($role['role_id']); ?></td>
+                    <td><?php echo  ($role['role_name'])?></td>
+                    <td><?php echo  ($role['role_description']); ?></td>
                     <td>
                        
                         <a href="edit_role.php?role_id=<?php echo $role['role_id']; ?>">Edit</a ></td>

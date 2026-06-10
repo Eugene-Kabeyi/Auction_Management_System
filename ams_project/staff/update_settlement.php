@@ -53,23 +53,23 @@ if (!$settlement) {
             <input type="hidden" name="settlement_id" value="<?= $settlement['settlement_id']; ?>">
 
             <label>Payment ID</label>
-            <input type="text" id="payment_id" value="<?= htmlspecialchars($settlement['payment_id']); ?>">
+            <input type="text" id="payment_id" value="<?=  ($settlement['payment_id']); ?>">
 
             <label>Auction Item ID</label>
-            <input type="text" id="auction_item_id" value="<?= htmlspecialchars($settlement['auction_item_id']); ?>">
+            <input type="text" id="auction_item_id" value="<?=  ($settlement['auction_item_id']); ?>">
 
             <label>Amount Due</label>
-            <input type="text" id="amount_due" value="<?= htmlspecialchars($settlement['amount_due']); ?>">
+            <input type="text" id="amount_due" value="<?=  ($settlement['amount_due']); ?>">
 
             <label>Commission Rate (%)</label>
-            <input type="text" id="commission_rate" value="<?= htmlspecialchars($settlement['commission_rate']); ?>">
+            <input type="text" id="commission_rate" value="<?=  ($settlement['commission_rate']); ?>">
 
             <label>Commission Amount</label>
             <input type="text" id="commission_amount"
-                value="<?= htmlspecialchars($settlement['commission_amount']); ?>">
+                value="<?=  ($settlement['commission_amount']); ?>">
 
             <label>Net Amount</label>
-            <input type="text" id="net_amount" value="<?= htmlspecialchars($settlement['net_amount']); ?>">
+            <input type="text" id="net_amount" value="<?=  ($settlement['net_amount']); ?>">
 
             <label>Settlement Date</label>
             <input type="date" id="settlement_date" name="settlement_date"
@@ -91,13 +91,13 @@ if (!$settlement) {
 
             <label>Transaction Reference</label>
             <input type="text" id="transaction_reference" name="transaction_reference"
-                value="<?= htmlspecialchars($settlement['transaction_reference']); ?>">
+                value="<?=  ($settlement['transaction_reference']); ?>">
 
             <label>Status</label>
             <select id="status" name="status">
 
                 <option value="pending" <?= ($settlement['status'] == "pending") ? "selected" : "" ?>> Pending </option>
-                
+
                 <option value="processing" <?= ($settlement['status'] == "processing") ? "selected" : "" ?>> Processing
                 </option>
                 <option value="completed" <?= ($settlement['status'] == "completed") ? "selected" : "" ?>> Completed

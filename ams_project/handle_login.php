@@ -3,7 +3,7 @@ session_start();
 require 'config.php'; 
 include 'log_activity.php';
 
-$error = '';
+
 
 if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $username = trim($_POST['username']);
@@ -28,16 +28,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             $result = mysqli_stmt_get_result($stmt);
             $user = mysqli_fetch_assoc($result);
-            if ($user === false) {
-                $user = null; // No user found
-                $error = "Invalid username.";
-            }
-
-
-            if ($user !== null && $password !== $user['password_hash']) {
-                $error = "Invalid password.";
-                
-            }
+            
 
 
             if ($user && $password == $user['password_hash']) {
@@ -54,38 +45,44 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['role_id'] = $user['role_id'];
                 $_SESSION['f_name'] = $user['firstname'];
                 $_SESSION['l_name'] = $user['surname'];
-                $_SESSION['image_path'] = $user['image_path'];
                 $_SESSION['login_type'] = $loginType; // Store login type in session
 
-                $_SESSION['success'] = "Login successful! Welcome, " . htmlspecialchars($user['firstname']) . ".";
+                $_SESSION['success'] = "Login successful! Welcome, " .($user['firstname']) . ".";
                 if ($loginType === 'admin') {
-                    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Admin logged in");
+                    
                     header("Location: ../ams_project/admin/admin_dashboard.php");
                 } elseif ($loginType === 'staff') {
-                    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Staff logged in");
+                    
                     header("Location: ../ams_project/staff/staff_dashboard.php");
                 } else {
-                    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "User logged in");
+                    
                     header("Location: ../ams_project/users/user_dashboard.php");
                 }
                 exit(); // very important
-
+            
 
             } else {
-                $_SESSION['error'] = $error;
-                if ($loginType === 'staff') {
-                    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed staff login attempt: " . $error);
-                    $_SESSION['error'] = "Something went wrong. Please try again.";
+                if ($user === null) {
+                $error = "Invalid username.";
+            }
+
+
+            if ($user !== null && $password !== $user['password_hash']) {
+                $error = "Invalid password.";
+                
+            }
+            
+                $_SESSION['error'] = "Something went wrong (".$error. ").";
+                if ($loginType == 'staff' || $loginType === 'admin' ) {                    
                     header("Location: ../ams_project/staff/staff_login.php");
                     exit();
-                } elseif ($loginType === 'admin') {
-                    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed admin login attempt: " . $error);
-                    $_SESSION['error'] = "Something went wrong. Please try again.";
+                } elseif ($loginType === 'admin') {                  
+                    
                     header("Location: ../ams_project/staff/staff_login.php");
                     exit();
                 } else {
-                    logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed user login attempt: " . $error);
-                    $_SESSION['error'] = "Something went wrong. Please try again.";
+                   
+                    
                     header("Location: ../ams_project/users/login.php");
                     exit();
                 }
@@ -93,8 +90,11 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
         } catch (Exception $e) {
             $error = "Database error: " . $e->getMessage();
             logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Database error during login: " . $error);
-            $_SESSION['error'] = $error;
+            $_SESSION['error'] = "Log in Failed. Please try again";
+            header("Location: ../ams_project/users/login.php");
+            exit();
         }
+        
     }
 }
 ?>

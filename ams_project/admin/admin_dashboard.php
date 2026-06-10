@@ -32,11 +32,25 @@ mysqli_stmt_execute($stmt);
 $results = mysqli_stmt_get_result($stmt);
 $live_auctions = mysqli_fetch_all($results, MYSQLI_ASSOC);  
 
-// Fetch payments processed
-$stmt = mysqli_prepare($conn, "SELECT SUM(amount) FROM payment WHERE payment_status =  'completed' ");
+
+// /REVENUE CALCULATION FOR THE YEAR TO DATE
+$sql = "SELECT SUM(amount) FROM payment WHERE YEAR(completed_at) = YEAR(CURDATE())  AND payment_status = 'completed'";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$payments = mysqli_fetch_array($result)[0];
+
+// Fetch pending payments
+$stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM payment WHERE payment_status = 'pending'");
 mysqli_stmt_execute($stmt);
 $results = mysqli_stmt_get_result($stmt);
-$payments = mysqli_fetch_array($results)[0];
+$pending_payments = mysqli_fetch_array($results)[0];
+
+// Fetch pending items
+$stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM consigner_items WHERE item_status = 'pending'");
+mysqli_stmt_execute($stmt);
+$results = mysqli_stmt_get_result($stmt);
+$pending_items = mysqli_fetch_array($results)[0];
 
 
 ?>
@@ -79,11 +93,11 @@ $payments = mysqli_fetch_array($results)[0];
         </div>
 
         <div class="stat-card">
-            <a href="../staff/payment_list.php" style="text-decoration:none;">
+            
             <div class="stat-icon">💰</div>
             <div class="stat-value">Ksh <?= number_format($payments, 2) ?></div>
-            <div class="stat-label">Total Revenue</div>
-            </a>
+            <div class="stat-label">Total Revenue (Year)</div>
+            
         </div>
     </div>
 
@@ -113,6 +127,11 @@ $payments = mysqli_fetch_array($results)[0];
                 <div class="action-label">Departments</div></a>
             </div>
 
+            <div class="action-btn"><a href="auction_settings.php">
+                <div class="action-icon">⚙️</div>
+                <div class="action-label">Auction Defaults</div></a>
+            </div>
+
         </div>
     </div>
 
@@ -123,12 +142,12 @@ $payments = mysqli_fetch_array($results)[0];
 
             <div class="action-btn">
                 <div class="action-icon">⏳</div>
-                <div class="action-label">Pending Approvals</div>
+                <div class="action-label">Pending Approvals <span><?= $pending_approvals ?></span></div>
             </div>
 
             <div class="action-btn">
                 <div class="action-icon">🔔</div>
-                <div class="action-label">System Notifications</div>
+                <div class="action-label">Pending Payments <span><?= $pending_payments ?></span></div>
             </div>
 
             <div class="action-btn">

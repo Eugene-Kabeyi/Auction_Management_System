@@ -78,12 +78,12 @@ $items = mysqli_stmt_get_result($stmt)->fetch_all(MYSQLI_ASSOC);
 
 
             <tr>
-                <td><?php echo htmlspecialchars($item['item_id']); ?></td>
-                <td><?php echo htmlspecialchars($item['item_name']); ?></td>
-                <td><?php echo htmlspecialchars($item['item_description']); ?></td>
-                <td><?php echo htmlspecialchars($item['item_category']); ?></td>
-                <td><?php echo htmlspecialchars($item['item_condition']); ?></td>
-                <td><?php echo htmlspecialchars($item['item_status']); ?></td>
+                <td><?php echo  ($item['item_id']); ?></td>
+                <td><?php echo  ($item['item_name']); ?></td>
+                <td><?php echo  ($item['item_description']); ?></td>
+                <td><?php echo  ($item['item_category']); ?></td>
+                <td><?php echo  ($item['item_condition']); ?></td>
+                <td><?php echo  ($item['item_status']); ?></td>
                 <td>
                     <?php if ($item['item_status'] === 'approved'): ?>
                         <span>No action needed</span>

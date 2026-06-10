@@ -50,13 +50,13 @@ include __DIR__ . '/../log_activity.php';
                 mysqli_stmt_execute($stmt);
                 $item = mysqli_stmt_get_result($stmt)->fetch_assoc();
                 if ($item) {
-                    echo "<h3>Item ID: " . htmlspecialchars($item['item_id']) . "</h3>";
-                    echo "<h3>Item Name: " . htmlspecialchars($item['item_name']) . "</h3>";
-                    echo "<p>Description: " . htmlspecialchars($item['item_description']) . "</p>";
-                    echo "<p>Category: " . htmlspecialchars($item['item_category']) . "</p>";
-                    echo "<p>Condition: " . htmlspecialchars($item['item_condition']) . "</p>";
+                    echo "<h3>Item ID: " .  ($item['item_id']) . "</h3>";
+                    echo "<h3>Item Name: " .  ($item['item_name']) . "</h3>";
+                    echo "<p>Description: " .  ($item['item_description']) . "</p>";
+                    echo "<p>Category: " .  ($item['item_category']) . "</p>";
+                    echo "<p>Condition: " .  ($item['item_condition']) . "</p>";
                     if ($item['image_path']) {
-                        echo '<img src="' . htmlspecialchars($item['image_path']) . '" alt="Item Image" style="max-width:300px;">';
+                        echo '<img src="' .  ($item['image_path']) . '" alt="Item Image" style="max-width:300px;">';
                     } else {
                         echo "<p>No image available.</p>";
                     }
@@ -76,12 +76,12 @@ include __DIR__ . '/../log_activity.php';
                 <!--display fetched item_id and make it read-only-->
                 <input type="text" id="item_id" name="item_id"
                     style="border: 1px solid #030303; background-color: #838383; cursor: not-allowed;"
-                    value="<?php echo htmlspecialchars($item['item_id'] ?? ''); ?>" >
+                    value="<?php echo  ($item['item_id'] ?? ''); ?>" >
 
                 <label for="item_name">Item Name:</label>
                 <input type="text" id="item_name" name="item_name"
                     style="border: 1px solid #030303; background-color: #838383; cursor: not-allowed;"
-                    value="<?php echo htmlspecialchars($item['item_name'] ?? ''); ?>" >
+                    value="<?php echo  ($item['item_name'] ?? ''); ?>" >
 
                 <label for="eval_notes">Evaluation notes:</label>
                 <textarea id="eval_notes" name="eval_notes" ></textarea>

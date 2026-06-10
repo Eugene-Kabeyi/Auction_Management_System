@@ -106,9 +106,9 @@ $auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
             </tr>
             <?php foreach ($auctions as $auction): ?>
                 <tr>
-                    <td><?= htmlspecialchars($auction['auction_id']) ?></td>
-                    <td><?= htmlspecialchars($auction['auction_name']) ?></td>
-                    <td><?= htmlspecialchars($auction['auction_code']) ?></td>
+                    <td><?=  ($auction['auction_id']) ?></td>
+                    <td><?=  ($auction['auction_name']) ?></td>
+                    <td><?=  ($auction['auction_code']) ?></td>
                 </tr>
 
             <?php endforeach ?>

@@ -22,35 +22,35 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
     $stmt = mysqli_prepare($conn, $sql);
 
     if ($stmt) {
+        try {
+            mysqli_stmt_bind_param($stmt, "iiissssssss", $national_id, $business_id, $role_id, $firstname, $secondname, $surname, $business_name, $phone, $email, $username, $password);
+            $success = mysqli_stmt_execute($stmt);
+            mysqli_stmt_close($stmt);
 
-        mysqli_stmt_bind_param( $stmt, "iiissssssss", $national_id, $business_id, $role_id, $firstname, $secondname, $surname, $business_name, $phone, $email, $username, $password );
 
-        if (mysqli_stmt_execute($stmt)) {
-
-            $_SESSION['success'] =
-                "Successfully created account for " . $username;
+            $_SESSION['success'] =  "Successfully created account for " . $username;
 
             header("Location: ../ams_project/users/login.php");
             exit();
 
-        } else {
 
+
+
+        } catch (Exception $e) {
             $_SESSION['error'] = "Registration failed.";
-
             header("Location: ../ams_project/users/register.php");
             exit();
         }
 
-        mysqli_stmt_close($stmt);
+
 
     } else {
 
         $_SESSION['error'] = "Failed to prepare statement.";
-
         header("Location: ../ams_project/users/register.php");
         exit();
     }
 }
 
-mysqli_close($conn);
+
 ?>

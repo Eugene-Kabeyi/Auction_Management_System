@@ -47,9 +47,9 @@ include __DIR__ . ('/../config.php');
                 foreach ($departments as $dept) {
 
                     echo "<tr>";
-                    echo "<td>" . htmlspecialchars($dept['department_name']) . "</td>";
-                    echo "<td>" . htmlspecialchars($dept['department_description']) . "</td>";
-                    echo "<td> <a href = 'department_edit.php?department_id=" . htmlspecialchars($dept['department_id']) . "'>Edit </a></td>";
+                    echo "<td>" .  ($dept['department_name']) . "</td>";
+                    echo "<td>" .  ($dept['department_description']) . "</td>";
+                    echo "<td> <a href = 'department_edit.php?department_id=" .  ($dept['department_id']) . "'>Edit </a></td>";
                     echo "</tr>";
                 }
 

@@ -56,7 +56,7 @@ mysqli_stmt_bind_param($stmt, "i", $auction_id);
 mysqli_stmt_execute($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $row = mysqli_fetch_assoc($result);
-$auction_end_time = $row['end_time'] ?? null;
+$auction_end_time = strtotime($row['end_time']);
 
 $current_time = date("Y-m-d H:i:s");
 
@@ -79,7 +79,7 @@ $alreadyFinalized = $row['c'] ?? 0;
 
 // FINALIZE AUCTION
 
-if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
+if ($current_time > $auction_end_time && $alreadyFinalized == 0) {
     // START TRANSACTION
     mysqli_begin_transaction($conn);
 
@@ -279,8 +279,8 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
             margin-top: 20px;
         }
 
-        .modal-content input[type="number"] {
-            padding: 10px;
+        .modal-content input {
+            padding: 20px;
             border: 1px solid #ccc;
             border-radius: 4px;
             font-size: 14px;
@@ -440,6 +440,7 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
 
             <!--Form bid submission-->
             <form id="bidForm" action="live_auction_handler.php" method="post">
+                <input type="hidden" name="auction_id" value="<?php echo $auction_id?> ">
                 <!-- Minimum bid amount is dynamically set based on current highest bid or starting bid -->
                 <label for="bid_amount">Bid Amount (Minimum: ksh <?php echo number_format($minimum_bid, 2); ?>):</label>
                 <input type="text" id="bid_amount" name="bid_amount" placeholder="Enter your bid amount" required

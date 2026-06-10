@@ -22,9 +22,9 @@ $stmt = mysqli_prepare($conn, "
     JOIN auctions c ON a.auction_id = c.auction_id
     WHERE a.bidder_id = ? AND a.result = ?
 ");
-
-mysqli_stmt_bind_param($stmt, "is", $_SESSION['user_id'], $result_status);
 $result_status = 'won';
+mysqli_stmt_bind_param($stmt, "is", $_SESSION['user_id'], $result_status);
+mysqli_stmt_execute($stmt);
 
 $result = mysqli_stmt_get_result($stmt);
 $results = mysqli_fetch_all($result, MYSQLI_ASSOC);
@@ -130,9 +130,9 @@ mysqli_stmt_close($stmt);
             <?php foreach ($results as $result): ?>
                 <tr>
 
-                    <td><?= htmlspecialchars($result['auction_id']) ?></td>
-                    <td><?= htmlspecialchars($result['auction_name']) ?></td>
-                    <td><?= htmlspecialchars($result['auction_code']) ?></td>
+                    <td><?=  ($result['auction_id']) ?></td>
+                    <td><?=  ($result['auction_name']) ?></td>
+                    <td><?=  ($result['auction_code']) ?></td>
 
                 </tr>
             <?php endforeach ?>

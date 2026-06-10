@@ -56,14 +56,14 @@ $total_users = mysqli_fetch_assoc($result)['count'];
 <main class="dashboard-container">
     <?php if (!empty($_SESSION['success'])): ?>
         <div class="flash success">
-            <?= htmlspecialchars($_SESSION['success']); ?>
+            <?=  ($_SESSION['success']); ?>
         </div>
         <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
 
     <?php if (!empty($_SESSION['error'])): ?>
         <div class="flash error">
-            <?= htmlspecialchars($_SESSION['error']); ?>
+            <?=  ($_SESSION['error']); ?>
         </div>
         <?php unset($_SESSION['error']); ?>
     <?php endif; ?>

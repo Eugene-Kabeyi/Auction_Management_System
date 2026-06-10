@@ -20,7 +20,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' ) {
 
     // Get form data
     $bid_id = $_POST['bid_id'];
-    $amount = $_POST['amount'];
+    $amount = $_POST['total_amount'];
     $payment_method = $_POST['payment_method'];
     $invoice_id = $_POST['invoice_id'];
 
@@ -101,7 +101,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' ) {
             $_SESSION['success'] =
                 "Payment started successfully! Please wait for staff to process it.";
 
-            header('Location: payments_history.php');
+            header('Location: user_dashboard.php');
             exit();
 
         } else {

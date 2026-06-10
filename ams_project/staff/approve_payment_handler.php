@@ -60,7 +60,7 @@ try {
         if ($item) {
             $stmt = mysqli_prepare($conn, "
                 UPDATE consigner_items
-                SET item_status = 'under_review',
+                SET item_status = 'sold',
                     updated_at = NOW()
                 WHERE item_id = ?
             ");
@@ -75,9 +75,9 @@ try {
         $_SESSION['success'] = "Payment approved successfully.";
     }
 
-    // =========================
+    
     // REJECT PAYMENT
-    // =========================
+    
     elseif ($action === 'reject') {
 
         $stmt = mysqli_prepare($conn, "
@@ -93,8 +93,8 @@ try {
         if ($item) {
             $stmt = mysqli_prepare($conn, "
                 UPDATE consigner_items
-                SET item_status = 'rejected',
-                    updated_at = NOW()
+                SET item_status = 'returned',
+                   
                 WHERE item_id = ?
             ");
 

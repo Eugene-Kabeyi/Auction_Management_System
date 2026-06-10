@@ -26,7 +26,7 @@ try {
 
     mysqli_begin_transaction($conn);
 
-    $stmt = mysqli_prepare($conn,"
+    $stmt = mysqli_prepare($conn, "
         UPDATE settlement
         SET
             settlement_date = ?,
@@ -49,6 +49,32 @@ try {
     );
 
     mysqli_stmt_execute($stmt);
+
+    //fetching the auction item id for updating the settlement status in consigner_items table
+    $item_stmt = mysqli_prepare($conn, "
+        SELECT auction_item_id FROM settlement WHERE settlement_id = ?
+    ");
+    mysqli_stmt_bind_param($item_stmt, "i", $settlement_id);
+    mysqli_stmt_execute($item_stmt);
+    $result = mysqli_stmt_get_result($item_stmt);
+    $record = mysqli_fetch_assoc($result);
+    $auction_item_id = $record['auction_item_id'];
+    //update settlement status in consigner_items table
+    if ($status === 'completed') {
+        $update_stmt = mysqli_prepare($conn, "
+        UPDATE consigner_items
+        SET 
+            item_status = ?
+
+        WHERE item_id = ?
+    ");
+
+        $item_status = 'sold';
+        mysqli_stmt_bind_param($update_stmt, "si", $item_status, $auction_item_id);
+        mysqli_stmt_execute($update_stmt);
+    }
+
+
 
     mysqli_commit($conn);
 
@@ -77,6 +103,6 @@ try {
         "Failed to update settlement.";
 }
 
-header("Location: settlement_list.php");
+header("Location: invoice_list.php");
 exit();
 ?>

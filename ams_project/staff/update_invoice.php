@@ -6,7 +6,7 @@ include __DIR__ . '/../log_activity.php';
 session_start();
 
 //  AUTH CHECK
-if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'staff') {
+if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'staff' || $_SESSION['login_type'] !== 'admin') {
     $_SESSION['error'] = "Please log in as staff to access this page.";
     header('Location: ../staff/staff_login.php');
     exit();
@@ -69,25 +69,25 @@ $due_date = date("Y-m-d", strtotime("+7 days"));
         <form id="invoiceForm" action="update_invoice_handler.php" method="POST" onsubmit="return validateInvoice()">
 
             <label>Invoice Number:</label>
-            <input type="text" id="invoice_number" name="invoice_number" value="<?= htmlspecialchars($payment['invoice_id']) ?>">
+            <input type="text" id="invoice_number" name="invoice_number" value="<?=  ($payment['invoice_id']) ?>">
 
             <label>Bidder ID:</label>
-            <input type="text" id="bidder_id" name="bidder_id" value="<?= htmlspecialchars($payment['bidder_id']) ?>">
+            <input type="text" id="bidder_id" name="bidder_id" value="<?=  ($payment['bidder_id']) ?>">
 
             <label>Payment ID:</label>
-            <input type="text" id="payment_id" name="payment_id" value="<?= htmlspecialchars($payment['payment_id']) ?>">
+            <input type="text" id="payment_id" name="payment_id" value="<?=  ($payment['payment_id']) ?>">
 
             <label>Amount:</label>
-            <input type="text" id="amount" name="amount" value="<?= htmlspecialchars(number_format($amount, 2, '.', '')) ?>">
+            <input type="text" id="amount" name="amount" value="<?=  (number_format($amount, 2, '.', '')) ?>">
 
             <label>Tax Amount:</label>
-            <input type="text" id="tax_amount" name="tax_amount" value="<?= htmlspecialchars(number_format($tax_amount, 2, '.', '')) ?>">
+            <input type="text" id="tax_amount" name="tax_amount" value="<?=  (number_format($tax_amount, 2, '.', '')) ?>">
 
             <label>Total Amount:</label>
-            <input type="text" id="total_amount" name="total_amount" value="<?= htmlspecialchars(number_format($total_amount, 2, '.', '')) ?>">
+            <input type="text" id="total_amount" name="total_amount" value="<?=  (number_format($total_amount, 2, '.', '')) ?>">
 
             <label>Due Date:</label>
-            <input type="text" id="due_date" name="due_date" placeholder="dd/mm/yyyy" value="<?= htmlspecialchars($due_date) ?>">
+            <input type="text" id="due_date" name="due_date" placeholder="dd/mm/yyyy" value="<?=  ($due_date) ?>">
 
             <label>Status:</label>
             <select id="status" name="status">

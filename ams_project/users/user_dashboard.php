@@ -28,7 +28,7 @@ mysqli_stmt_execute($stmt);
 mysqli_stmt_bind_result($stmt, $auctions_participated);
 mysqli_stmt_fetch($stmt);
 mysqli_stmt_close($stmt);
-;
+
 
 // Count bids won
 $stmt = mysqli_prepare($conn, "SELECT COUNT(*) FROM auction_bids WHERE bidder_id = ? AND result = 'won'");
@@ -55,21 +55,21 @@ mysqli_stmt_close($stmt);
 
     <?php if (!empty($_SESSION['success'])): ?>
         <div class="flash success">
-            <?= htmlspecialchars($_SESSION['success']); ?>
+            <?=  ($_SESSION['success']); ?>
         </div>
         <?php unset($_SESSION['success']); ?>
     <?php endif; ?>
 
     <?php if (!empty($_SESSION['error'])): ?>
         <div class="flash error">
-            <?= htmlspecialchars($_SESSION['error']); ?>
+            <?=  ($_SESSION['error']); ?>
         </div>
         <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
 
 
     <div class="dashboard-header">
-        <h1 class="dashboard-title">My Dashboard</h1>
+        <h1 class="dashboard-title"><?= $_SESSION['f_name']. " " . $_SESSION['l_name'] ?>'s Dashboard</h1>
         <p class="dashboard-subtitle">Manage your consignments, bids, and auctions</p>
     </div>
 
@@ -77,19 +77,19 @@ mysqli_stmt_close($stmt);
     <div class="stats-container">
         <div class="stat-card"><a href="items_consign_list.php">
             <div class="stat-icon icon-auction">📦</div>
-            <div class="stat-value"><?= htmlspecialchars($items_consigned) ?? '0'?></div>
+            <div class="stat-value"><?=  ($items_consigned) ?? '0'?></div>
             <div class="stat-label">Items Consigned</div></a>
         </div>
 
         <div class="stat-card"><a href="auctions_participated.php">
             <div class="stat-icon icon-bid">🔨</div>
-            <div class="stat-value"><?=htmlspecialchars($auctions_participated )?? '0'?></div>
+            <div class="stat-value"><?= ($auctions_participated )?? '0'?></div>
             <div class="stat-label">Auctions Participated</div></a>
         </div>
 
         <div class="stat-card"><a href="bids_won.php">
             <div class="stat-icon icon-revenue">🏆</div>
-            <div class="stat-value"><?= htmlspecialchars($bids_won) ?? '0'?></div>
+            <div class="stat-value"><?=  ($bids_won) ?? '0'?></div>
             <div class="stat-label">Bids Won</div></a>
         </div>
 

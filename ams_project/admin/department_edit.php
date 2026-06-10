@@ -51,17 +51,17 @@ if (!$dept) {
     <div class="outer_container f_container">
         <a href="department_list.php" class="back">Back to List:</a>
         <form action="department_edit_handler.php" method="post" onsubmit="return validateDepartment()">
-            <input type="hidden" name="department_id" id="department_id" value="<?php echo htmlspecialchars($dept['department_id']) ?>">
+            <input type="hidden" name="department_id" id="department_id" value="<?php echo  ($dept['department_id']) ?>">
 
             <label for="department_name">Department Name:</label>
-            <input type="text" name="department_name" value="<?php echo htmlspecialchars($dept['department_name']) ?>"
+            <input type="text" name="department_name" value="<?php echo  ($dept['department_name']) ?>"
                 required>
 
             <label for="department_description">Department Description:</label>
             <!-- <input type="text" name="department_description"
-            value="<?php //echo htmlspecialchars($dept['department_description']) ?>"> -->
+            value="<?php //echo  ($dept['department_description']) ?>"> -->
             <textarea name="department_description"
-                id="department_description"><?php echo htmlspecialchars($dept['department_description']) ?></textarea>
+                id="department_description"><?php echo  ($dept['department_description']) ?></textarea>
 
             <button type="submit" name="update">Update Department</button>
             <button type="submit" class="delete" name="delete" onclick="return confirm('Are you sure you want to delete this department?')">Delete Department</button>

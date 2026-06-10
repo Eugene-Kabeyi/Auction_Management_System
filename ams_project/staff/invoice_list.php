@@ -10,6 +10,7 @@ if (
     empty($_SESSION['user_id']) ||
     !isset($_SESSION['login_type']) ||
     $_SESSION['login_type'] !== 'staff'
+    
 ) {
     $_SESSION['error'] = "Please log in as staff to access this page.";
     header('Location: ../staff/staff_login.php');
@@ -20,7 +21,6 @@ if (
 $stmt = mysqli_prepare($conn, "
     SELECT * 
     FROM payment 
-    WHERE payment_status = 'pending'
     ORDER BY payment_date DESC
     
 ");
@@ -69,31 +69,31 @@ $payments = $results->fetch_all(MYSQLI_ASSOC);
                         <?php foreach ($payments as $payment): ?>
 
                             <?php
-                            $statusClass = "status-" . htmlspecialchars($payment['payment_status']);
+                            $statusClass = "status-" .  ($payment['payment_status']);
                             ?>
 
                             <tr>
-                                <td><?= htmlspecialchars($payment['payment_id']) ?></td>
-                                <td><?= htmlspecialchars($payment['bid_id']) ?></td>
-                                <td><?= htmlspecialchars($payment['bidder_id']) ?></td>
-                                <td><?= htmlspecialchars($payment['payment_method']) ?></td>
-                                <td><?= htmlspecialchars($payment['amount']) ?></td>
-                                <td><?= htmlspecialchars($payment['payment_date']) ?></td>
-                                <td><?= htmlspecialchars($payment['transaction_reference']) ?></td>
+                                <td><?=  ($payment['payment_id']) ?></td>
+                                <td><?=  ($payment['bid_id']) ?></td>
+                                <td><?=  ($payment['bidder_id']) ?></td>
+                                <td><?=  ($payment['payment_method']) ?></td>
+                                <td><?=  ($payment['amount']) ?></td>
+                                <td><?=  ($payment['payment_date']) ?></td>
+                                <td><?=  ($payment['transaction_reference']) ?></td>
 
                                 <td class="<?= $statusClass ?>">
-                                    <?= htmlspecialchars($payment['payment_status']) ?>
+                                    <?=  ($payment['payment_status']) ?>
                                 </td>
 
                                 <td style="display: flex;flex-direction: column; gap:5px;">
                                     <a href="update_invoice.php?payment_id=<?= ($payment['payment_id']) ?>">
-                                        View Invoice
+                                        Invoice
                                     </a>
                                     <!-- Open approve_payment -->
-                                    <a href="approve_payment.php?payment_id=<?= ($payment['payment_id']) ?>">Review Payment</a>
+                                    <a href="approve_payment.php?payment_id=<?= ($payment['payment_id']) ?>">Payment</a>
                                     <!-- Update Settlement show only if payment-status is 'completed' -->
                                     <?php if ($payment['payment_status'] === 'completed'): ?>
-                                        <a href="create_settlement.php?payment_id=<?= ($payment['payment_id']) ?>">Create
+                                        <a href="create_settlement.php?payment_id=<?= ($payment['payment_id']) ?>">
                                             Settlement</a>
                                     <?php endif; ?>
                                 </td>

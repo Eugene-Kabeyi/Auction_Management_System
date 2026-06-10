@@ -50,13 +50,13 @@ if (!$role) {
         <div class="f_inner_container">
             <h2>Edit Role</h2>
             <form action="edit_role_handler.php" method="POST" onsubmit="return validateRole();">
-                <input type="hidden" name="role_id" value="<?php echo htmlspecialchars($role['role_id']); ?>">
+                <input type="hidden" name="role_id" value="<?php echo  ($role['role_id']); ?>">
                 <label for="role_name">Role Name:</label>
                 <input type="text" id="role_name" name="role_name"
-                    value="<?php echo htmlspecialchars($role['role_name']); ?>">
+                    value="<?php echo  ($role['role_name']); ?>">
                 <label for="role_description">Role Description:</label>
                 <textarea id="role_description"
-                    name="role_description"><?php echo htmlspecialchars($role['role_description']); ?></textarea>
+                    name="role_description"><?php echo  ($role['role_description']); ?></textarea>
                 <button type="submit" name="update_role">Update Role</button>
                 <button type="submit" name="delete_role" value="delete" class="delete">Delete</button>
 

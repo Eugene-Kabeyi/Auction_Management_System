@@ -1,4 +1,5 @@
 <?php
+require  '../config.php';
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -8,7 +9,14 @@ if (empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user') {
     exit;
 }
 
-include __DIR__ . '/../header.php'; ?>
+include __DIR__ . '/../header.php'; 
+$sql = "SELECT * FROM item_categories";
+$stmt = mysqli_prepare($conn, $sql);
+mysqli_stmt_execute($stmt);
+
+$categories = mysqli_stmt_get_result($stmt)->fetch_all(MYSQLI_ASSOC);
+
+?>
 
 
 <head>
@@ -17,7 +25,7 @@ include __DIR__ . '/../header.php'; ?>
 </head>
 
 <body>
-    <?php if (isset($_SESSION['error'])): ?>
+    <?php if (!empty($_SESSION['error'])): ?>
         <div class="flash error">
             <?= $_SESSION['error']; ?>
         </div>
@@ -34,19 +42,30 @@ include __DIR__ . '/../header.php'; ?>
 
 
             <label>Item Name</label>
-            <input type="text" name="item_name" id="name" required>
+            <input type="text" name="item_name" id="name" >
 
             <label>Item Quantity</label>
-            <input type="text" name="item_quantity" id="quantity" required>
+            <input type="text" name="item_quantity" id="quantity" >
 
             <label>Item Description</label>
             <textarea name="item_description" id="description"></textarea>
 
             <label>Item Category</label>
-            <input type="text" name="item_category">
+            <select type="text" name="item_category">
+                <?php
+                if (count($categories) > 0) {
+                        foreach ($categories as $row) {
+                            echo "<option value='{$row['category_name']}'>{$row['category_name']}</option>";
+                        }
+                    } else {
+                        echo "<option value=''>No items available</option>";
+                    }
+
+                    ?>
+            </select>
 
             <label>Item Condition</label>
-            <select name="item_condition" id="condition" required>
+            <select name="item_condition" id="condition" >
                 <option value="">-- Select Condition --</option>
                 <option value="new">New</option>
                 <option value="used">Used</option>

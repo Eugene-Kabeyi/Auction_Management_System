@@ -197,10 +197,10 @@ $auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     <?php $start_time = date("F j, Y, g:i a", strtotime($auction['start_time'])); // Format start time for display
                         $end_time = date("F j, Y, g:i a", strtotime($auction['end_time'])); // Format end time for display ?>
                     <tr>
-                        <td><?= htmlspecialchars($auction['auction_id']) ?></td>
-                        <td><?= htmlspecialchars($auction['auction_name']) ?></td>
-                        <td><?= htmlspecialchars($start_time) ?></td>
-                        <td><?= htmlspecialchars($end_time) ?></td>
+                        <td><?=  ($auction['auction_id']) ?></td>
+                        <td><?=  ($auction['auction_name']) ?></td>
+                        <td><?=  ($start_time) ?></td>
+                        <td><?=  ($end_time) ?></td>
 
                         <td><a href="update_auctions.php?auction_id=<?= $auction['auction_id'] ?>">Edit</a></td>
                     </tr>

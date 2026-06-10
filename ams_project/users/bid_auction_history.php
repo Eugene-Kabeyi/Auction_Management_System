@@ -123,10 +123,10 @@ $results = mysqli_fetch_all($results, MYSQLI_ASSOC);
             </tr>
             <?php foreach ($results as $result): ?>
                 <tr>
-                    <td><?= htmlspecialchars($result['auction_name']) ?></td>
-                    <td><?= htmlspecialchars($result['amount_bidded']) ?></td>
-                    <td><?= htmlspecialchars($result['bid_status']) ?></td>
-                    <td><?= htmlspecialchars($result['result']) ?></td>
+                    <td><?=  ($result['auction_name']) ?></td>
+                    <td><?=  ($result['amount_bidded']) ?></td>
+                    <td><?=  ($result['bid_status']) ?></td>
+                    <td><?=  ($result['result']) ?></td>
                 </tr>
             <?php endforeach ?>
         </table>

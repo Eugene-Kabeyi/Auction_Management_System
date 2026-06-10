@@ -30,11 +30,11 @@ $logs = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
 
             <?php foreach ($logs as $log): ?>
                 <tr>
-                    <td><?= htmlspecialchars($log['log_id']) ?></td>
-                    <td><?= htmlspecialchars($log['user_id']) ?></td>
-                    <td><?= htmlspecialchars($log['username']) ?></td>
-                    <td><?= htmlspecialchars($log['action']) ?></td>
-                    <td><?= htmlspecialchars($log['created_at']) ?></td>
+                    <td><?=  ($log['log_id']) ?></td>
+                    <td><?=  ($log['user_id']) ?></td>
+                    <td><?=  ($log['username']) ?></td>
+                    <td><?=  ($log['action']) ?></td>
+                    <td><?=  ($log['created_at']) ?></td>
                 </tr>
             <?php endforeach; ?>
         </table>

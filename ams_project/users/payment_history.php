@@ -91,22 +91,22 @@ $payments = mysqli_stmt_get_result($stmt);
             }
 
             foreach ($payments as $payment): 
-                $statusClass = "status-" . htmlspecialchars($payment['payment_status']);
+                $statusClass = "status-" .  ($payment['payment_status']);
             ?>
                 <tr>
-                    <td><?= htmlspecialchars($payment['payment_id']) ?></td>
+                    <td><?=  ($payment['payment_id']) ?></td>
                     <td>
-                        <?= htmlspecialchars($payment['auction_name'] ?? 'N/A') ?>
-                        (<?= htmlspecialchars($payment['auction_code'] ?? '-') ?>)
+                        <?=  ($payment['auction_name'] ?? 'N/A') ?>
+                        (<?=  ($payment['auction_code'] ?? '-') ?>)
                     </td>
-                    <td>$<?= htmlspecialchars($payment['amount']) ?></td>
-                    <td><?= htmlspecialchars($payment['payment_method']) ?></td>
+                    <td>$<?=  ($payment['amount']) ?></td>
+                    <td><?=  ($payment['payment_method']) ?></td>
                     <td class="<?= $statusClass ?>">
-                        <?= htmlspecialchars($payment['payment_status']) ?>
+                        <?=  ($payment['payment_status']) ?>
                     </td>
-                    <td><?= htmlspecialchars($payment['transaction_reference'] ?? '-') ?></td>
-                    <td><?= htmlspecialchars($payment['payment_date']) ?></td>
-                    <td><?= htmlspecialchars($payment['completed_at'] ?? '-') ?></td>
+                    <td><?=  ($payment['transaction_reference'] ?? '-') ?></td>
+                    <td><?=  ($payment['payment_date']) ?></td>
+                    <td><?=  ($payment['completed_at'] ?? '-') ?></td>
                 </tr>
             <?php endforeach; ?>
         </table>

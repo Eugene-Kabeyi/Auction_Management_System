@@ -2,15 +2,16 @@
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
-$_SESSION['error'] = $_SESSION['error'] ?? '';
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>Sign Up</title>
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
+
     <style>
         /* Page background */
         body {
@@ -29,7 +30,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
             flex-direction: column;
             justify-items: center;
             gap: 20px;
-            width: 25%;
+            width: 40%;
             background-color: #ffffff;
             border: 1px solid #e5e7eb;
             border-radius: 8px;
@@ -79,7 +80,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
             display: block;
             margin-top: 14px;
             font-weight: 500;
-            font-size: 13px;
+            font-size: 15px;
             color: #374151;
         }
 
@@ -223,6 +224,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
                 transform: translateX(-30px);
             }
         }
+
         .back {
             display: inline-block;
             margin-bottom: 20px;
@@ -232,6 +234,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
             text-decoration: none;
             border-radius: 6px;
         }
+
         .back:hover {
             background-color: white;
             color: #1f2933;
@@ -242,7 +245,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
 
 <body>
     <!-- back button to user_dashboard.php -->
-    
+
     <?php if (!empty($_SESSION['error'])): ?>
         <div class="flash error">
             <?= $_SESSION['error']; ?>
@@ -252,48 +255,42 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
 
     <div class="register_container">
         <a href="../index.php" class="back">Back to Home</a>
-       <h2>Register for AMS</h2>
-            <span class="logo">AMS</span>
+        <h2>Register for AMS</h2>
+        <span class="logo">AMS</span>
         <form action="../handle_register.php" method="post" onsubmit="return validateForm()">
             <label>National ID</label>
             <input type="text" id="national_id" name="national_id">
-            <span class="error" id="nidErr"></span>
 
             <label>Business ID (Optional)</label>
             <input type="text" name="business_id">
 
-
-
             <label>First Name</label>
             <input type="text" id="firstname" name="firstname">
-            <span class="error" id="fnameErr"></span>
 
             <label>Second Name (Optional)</label>
             <input type="text" name="secondname">
 
             <label>Surname</label>
             <input type="text" id="surname" name="surname">
-            <span class="error" id="surnameErr"></span>
 
             <label>Business Name (Optional)</label>
             <input type="text" name="business_name">
 
             <label>Phone Number</label>
             <input type="text" id="phone" name="phone_number">
-            <span class="error" id="phoneErr"></span>
 
             <label>Email</label>
             <input type="text" id="email" name="email">
-            <span class="error" id="emailErr"></span>
+
 
             <label>Username</label>
             <input type="text" id="username" name="username">
-            <span class="error" id="userErr"></span>
+
 
             <label>Password</label>
             <input type="text" id="password" name="password" class="pass_w">
             <span class="hide_show" id="togglePassword">Hide/Show</span>
-            <span class="error" id="passErr"></span>
+
 
             <label>Role</label>
             <select id="role_id" name="role_id">
@@ -302,7 +299,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
                 <option value="2">Bidder</option>
 
             </select>
-            <span class="error" id="roleErr"></span>
+
 
             <input type="submit" value="Register">
         </form>
@@ -328,42 +325,56 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
             document.getElementById("togglePassword").addEventListener("click", togglePasswordVisibility);
 
             function validateForm() {
-                var valid = true;
-
-                function error(id, msg) {
-                    document.getElementById(id).innerHTML = msg;
-                    valid = false;
-                }
-
-                // Clear errors
-                var errors = document.getElementsByClassName("error");
-                for (var i = 0; i < errors.length; i++) {
-                    errors[i].innerHTML = "";
-                }
-
-
-
-                // Get values
-                var national_id = document.getElementById("national_id").value;
+                var national_id = document.getElementById("national_id").value.trim();
                 var role_id = document.getElementById("role_id").value;
-                var firstname = document.getElementById("firstname").value;
-                var surname = document.getElementById("surname").value;
-                var phone = document.getElementById("phone").value;
-                var email = document.getElementById("email").value;
-                var username = document.getElementById("username").value;
+                var firstname = document.getElementById("firstname").value.trim();
+                var surname = document.getElementById("surname").value.trim();
+                var phone = document.getElementById("phone").value.trim();
+                var email = document.getElementById("email").value.trim();
+                var username = document.getElementById("username").value.trim();
                 var password = document.getElementById("password").value;
 
-                // Validation rules
-                if (national_id == "") error("nidErr", "National ID required");
-                if (role_id == "") error("roleErr", "Select a role");
-                if (firstname == "") error("fnameErr", "First name required");
-                if (surname == "") error("surnameErr", "Surname required");
-                if (phone == "") error("phoneErr", "Phone number required");
-                if (email == "" || email.indexOf("@") == false) error("emailErr", "Valid email required");
-                if (username.length < 4) error("userErr", "Username must be at least 4 characters");
-                if (password.length < 6) error("passErr", "Password must be at least 6 characters");
+                if (national_id === "") {
+                    alert("National ID required");
+                    return false;
+                }
 
-                return valid;
+                if (role_id === "") {
+                    alert("Select a role");
+                    return false;
+                }
+
+                if (firstname === "") {
+                    alert("First name required");
+                    return false;
+                }
+
+                if (surname === "") {
+                    alert("Surname required");
+                    return false;
+                }
+
+                if (phone === "") {
+                    alert("Phone number required");
+                    return false;
+                }
+
+                if (email === "" || email.indexOf("@") === -1) {
+                    alert("Valid email required");
+                    return false;
+                }
+
+                if (username.length < 4) {
+                    alert("Username must be at least 4 characters");
+                    return false;
+                }
+
+                if (password.length < 6) {
+                    alert("Password must be at least 6 characters");
+                    return false;
+                }
+
+                return true;
             }
         </script>
 

@@ -14,15 +14,13 @@ include __DIR__ . '/../log_activity.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $consigner_id = $_SESSION['user_id'];
-
     $item_name = $_POST['item_name'];
     $item_quantity = $_POST['item_quantity'];
     $item_description = $_POST['item_description'];
-    $item_category = $_POST['item_category'];
+    $item_category = $_POST['category_name'];
     $item_condition = $_POST['item_condition'];
 
-    // Handle image upload
-    $image_path = null;
+  
 
     //Check if image file is uploaded
     if (isset($_FILES['item_image']) && $_FILES['item_image']['error'] === UPLOAD_ERR_OK) {

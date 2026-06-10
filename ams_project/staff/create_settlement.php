@@ -87,22 +87,22 @@ $net_amount = $amount - $commission_amount;
     <form method="POST" action="create_settlement_handler.php" onsubmit="return validateSettlement()">
 
         <label>Payment ID:</label>
-        <input type="text" id="payment_id" name="payment_id" value="<?= htmlspecialchars($record['payment_id']) ?>" >
+        <input type="text" id="payment_id" name="payment_id" value="<?=  ($record['payment_id']) ?>" >
 
         <label>Auction Item ID:</label>
-        <input type="text" id="auction_item_id" name="auction_item_id" value="<?= htmlspecialchars($item_record['item_id']) ?>" >
+        <input type="text" id="auction_item_id" name="auction_item_id" value="<?=  ($item_record['item_id']) ?>" >
 
         <label>Amount Due (Ksh):</label>
-        <input type="text" id="amount_due" name="amount_due" value="<?= htmlspecialchars(number_format($record['amount'], 2, '.', '')) ?>" >
+        <input type="text" id="amount_due" name="amount_due" value="<?=  (number_format($record['amount'], 2, '.', '')) ?>" >
 
         <label>Commission Rate (%):</label>
-        <input type="text" id="commission_rate" name="commission_rate" value="<?= htmlspecialchars($settings['commission_rate']) ?>">
+        <input type="text" id="commission_rate" name="commission_rate" value="<?=  ($settings['commission_rate']) ?>">
 
         <label>Commission Amount:</label>
-        <input type="text" id="commission_amount" name="commission_amount" value="<?= htmlspecialchars(number_format($commission_amount, 2, '.', '')) ?>">
+        <input type="text" id="commission_amount" name="commission_amount" value="<?=  (number_format($commission_amount, 2, '.', '')) ?>">
 
         <label>Net Amount:</label>
-        <input type="text" id="net_amount" name="net_amount" value="<?= htmlspecialchars(number_format($net_amount, 2, '.', '')) ?>">
+        <input type="text" id="net_amount" name="net_amount" value="<?=  (number_format($net_amount, 2, '.', '')) ?>">
 
         <label>Settlement Date:</label>
         <input type="text"

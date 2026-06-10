@@ -25,7 +25,7 @@ $settings = mysqli_fetch_assoc($result);
             Back to Dashboard
         </a>
         <!-- form action to update settings -->
-        <form action="update_auction_settings.php" method="post">
+        <form action="auction_settings_handler.php" method="post">
             <label for="tax_rate">Tax Rate (%)</label>
             <input type="text" name="tax_rate" id="tax_rate" value="<?= $settings['tax_rate'] ?>" required>
 

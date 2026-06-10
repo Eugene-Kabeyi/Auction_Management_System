@@ -20,7 +20,7 @@ include __DIR__ . '/../log_activity.php';
 </head>
 
 <body>
-    <?php if (isset($_SESSION['error'])): ?>
+    <?php if (!empty($_SESSION['error'])): ?>
         <div class="flash error">
             <?= $_SESSION['error']; ?>
         </div>

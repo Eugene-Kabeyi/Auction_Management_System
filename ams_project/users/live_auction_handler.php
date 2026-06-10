@@ -13,6 +13,7 @@ include __DIR__ . '/../log_activity.php';
 
 // Handle bid submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    $auction_id = $_POST['auction_id'];
     $bid_amount = $_POST['bid_amount'];
     $user_id = $_SESSION['user_id']; 
     if ($bid_amount < $minimum_bid) {
@@ -31,13 +32,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         // 2. Insert new bid as winning
         $stmt = mysqli_prepare($conn, "INSERT INTO auction_bids (auction_id, bidder_id, amount_bidded, bid_status) VALUES (?, ?, ?, 'winning')");
-        mysqli_stmt_bind_param($stmt, "iiid", $auction_id, $user_id, $bid_amount);
+        mysqli_stmt_bind_param($stmt, "iid", $auction_id, $user_id, $bid_amount);
         mysqli_stmt_execute($stmt);
 
         mysqli_commit($conn);
         logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Placed a bid of Ksh " . number_format($bid_amount, 2) . " on auction ID: " . $auction_id);
 
         // Redirect
+        $_SESSION['success'] = "You have successfully placed a bid";
         header("Location: live_auction.php?auction_id=" . $auction_id);
         exit();
 

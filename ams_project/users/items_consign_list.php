@@ -40,26 +40,26 @@ $items = mysqli_stmt_get_result($tmt)->fetch_all(MYSQLI_ASSOC);
             }
 
             foreach ($items as $item):
-                $statusClass = "status-" . htmlspecialchars($item['item_status']);
+                $statusClass = "status-" .  ($item['item_status']);
                 ?>
                 <tr>
-                    <td><?= htmlspecialchars($item['item_id']) ?></td>
+                    <td><?=  ($item['item_id']) ?></td>
 
                     <td>
                         <?php if (!empty($item['image_path'])): ?>
-                            <img src="<?= htmlspecialchars($item['image_path']) ?>" width="60" height="60"
+                            <img src="<?=  ($item['image_path']) ?>" width="60" height="60"
                                 style="object-fit:cover; border-radius:5px;">
                         <?php else: ?>
                             No Image
                         <?php endif; ?>
                     </td>
 
-                    <td><?= htmlspecialchars($item['item_name']) ?></td>
-                    <td><?= htmlspecialchars($item['item_quantity']) ?></td>
-                    <td><?= htmlspecialchars($item['item_category'] ?? '-') ?></td>
-                    <td><?= htmlspecialchars($item['item_condition']) ?></td>
-                    <td><?= htmlspecialchars($item['item_status']) ?></td>
-                    <td><?= htmlspecialchars($item['created_at']) ?></td>
+                    <td><?=  ($item['item_name']) ?></td>
+                    <td><?=  ($item['item_quantity']) ?></td>
+                    <td><?=  ($item['item_category'] ?? '-') ?></td>
+                    <td><?=  ($item['item_condition']) ?></td>
+                    <td><?=  ($item['item_status']) ?></td>
+                    <td><?=  ($item['created_at']) ?></td>
                 </tr>
             <?php endforeach; ?>
         </table>

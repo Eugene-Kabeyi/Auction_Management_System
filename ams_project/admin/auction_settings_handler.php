@@ -20,11 +20,11 @@ if($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if ($success) {
         $_SESSION['success'] = "Auction settings updated successfully";
-        header('Location: auction_settings.php');
+        header('Location: admin_dashboard.php');
         exit();
     } else {
         $_SESSION['error'] = "Failed to update auction settings";
-        header('Location: auction_settings.php');
+        header('Location: admin_dashboard.php');
         exit();
     }
 }

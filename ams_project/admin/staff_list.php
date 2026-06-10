@@ -49,12 +49,12 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id']) || $_SESSION['lo
 
                 foreach ($staff_members as $staff) {
                     echo "<tr>";
-                    echo "<td>" . htmlspecialchars($staff['staff_id']) . "</td>";
-                    echo "<td>" . htmlspecialchars($staff['firstname'] . ' ' . $staff['secondname'] . ' ' . $staff['surname']) . "</td>";
-                    echo "<td>" . htmlspecialchars($staff['email']) . "</td>";
-                    echo "<td>" . htmlspecialchars($staff['role']) . "</td>";
-                    echo "<td>" . htmlspecialchars($staff['phone_number']) . "</td>";
-                    echo "<td><a href='staff_edit.php?id=" . htmlspecialchars($staff['staff_id']) . "'>Edit</a></td>";
+                    echo "<td>" .  ($staff['staff_id']) . "</td>";
+                    echo "<td>" .  ($staff['firstname'] . ' ' . $staff['secondname'] . ' ' . $staff['surname']) . "</td>";
+                    echo "<td>" .  ($staff['email']) . "</td>";
+                    echo "<td>" .  ($staff['role']) . "</td>";
+                    echo "<td>" .  ($staff['phone_number']) . "</td>";
+                    echo "<td><a href='staff_edit.php?id=" .  ($staff['staff_id']) . "'>Edit</a></td>";
                     echo "</tr>";
                 }
                 ?>

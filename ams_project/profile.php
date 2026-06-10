@@ -60,10 +60,10 @@ mysqli_stmt_close($stmt);
 
     <div class="outer_container f_container">
 
-        <form id="profileForm" action="handle_profile_update.php" method="post">
+        <form id="profileForm" action="handle_profile_update.php" method="post" onsubmit="return validateForm()">
             <!-- Back button to dashboard based on role -->
             <?php if ($role == "user"): ?>
-                <a href="users/user_dashboard.php" class="back" >Back to Dashboard</a>
+                <a href="users/user_dashboard.php" class="back">Back to Dashboard</a>
             <?php elseif ($role == "staff"): ?>
                 <a href="staff/staff_dashboard.php" class="back">Back to Dashboard</a>
             <?php elseif ($role == "admin"): ?>
@@ -71,29 +71,29 @@ mysqli_stmt_close($stmt);
             <?php endif; ?>
             <h2>User Profile</h2>
             <label>First Name:</label>
-            <input type="text" name="firstname" class="firstname"
-                value="<?php echo htmlspecialchars($user['firstname'] ?? ''); ?>">
+            <input type="text" name="firstname" class="firstname" id="firstname"
+                value="<?php echo ($user['firstname'] ?? ''); ?>">
 
             <label>Last Name:</label>
-            <input type="text" name="surname" class="surname"
-                value="<?php echo htmlspecialchars($user['surname'] ?? ''); ?>">
+            <input type="text" name="surname" class="surname" id="surname"
+                value="<?php echo ($user['surname'] ?? ''); ?>">
 
             <label>Phone Number:</label>
-            <input type="text" name="phone_number" class="phone_number"
-                value="<?php echo htmlspecialchars($user['phone_number'] ?? ''); ?>">
+            <input type="text" name="phone_number" class="phone_number" id="phone_number"
+                value="<?php echo ($user['phone_number'] ?? ''); ?>">
 
             <label>Email:</label>
-            <input type="text" name="email" class="email" value="<?php echo htmlspecialchars($user['email'] ?? ''); ?>">
+            <input type="text" name="email" class="email" id="email" value="<?php echo ($user['email'] ?? ''); ?>">
 
             <label>Username:</label>
-            <input type="text" name="username" class="username"
-                value="<?php echo htmlspecialchars($user['username'] ?? ''); ?>">
+            <input type="text" name="username" class="username" id="username"
+                value="<?php echo ($user['username'] ?? ''); ?>">
 
             <label>Password:</label>
-            <input type="text" name="password" class="password">
+            <input type="text" name="password" class="password" id="password">
 
             <label>Confirm Password:</label>
-            <input type="text" name="confirm_password" class="confirm_password">
+            <input type="text" name="confirm_password" class="confirm_password" id="confirm_password">
 
             <button type="submit">Update Profile</button>
 
@@ -109,44 +109,45 @@ mysqli_stmt_close($stmt);
         </button>
     </form>
     <script>
-        document.getElementById("profileForm").addEventListener("submit", function (e) {
+        function validateForm() {
 
-            let firstname = document.querySelector(".firstname").value.trim();
-            let surname = document.querySelector(".surname").value.trim();
-            let email = document.querySelector(".email").value.trim();
-            let username = document.querySelector(".username").value.trim();
-            let password = document.querySelector(".password").value;
-            let confirm_password = document.querySelector(".confirm_password").value;
+            let firstname = document.getElementById("firstname").value.trim();
+            let surname = document.getElementById("surname").value.trim();
+            let email = document.getElementById("email").value.trim();
+            let username = document.getElementById("username").value.trim();
+            let password = document.getElementById("password").value;
+            let confirm_password = document.getElementById("confirm_password").value;
 
-            // 1. Empty field validation
             if (firstname === "" || surname === "" || email === "" || username === "") {
                 alert("Please fill in all required fields.");
-                e.preventDefault();
-                return;
+                return false;
             }
 
             if (email.indexOf("@") === -1) {
                 alert("Invalid email format. Email must contain @");
-                e.preventDefault();
-                return;
+                return false;
             }
 
-            // 3. Password match validation (only if password is entered)
             if (password !== "" || confirm_password !== "") {
+
+                if (password === "" || confirm_password === "") {
+                    alert("Please fill both password fields.");
+                    return false;
+                }
+
                 if (password !== confirm_password) {
                     alert("Passwords do not match.");
-                    e.preventDefault();
-                    return;
+                    return false;
                 }
 
                 if (password.length < 6) {
                     alert("Password must be at least 6 characters.");
-                    e.preventDefault();
-                    return;
+                    return false;
                 }
             }
 
-        });
+            return true;
+        }
     </script>
 
 </body>

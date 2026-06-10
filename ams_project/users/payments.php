@@ -15,7 +15,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'user') {
 $user_id = $_SESSION['user_id'];
 
 // Get all auctions where this user won but hasn't paid yet
-$stmt = $conn->prepare("
+$stmt = mysqli_prepare($conn, "
         SELECT 
         ab.bid_id,
         ab.auction_id,
@@ -23,6 +23,7 @@ $stmt = $conn->prepare("
         a.auction_name,
         i.invoice_id,
         i.invoice_number,
+        i.tax_amount,
         i.total_amount,
         i.status AS invoice_status
 
@@ -46,9 +47,9 @@ $stmt = $conn->prepare("
         AND p.payment_status IN ('pending', 'completed')
     )
 ");
-
-$stmt->execute([$user_id]);
-$winning_bids = $stmt->fetchAll();
+mysqli_stmt_bind_param($stmt, "i", $user_id);
+mysqli_stmt_execute($stmt);
+$winning_bids = mysqli_stmt_get_result($stmt)->fetch_all(MYSQLI_ASSOC);
 
 ?>
 
@@ -162,7 +163,7 @@ $winning_bids = $stmt->fetchAll();
 
 <body>
     <div class="container">
-        <h2>Start a New Payment</h2>
+        <h2>Initiate a New Payment</h2>
 
         <!-- Show error message if any -->
         <?php if (!empty($_SESSION['error'])): ?>
@@ -182,18 +183,21 @@ $winning_bids = $stmt->fetchAll();
             <form method="POST" action="payments_handler.php" onsubmit="return validateForm()">
 
                 <!-- Select which auction to pay for -->
-                <div class="form-group">
-                    <label>Select Auction to Pay For:</label>
-                    <select name="bid_id" id="bid_id" required onchange="updateAmount()">
-                        <option value="">-- Choose an auction --</option>
-                        <?php foreach ($winning_bids as $bid): ?>
-                            <option value="<?php echo $bid['bid_id']; ?>" data-amount="<?php echo $bid['amount_bidded']; ?>">
-                                <?php echo htmlspecialchars($bid['auction_name']); ?> -
-                                Won: ksh<?php echo number_format($bid['amount_bidded'], 2); ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </div>
+                <select name="bid_id" id="bid_id" required onchange="updateAmount()">
+
+                    <option value="">-- Choose an auction --</option>
+
+                    <?php foreach ($winning_bids as $bid): ?>
+                        <option value="<?= $bid['bid_id']; ?>" data-amount="<?= $bid['amount_bidded']; ?>"
+                            data-tax="<?= $bid['tax_amount'] ?? 0; ?>" data-total="<?= $bid['total_amount'] ?? 0; ?>"
+                            data-invoice="<?= $bid['invoice_id']; ?>">
+
+                            <?= $bid['auction_name']; ?> -
+                            Won: Ksh <?= number_format($bid['amount_bidded'], 2); ?>
+                        </option>
+                    <?php endforeach; ?>
+
+                </select>
 
                 <!-- Show selected bid info -->
                 <div id="bidInfo" class="info-box" style="display: none;"></div>
@@ -201,10 +205,15 @@ $winning_bids = $stmt->fetchAll();
                 <!-- Amount to pay (auto-filled, cannot change) -->
                 <div class="form-group">
                     <label for="invoice_id">Invoice ID:</label>
-                    <input type="text" id="invoice_id" name="invoice_id" value = "<?php echo htmlspecialchars ($winning_bids['invoice_id']) ; ?>" >
-                    <label>Amount to Pay (Ksh):</label>
+                    <input type="text" id="invoice_id" name="invoice_id">
+                    <label>Amount (Ksh):</label>
                     <input type="text" id="amount" name="amount" placeholder="Select an auction to see amount" readonly>
-                    <small style="color: #666;">Amount is fixed based on your winning bid</small>
+                    <small style="color: #666;">Amount is based on your winning bid</small>
+                    <label>Tax Amount (Ksh):</label>
+                    <input type="text" id="tax_amount" name="tax_amount" readonly>
+
+                    <label>Total Amount to pay(Ksh):</label>
+                    <input type="text" id="total_amount" name="total_amount" readonly>
                 </div>
 
                 <!-- Payment method selection -->
@@ -238,27 +247,30 @@ $winning_bids = $stmt->fetchAll();
         //make amount readonly
         document.getElementById('amount').setAttribute('readonly', true);
         document.getElementById('invoice_id').setAttribute('readonly', true);
+
+
+
         // This function runs when user selects an auction
         function updateAmount() {
             const select = document.getElementById('bid_id');
             const amountInput = document.getElementById('amount');
-            const bidInfo = document.getElementById('bidInfo');
+            const taxInput = document.getElementById('tax_amount');
+            const totalInput = document.getElementById('total_amount');
+            const invoiceInput = document.getElementById('invoice_id');
 
-            // Get the selected option
             const selectedOption = select.options[select.selectedIndex];
 
             if (selectedOption.value) {
-                // Get amount from data-amount attribute
-                const amount = selectedOption.dataset.amount;
-                amountInput.value = amount;
+                amountInput.value = selectedOption.dataset.amount;
+                taxInput.value = selectedOption.dataset.tax;
+                totalInput.value = selectedOption.dataset.total;
+                invoiceInput.value = selectedOption.dataset.invoice;
 
-                // Show info box with details
-                bidInfo.style.display = 'block';
-                bidInfo.innerHTML = `Your amount: <strong>${selectedOption.text}</strong>`;
             } else {
-                // No auction selected
                 amountInput.value = '';
-                bidInfo.style.display = 'none';
+                taxInput.value = '';
+                totalInput.value = '';
+                invoiceInput.value = '';
             }
         }
 

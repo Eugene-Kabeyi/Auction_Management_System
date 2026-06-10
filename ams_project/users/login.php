@@ -10,7 +10,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
 
     <title>Login </title>
 
@@ -79,7 +79,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
 
         /* Labels */
         .login_form label {
-            font-size: 13px;
+            font-size: 15px;
             font-weight: 500;
             margin-top: 14px;
             color: #374151;
@@ -177,6 +177,12 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
             border-left: 5px solid #ef4444;
         }
 
+        .flash.success {
+            background-color: #ecfdf5;
+            color: #065f46;
+            border-left: 5px solid #10b981;
+        }
+
         @keyframes slideIn {
             from {
                 transform: translateX(-30px);
@@ -195,6 +201,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
                 transform: translateX(-30px);
             }
         }
+
         .back {
             display: inline-block;
             margin-bottom: 20px;
@@ -204,6 +211,7 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
             text-decoration: none;
             border-radius: 6px;
         }
+
         .back:hover {
             background-color: white;
             color: #1f2933;
@@ -217,6 +225,13 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
     <div class="login_container">
         <a href="../index.php" class="back">Back to Home</a>
 
+        <?php if (!empty($_SESSION['success'])): ?>
+            <div class="flash success">
+                <?= ($_SESSION['success']); ?>
+            </div>
+            <?php unset($_SESSION['success']); ?>
+        <?php endif; ?>
+
         <?php if (!empty($_SESSION['error'])): ?>
             <div class="flash error">
                 <?= $_SESSION['error']; ?>
@@ -229,32 +244,35 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
         <form action="../handle_login.php" method="post" class="login_form">
             <input type="hidden" name="login_type" value="user">
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="username" name="username">
 
             <label for="password">Password:</label>
             <span class="hide_show" id="togglePassword">Hide/Show</span>
-            <input type="text" id="password" name="password" class="pass_w" required>
+            <input type="text" id="password" name="password" class="pass_w">
 
             <button type="submit">Log In</button>
         </form>
-        <span class="dont">Don't have an account? <a href="register.html">Register</a></span>
+        <span class="dont">Don't have an account? <a href="register.php">Register</a></span>
     </div>
     <script>
         // Validation of password field to ensure it is not empty and handle show/hide password
         function togglePasswordVisibility() {
-            const passwordInput = document.getElementById('password');
-            const toggleButton = document.getElementById('togglePassword');
-            toggleButton.addEventListener('click', function () {
-                if (passwordInput.classList.contains('pass_w')) {
-                    passwordInput.classList.remove('pass_w');
-                    toggleButton.textContent = "Hide";
-                } else {
-                    passwordInput.classList.add('pass_w');
-                    toggleButton.textContent = "Show";
-                }
-            });
+
+            // Fetch the password field and the toggle text element
+            var passwordField = document.getElementById("password");
+            var toggleText = document.getElementById("togglePassword");
+
+            // Toggle the class to switch between text and password styles
+            if (passwordField.classList.contains("pass_w")) {
+                passwordField.classList.remove("pass_w");
+                toggleText.textContent = "Hide";
+            } else {
+                passwordField.classList.add("pass_w");
+                toggleText.textContent = "Show";
+            }
         }
-        togglePasswordVisibility();
+        document.getElementById("togglePassword").addEventListener("click", togglePasswordVisibility);
+        
         function validateLogin() {
 
             if (!validateUsername()) return false;

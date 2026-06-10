@@ -89,16 +89,16 @@ $evaluations = mysqli_stmt_get_result($stmt)->fetch_all(MYSQLI_ASSOC);
 
                             <tr>
 
-                                <td> <?= htmlspecialchars($eval['eval_id']) ?> </td>
-                                <td> <?= htmlspecialchars($eval['item_name']) ?> </td>
-                                <td> <?= htmlspecialchars($eval['evaluator_name']) ?> </td>
-                                <td> <?= htmlspecialchars($eval['evaluation_date']) ?> </td>
-                                <td> <?= htmlspecialchars($eval['condition_rating']) ?> </td>
-                                <td> <?= htmlspecialchars($eval['authenticity_status']) ?> </td>
+                                <td> <?=  ($eval['eval_id']) ?> </td>
+                                <td> <?=  ($eval['item_name']) ?> </td>
+                                <td> <?=  ($eval['evaluator_name']) ?> </td>
+                                <td> <?=  ($eval['evaluation_date']) ?> </td>
+                                <td> <?=  ($eval['condition_rating']) ?> </td>
+                                <td> <?=  ($eval['authenticity_status']) ?> </td>
                                 <td> Ksh <?= number_format($eval['reserve_price'], 2) ?> </td>
-                                <td> <?= htmlspecialchars($eval['evaluation_notes']) ?> </td>
-                                <td> <?= htmlspecialchars($eval['final_decision']) ?> </td>
-                                <td> <?= htmlspecialchars($eval['created_at']) ?> </td>
+                                <td> <?=  ($eval['evaluation_notes']) ?> </td>
+                                <td> <?=  ($eval['final_decision']) ?> </td>
+                                <td> <?=  ($eval['created_at']) ?> </td>
 
                             </tr>
 

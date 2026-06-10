@@ -78,7 +78,7 @@
     color: #1f2933;
 }
 
-/* UNDERLINE EFFECT */
+
 .nav-item::after {
     content: "";
     position: absolute;
@@ -110,67 +110,7 @@
     user-select: none;
 }
 
-/*   MOBILE RESPONSIVE */
-@media screen and (max-width:768px) {
 
-    /* NAVBAR */
-    .navbar {
-        flex-wrap: wrap;
-        padding: 14px 20px;
-    }
-
-    /* HAMBURGER */
-    .menu-toggle {
-        display: block;
-    }
-
-    /* NAVIGATION LINKS */
-    .nav-links {
-        width: 100%;
-        flex-direction: column;
-        align-items: flex-start;
-        gap: 0;
-
-        background-color: #ffffff;
-
-        max-height: 0;
-        overflow: hidden;
-
-        transition: max-height 0.3s ease;
-
-        margin-top: 10px;
-    }
-
-    /* ACTIVE MENU */
-    .nav-links.active {
-        max-height: 500px;
-    }
-
-    /* MOBILE NAV ITEMS */
-    .nav-item {
-        width: 100%;
-        padding: 14px 0;
-        border-top: 1px solid #e5e7eb;
-    }
-
-    /* REMOVE UNDERLINE ON MOBILE */
-    .nav-item::after {
-        display: none;
-    }
-
-    /* LOGIN CONTAINER */
-    .login-container {
-        width: 100%;
-        margin-top: 10px;
-        justify-content: flex-end;
-    }
-
-    /* LOGO */
-    .logo-container {
-        max-width: 80%;
-    }
-
-}
 
 /*Landing page*/
 .hero {

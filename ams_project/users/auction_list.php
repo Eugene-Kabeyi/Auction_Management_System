@@ -3,17 +3,7 @@ include __DIR__ . '/../header.php';
 
 //Fetch auction list from the database
 include __DIR__ . '/../config.php';
-if (empty($_SESSION['user_id']) || !isset($_SESSION['user_id'])) {
-    if (empty($_SESSION['login_type']) || $_SESSION['login_type'] !== 'user') {
-        header('Location: ../users/login.php');
-        session_destroy();
-        $_SESSION['error'] = "Please log in to view auction listings.";
-        exit();
-    }
-    header('Location: ../users/user_login.php');
-    session_destroy();
-    $_SESSION['error'] = "Please log in to view auction listings.";
-}
+
 // GET FILTER VALUES FIRST
 $type = $_GET['type'] ?? 'upcoming';
 $range = $_GET['range'] ?? '';
@@ -22,7 +12,7 @@ $range = $_GET['range'] ?? '';
 $query = "SELECT * FROM auctions ";
 
 // UPCOMING / FUTURE
-if ($type === 'upcoming' || $type === 'future') {
+if ($type === 'upcoming' ) {
     $query .= " WHERE start_time > NOW()";
 }
 
@@ -156,7 +146,6 @@ $auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
             <option value="upcoming" <?= ($type === 'upcoming') ? 'selected' : '' ?>>Upcoming</option>
             <option value="ongoing" <?= ($type === 'ongoing') ? 'selected' : '' ?>>Ongoing</option>
             <option value="past" <?= ($type === 'past') ? 'selected' : '' ?>>Past</option>
-            <option value="future" <?= ($type === 'future') ? 'selected' : '' ?>>Future</option>
         </select>
 
         <label>Range (for past):</label>
@@ -189,7 +178,9 @@ $auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     <th>Auction Name</th>
                     <th>Start Date</th>
                     <th>End Date</th>
+                    <?php if(isset($_SESSION['user_id'])&& $type === "ongoing"):  ?>
                     <th>Action</th>
+                    <?php endif;?>
                 </tr>
             </thead>
             <tbody>
@@ -197,12 +188,13 @@ $auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
                     <?php $start_time = date("F j, Y, g:i a", strtotime($auction['start_time'])); // Format start time for display
                         $end_time = date("F j, Y, g:i a", strtotime($auction['end_time'])); // Format end time for display ?>
                     <tr>
-                        <td><?= htmlspecialchars($auction['auction_id']) ?></td>
-                        <td><?= htmlspecialchars($auction['auction_name']) ?></td>
-                        <td><?= htmlspecialchars($start_time) ?></td>
-                        <td><?= htmlspecialchars($end_time) ?></td>
-
+                        <td><?=  ($auction['auction_id']) ?></td>
+                        <td><?=  ($auction['auction_name']) ?></td>
+                        <td><?=  ($start_time) ?></td>
+                        <td><?=  ($end_time) ?></td>
+                        <?php if(isset($_SESSION['user_id']) && $type !== "upcoming"):  ?>
                         <td><a href="live_auction.php?auction_id=<?= $auction['auction_id'] ?>">View</a></td>
+                        <?php endif;?>
                     </tr>
                 <?php endforeach; ?>
             </tbody>

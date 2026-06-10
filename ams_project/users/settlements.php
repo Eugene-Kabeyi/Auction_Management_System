@@ -32,7 +32,6 @@ $stmt = mysqli_prepare($conn, "
 
 mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
 mysqli_stmt_execute($stmt);
-var_dump($stmt);
 $result = mysqli_stmt_get_result($stmt);
 $settlements = mysqli_fetch_all($result, MYSQLI_ASSOC);
 mysqli_stmt_close($stmt);
@@ -92,7 +91,7 @@ mysqli_stmt_close($stmt);
         .status-cancelled { color: red; font-weight: bold; }
         .back {
             display: inline-block;
-            margin: 10px 0;
+            margin: 10px auto;
             padding: 8px 16px;
             background-color: #1f2933;
             color: white;
@@ -132,21 +131,21 @@ mysqli_stmt_close($stmt);
             }
 
             foreach ($settlements as $settlement): 
-                $statusClass = "status-" . htmlspecialchars($settlement['status']);
+                $statusClass = "status-" .  ($settlement['status']);
             ?>
                 <tr>
-                    <td><?= htmlspecialchars($settlement['settlement_id']) ?></td>
-                    <td><?= htmlspecialchars($settlement['item_title']) ?></td>
-                    <td>$<?= htmlspecialchars($settlement['amount_due']) ?></td>
-                    <td><?= htmlspecialchars($settlement['commission_rate']) ?>%</td>
-                    <td>$<?= htmlspecialchars($settlement['commission_amount']) ?></td>
-                    <td><strong>$<?= htmlspecialchars($settlement['net_amount']) ?></strong></td>
+                    <td><?=  ($settlement['settlement_id']) ?></td>
+                    <td><?=  ($settlement['item_title']) ?></td>
+                    <td>Ksh<?=  ($settlement['amount_due']) ?></td>
+                    <td><?=  ($settlement['commission_rate']) ?>%</td>
+                    <td>Ksh<?=  ($settlement['commission_amount']) ?></td>
+                    <td><strong>Ksh<?=  ($settlement['net_amount']) ?></strong></td>
                     <td class="<?= $statusClass ?>">
-                        <?= htmlspecialchars($settlement['status']) ?>
+                        <?=  ($settlement['status']) ?>
                     </td>
-                    <td><?= htmlspecialchars($settlement['payment_method'] ?? '-') ?></td>
-                    <td><?= htmlspecialchars($settlement['transaction_reference'] ?? '-') ?></td>
-                    <td><?= htmlspecialchars($settlement['settlement_date'] ?? '-') ?></td>
+                    <td><?=  ($settlement['payment_method'] ?? '-') ?></td>
+                    <td><?=  ($settlement['transaction_reference'] ?? '-') ?></td>
+                    <td><?=  ($settlement['settlement_date'] ?? '-') ?></td>
                 </tr>
             <?php endforeach; ?>
         </table>

@@ -63,19 +63,19 @@ if (!$payment) {
     <input type="hidden" name="payment_id" value="<?php echo $payment['payment_id']; ?>">
 
     <label>Amount:</label>
-    <input type="text" value="<?php echo htmlspecialchars($payment['amount']); ?>" disabled>
+    <input type="text" value="<?php echo  ($payment['amount']); ?>" disabled>
 
     <label>Payment Method:</label>
-    <input type="text" value="<?php echo htmlspecialchars($payment['payment_method']); ?>" disabled>
+    <input type="text" value="<?php echo  ($payment['payment_method']); ?>" disabled>
 
     <label>Transaction Reference:</label>
-    <input type="text" value="<?php echo htmlspecialchars($payment['transaction_reference']); ?>" disabled>
+    <input type="text" value="<?php echo  ($payment['transaction_reference']); ?>" disabled>
 
     <label>Current Status:</label>
-    <input type="text" value="<?php echo htmlspecialchars($payment['payment_status']); ?>" disabled>
+    <input type="text" value="<?php echo  ($payment['payment_status']); ?>" disabled>
 
     <label>Payment Date:</label>
-    <input type="text" value="<?php echo htmlspecialchars($payment['payment_date']); ?>" disabled>
+    <input type="text" value="<?php echo  ($payment['payment_date']); ?>" disabled>
 
     <label>Action:</label>
     <select name="action" id="action">

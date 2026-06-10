@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() == PHP_SESSION_NONE) {
+    session_start();
+}
 
 ?>
 <!DOCTYPE html>
@@ -7,7 +9,7 @@ session_start();
 
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png" href="../uploads/favicon.png">
 
     <title>Login </title>
 
@@ -135,7 +137,7 @@ session_start();
         .hide_show {
             position: absolute;
             right: 30px;
-            top: 305px;
+            top: 355px;
             cursor: pointer;
             font-size: 12px;
             color: #1f2933;
@@ -186,6 +188,19 @@ session_start();
                 transform: translateX(-30px);
             }
         }
+         .back {
+            display: inline-block;
+            margin-bottom: 20px;
+            padding: 8px 16px;
+            background-color: #1f2933;
+            color: white;
+            text-decoration: none;
+            border-radius: 6px;
+        }
+        .back:hover {
+            background-color: white;
+            color: #1f2933;
+            border: 2px solid #1f2933;
     </style>
 </head>
 
@@ -199,8 +214,10 @@ session_start();
         <?php unset($_SESSION['error']); ?>
     <?php endif; ?>
     <div class="login_container">
+        <a href="../index.php" class="back">Back to Home</a>
         <!-- Logo and Headings -->
         <h2>Welcome to AMS</h2>
+
         <span class="logo">AMS</span>
         <h3>Staff Log In</h3>
         <!-- Login Form -->

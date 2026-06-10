@@ -60,10 +60,10 @@ $users = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
             </tr>
             <?php foreach ($users as $user): ?>
             <tr>
-                <td><?= htmlspecialchars($user['firstname'])?></td>
-                <td><?= htmlspecialchars($user['secondname'])?></td>
-                <td><?= htmlspecialchars($user['surname'])?></td>
-                <td><?= htmlspecialchars($user['username'])?></td>
+                <td><?=  ($user['firstname'])?></td>
+                <td><?=  ($user['secondname'])?></td>
+                <td><?=  ($user['surname'])?></td>
+                <td><?=  ($user['username'])?></td>
 
             </tr>
             <?php endforeach ?>

@@ -1,4 +1,5 @@
 <?php
+session_start();
 require __DIR__ . '/../config.php';
 include __DIR__ . '/../log_activity.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -14,21 +15,26 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $payment_method = !empty($_POST['payment_method']) ? $_POST['payment_method'] : null;
     $tx_reference = !empty($_POST['transaction_reference']) ? trim($_POST['transaction_reference']) : null;
     $staff_id = $_SESSION['user_id'];
+    //REPLACE / WITH - IN DATE
+
+    $settlement_date = explode("/", $settlement_date);
+    $settlement_date = $settlement_date[2] . "-" . $settlement_date[1] . "-" . $settlement_date[0]; 
+
 
     
     $stmt = mysqli_prepare($conn, "
-        INSERT INTO settlements
+        INSERT INTO settlement
         (auction_item_id, amount_due, commission_rate, commission_amount, net_amount,
          settlement_date, status, processed_by_staff, payment_method, transaction_reference)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     ");
-    mysqli_stmt_bind_param($stmt, "idddssisss", $auction_item_id, $amount_due, $commission_rate, $commission_amount, $net_amount, $settlement_date, $status, $staff_id, $payment_method, $tx_reference);
+    mysqli_stmt_bind_param($stmt, "iddddssiss", $auction_item_id, $amount_due, $commission_rate, $commission_amount, $net_amount, $settlement_date, $status, $staff_id, $payment_method, $tx_reference);
     $success = mysqli_stmt_execute($stmt);
 
     if ($success) {
         $_SESSION['success'] = "Settlement added successfully";
         logActivity($conn, $staff_id,$_SESSION['username'] ,"Created settlement for payment ID: $payment_id, item ID: $auction_item_id");
-        header('Location: settlement_list.php');
+        header('Location: invoice_list.php');
         exit();
     } else {
         $_SESSION['error'] = "Failed to add settlement";

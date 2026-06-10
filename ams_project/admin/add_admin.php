@@ -18,14 +18,14 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin' && $_SES
 </head>
 <?php if (!empty($_SESSION['success'])): ?>
     <div class="flash success">
-        <?= htmlspecialchars($_SESSION['success']); ?>
+        <?=  ($_SESSION['success']); ?>
     </div>
     <?php unset($_SESSION['success']); ?>
 <?php endif; ?>
 
 <?php if (!empty($_SESSION['error'])): ?>
     <div class="flash error">
-        <?= htmlspecialchars($_SESSION['error']); ?>
+        <?=  ($_SESSION['error']); ?>
     </div>
     <?php unset($_SESSION['error']); ?>
 <?php endif; ?>
@@ -65,7 +65,7 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin' && $_SES
 
             <label>Password</label>
             <input type="text" id="password" name="password" class="pass_w">
-            <span class="hide_show" id="togglePassword">Hide/Show</span>
+            <span class="hide_show" id="togglePassword" style="cursor:pointer;">Hide/Show</span>
 
 
             <button type="submit">Add Admin</button>

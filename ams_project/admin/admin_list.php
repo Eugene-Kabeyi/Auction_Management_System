@@ -1,9 +1,11 @@
 <?php
 include __DIR__ . '/../header.php';
-if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin' && $_SESSION['admin_level'] !== 'super_admin') {
+if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin' || $_SESSION['admin_level'] !== 'super_admin') {
+
+    $_SESSION['error'] = "Please log in as a Super admin to access this page.";
     header('Location: ../staff/staff_login.php');
     session_destroy();
-    $_SESSION['error'] = "Please log in as an admin to access this page.";
+    
     exit();
 }
 include __DIR__ . '/../config.php';
@@ -25,6 +27,8 @@ include __DIR__ . '/../config.php';
     
     <div class="outer_container">
     <h2>Admin List</h2>
+     <a href="admin_dashboard.php" class="back" >Back to Dashboard </a>
+    
     <a href="add_admin.php" class="back">Add New Admin </a>
        
 <div class="inner_container">
@@ -42,6 +46,7 @@ include __DIR__ . '/../config.php';
             </tr>
 
             <?php
+            
             /* Fetch admin members from the database */
             $stmt = mysqli_prepare($conn, "SELECT a.admin_id, a.firstname, a.secondname,a.admin_level, a.surname, a.email, a.username, a.phone_number, a.role_id, r.role_name FROM admin a JOIN roles r ON a.role_id = r.role_id WHERE a.admin_level != 'super_admin'"); // Exclude super_admins from the list
             mysqli_stmt_execute($stmt);
@@ -49,16 +54,16 @@ include __DIR__ . '/../config.php';
 
             foreach ($admin_members as $admin) {
                 echo "<tr>";
-                echo "<td>" . htmlspecialchars($admin['firstname']) . "</td>";
-                echo "<td>" . htmlspecialchars($admin['secondname']) . "</td>";
-                echo "<td>" . htmlspecialchars($admin['surname']) . "</td>";
-                echo "<td>" . htmlspecialchars($admin['role_name']) . "</td>";
-                echo "<td>" . htmlspecialchars($admin['phone_number']) . "</td>";
-                echo "<td>" . htmlspecialchars($admin['email']) . "</td>";
-                echo "<td>" . htmlspecialchars($admin['username']) . "</td>";
-                echo "<td>" . htmlspecialchars($admin['admin_level']) . "</td>";
+                echo "<td>" .  ($admin['firstname']) . "</td>";
+                echo "<td>" .  ($admin['secondname']) . "</td>";
+                echo "<td>" .  ($admin['surname']) . "</td>";
+                echo "<td>" .  ($admin['role_name']) . "</td>";
+                echo "<td>" .  ($admin['phone_number']) . "</td>";
+                echo "<td>" .  ($admin['email']) . "</td>";
+                echo "<td>" .  ($admin['username']) . "</td>";
+                echo "<td>" .  ($admin['admin_level']) . "</td>";
                 echo "<td>
-                  <a href='admin_edit.php?id=" . htmlspecialchars($admin['admin_id']) . "'>Edit</a>
+                  <a href='admin_edit.php?id=" .  ($admin['admin_id']) . "'>Edit</a>
                    </td>";
                 echo "</tr>";
             }

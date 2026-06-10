@@ -49,34 +49,34 @@ include __DIR__ . '/../config.php';
         <form action="staff_edit_handler.php" method="post">
             <label for="employee_id">Employee ID:</label>
             <input type="text" id="employee_id" name="employee_id"
-                value="<?php echo htmlspecialchars($staff_members[0]['employee_id'] ?? ''); ?>">
+                value="<?php echo  ($staff_members[0]['employee_id'] ?? ''); ?>">
             <label for="national_id">National ID:</label>
             <input type="text" id="national_id" name="national_id"
-                value="<?php echo htmlspecialchars($staff_members[0]['national_id'] ?? ''); ?>">
+                value="<?php echo  ($staff_members[0]['national_id'] ?? ''); ?>">
 
             <label for="firstname">First Name:</label>
             <input type="text" id="firstname" name="firstname"
-                value="<?php echo htmlspecialchars($staff_members[0]['firstname'] ?? ''); ?>">
+                value="<?php echo  ($staff_members[0]['firstname'] ?? ''); ?>">
 
             <label for="secondname">Second Name:</label>
             <input type="text" id="secondname" name="secondname"
-                value="<?php echo htmlspecialchars($staff_members[0]['secondname'] ?? ''); ?>">
+                value="<?php echo  ($staff_members[0]['secondname'] ?? ''); ?>">
 
             <label for="surname">Surname:</label>
             <input type="text" id="surname" name="surname"
-                value="<?php echo htmlspecialchars($staff_members[0]['surname'] ?? ''); ?>">
+                value="<?php echo  ($staff_members[0]['surname'] ?? ''); ?>">
 
             <label for="email">Email:</label>
             <input type="email" id="email" name="email"
-                value="<?php echo htmlspecialchars($staff_members[0]['email'] ?? ''); ?>">
+                value="<?php echo  ($staff_members[0]['email'] ?? ''); ?>">
 
             <label for="phone_number">Phone Number:</label>
             <input type="text" id="phone_number" name="phone_number"
-                value="<?php echo htmlspecialchars($staff_members[0]['phone_number'] ?? ''); ?>">
+                value="<?php echo  ($staff_members[0]['phone_number'] ?? ''); ?>">
 
             <label for="job_title">Job Title:</label>
             <input type="text" id="job_title" name="job_title"
-                value="<?php echo htmlspecialchars($staff_members[0]['job_title'] ?? ''); ?>">
+                value="<?php echo  ($staff_members[0]['job_title'] ?? ''); ?>">
 
             <label for="role">Role:</label>
 
@@ -84,11 +84,11 @@ include __DIR__ . '/../config.php';
             mysqli_stmt_execute($stmt);
             $roles = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
             ?>
-            
+
             <select name="role_id" id="role_id">
                 <?php foreach ($roles as $role): ?>
                     <option value="<?php echo $role['role_id']; ?>" <?php echo (isset($staff_members[0]['role_id']) && $staff_members[0]['role_id'] == $role['role_id']) ? 'selected' : ''; ?>>
-                        <?php echo htmlspecialchars($role['role_name']); ?>
+                        <?php echo  ($role['role_name']); ?>
                     </option>
                 <?php endforeach; ?>
             </select>
