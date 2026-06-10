@@ -8,98 +8,101 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'staff') {
     $_SESSION['error'] = "Please log in as an admin to access this page.";
     exit();
 }
-$stmt = $conn->prepare("
-    SELECT 
-        ci.item_id,
-        ci.item_name,
-        ci.consigner_id,
-        a.auction_id,
-        ab.bid_id,
-        ab.bidder_id,
-        ab.amount_bidded,
-        p.payment_id
-    FROM consigner_items ci
-    JOIN auctions a ON a.item_id = ci.item_id
-    JOIN auction_bids ab ON ab.auction_id = a.auction_id AND ab.result = 'won'
-    JOIN payment p ON p.bid_id = ab.bid_id AND p.payment_status = 'completed'
-    WHERE ci.item_status = 'sold'
+$payment_id = $_GET['payment_id'] ;
+$stmt = mysqli_prepare($conn, "
+    SELECT * FROM payment    
+    WHERE payment_id = ?
 ");
-$stmt->execute();
-$records = $stmt->fetchAll();
+mysqli_stmt_bind_param($stmt, "i", $payment_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$record = mysqli_fetch_assoc($result);
+
+if (!$record) {
+    $_SESSION['error'] = "Payment record not found.";
+    header('Location: payment_list.php');
+    exit();
+}
+// Ensure payment_id is not in settlements to prevent duplicates
+$check_stmt = mysqli_prepare($conn, "
+    SELECT * FROM settlement
+    WHERE payment_id = ?
+");
+mysqli_stmt_bind_param($check_stmt, "i", $payment_id);
+mysqli_stmt_execute($check_stmt);
+$check_result = mysqli_stmt_get_result($check_stmt);
+if (mysqli_num_rows($check_result) > 0) {
+    $_SESSION['error'] = "A settlement for this payment already exists. You are forwarded to the update page.";
+    header('Location: update_settlement.php?settlement_id=' . mysqli_fetch_assoc($check_result)['settlement_id']);
+    exit();
+}
+// find item_id from auctions using bid_id from payment
+$stmt = mysqli_prepare($conn, "
+    SELECT
+        p.payment_id,
+        p.amount,
+        p.payment_status,
+        ab.bid_id,
+        a.auction_id,
+        a.item_id
+    FROM payment p
+    JOIN auction_bids ab
+        ON p.bid_id = ab.bid_id
+    JOIN auctions a
+        ON ab.auction_id = a.auction_id
+    WHERE p.payment_id = ?
+");
+mysqli_stmt_bind_param($stmt, "i", $payment_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$item_record = mysqli_fetch_assoc($result);
+
+$sql = "SELECT * FROM auction_settings";
+$result = mysqli_query($conn, $sql);
+$settings = mysqli_fetch_assoc($result);
+
+$commission_rate = $settings['commission_rate'];
+
+//calculations
+$amount = $record['amount'];
+$commission_amount = ($commission_rate / 100) * $amount;
+$net_amount = $amount - $commission_amount;
+
 ?>
 
 <head>
-    <style>
-        .outer_container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 640px;
-            margin: 0 auto;
-            justify-content: center;
-        }
-
-        form {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        form label {
-            font-weight: bold;
-        }
-
-        form input,
-        form select {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-        form button {
-            padding: 10px;
-            background-color: #1f2933;
-            color: #ffffff;
-            border: none;
-            border-radius: 5px;
-            cursor: pointer;
-        }
-
-        .back {
-            border-radius: 5px;
-            color: #ffffff;
-            text-decoration: none;
-            background-color: #1f2933;
-            padding: 6px 0 6px 30px;
-            width: 30%;
-        }
-    </style>
+    <title>Create Settlement</title>
+    <link rel="stylesheet" href="../css/form_table_styles.css">
 </head>
 
 <body>
-    <div class="outer_container">
+    <div class="outer_container f_container"> ">
+        <!-- error messages -->
+        <?php if (isset($_SESSION['error'])): ?>
+            <div class="error"><?php echo $_SESSION['error']; ?></div>
+        <?php endif; ?>
 
     <h2>Create Settlement</h2>
 
     <form method="POST" action="create_settlement_handler.php" onsubmit="return validateSettlement()">
 
         <label>Payment ID:</label>
-        <input type="text" id="payment_id" name="payment_id">
+        <input type="text" id="payment_id" name="payment_id" value="<?= htmlspecialchars($record['payment_id']) ?>" >
 
         <label>Auction Item ID:</label>
-        <input type="text" id="auction_item_id" name="auction_item_id">
+        <input type="text" id="auction_item_id" name="auction_item_id" value="<?= htmlspecialchars($item_record['item_id']) ?>" >
 
         <label>Amount Due (Ksh):</label>
-        <input type="text" id="amount_due" name="amount_due">
+        <input type="text" id="amount_due" name="amount_due" value="<?= htmlspecialchars(number_format($record['amount'], 2, '.', '')) ?>" >
 
         <label>Commission Rate (%):</label>
-        <input type="text" id="commission_rate" name="commission_rate" value="15">
+        <input type="text" id="commission_rate" name="commission_rate" value="<?= htmlspecialchars($settings['commission_rate']) ?>">
 
         <label>Commission Amount:</label>
-        <input type="text" id="commission_amount" name="commission_amount" >
+        <input type="text" id="commission_amount" name="commission_amount" value="<?= htmlspecialchars(number_format($commission_amount, 2, '.', '')) ?>">
 
         <label>Net Amount:</label>
-        <input type="text" id="net_amount" name="net_amount" >
+        <input type="text" id="net_amount" name="net_amount" value="<?= htmlspecialchars(number_format($net_amount, 2, '.', '')) ?>">
 
         <label>Settlement Date:</label>
         <input type="text"
@@ -136,6 +139,14 @@ $records = $stmt->fetchAll();
 </body>
 <?php include __DIR__ . '/../footer.php'; ?>
 <script>
+    // making prefielded fields readonly
+    document.getElementById("payment_id").readOnly = true;
+    document.getElementById("auction_item_id").readOnly = true;
+    document.getElementById("amount_due").readOnly = true;
+    document.getElementById("commission_rate").readOnly = true;
+    document.getElementById("commission_amount").readOnly = true;
+    document.getElementById("net_amount").readOnly = true;
+
 
 
 // MAIN VALIDATION CONTROLLER
@@ -154,45 +165,12 @@ function validateSettlement() {
 
 
 
-// AUTO CALCULATE COMMISSION + NET
-
-function calculateAmounts() {
-
-    var amount =
-        parseFloat(document.getElementById("amount").value) || 0;
-
-    var rate =
-        parseFloat(document.getElementById("commision_rate").value) || 0;
-
-    var commission =
-        (amount * rate) / 100;
-
-    var net =
-        amount - commission;
-
-    document.getElementById("commission_amount").value =
-        commission.toFixed(2);
-
-    document.getElementById("net_amount").value =
-        net.toFixed(2);
-}
-
-
-// Run calculation whenever user types
-document.getElementById("amount")
-    .addEventListener("keyup", calculateAmounts);
-
-document.getElementById("commision_rate")
-    .addEventListener("keyup", calculateAmounts);
-
-
-
 // AUCTION ITEM ID VALIDATION
 
 function validateAuctionID() {
 
     var id =
-        document.getElementById("item_id").value.trim();
+        document.getElementById("auction_item_id").value.trim();
 
     if (id.length == 0) {
         alert("Auction Item ID is required");
@@ -218,23 +196,23 @@ function validateAuctionID() {
 function validateAmount() {
 
     var amount =
-        document.getElementById("amount").value.trim();
+        document.getElementById("amount_due").value.trim();
 
     if (amount.length == 0) {
         alert("Amount Due is required");
-        document.getElementById("amount").focus();
+        document.getElementById("amount_due").focus();
         return false;
     }
 
     if (isNaN(amount)) {
         alert("Amount Due must be numeric");
-        document.getElementById("amount").focus();
+        document.getElementById("amount_due").focus();
         return false;
     }
 
     if (parseFloat(amount) <= 0) {
         alert("Amount Due must be greater than 0");
-        document.getElementById("amount").focus();
+        document.getElementById("amount_due").focus();
         return false;
     }
 
@@ -248,17 +226,17 @@ function validateAmount() {
 function validateCommission() {
 
     var rate =
-        document.getElementById("commision_rate").value.trim();
+        document.getElementById("commission_rate").value.trim();
 
     if (rate.length == 0) {
         alert("Commission Rate is required");
-        document.getElementById("commision_rate").focus();
+        document.getElementById("commission_rate").focus();
         return false;
     }
 
     if (isNaN(rate)) {
         alert("Commission Rate must be numeric");
-        document.getElementById("commision_rate").focus();
+        document.getElementById("commission_rate").focus();
         return false;
     }
 
@@ -266,7 +244,7 @@ function validateCommission() {
         parseFloat(rate) > 100) {
 
         alert("Commission Rate must be between 0 and 100");
-        document.getElementById("commision_rate").focus();
+        document.getElementById("commission_rate").focus();
         return false;
     }
 
@@ -355,7 +333,7 @@ function validateReference() {
         document.getElementById("payment_method").value;
 
     var reference =
-        document.getElementById("reference").value.trim();
+        document.getElementById("transaction_reference").value.trim();
 
     if (
         method == "bank_transfer" ||
@@ -369,7 +347,7 @@ function validateReference() {
                 method.replace("_", " ")
             );
 
-            document.getElementById("reference").focus();
+            document.getElementById("transaction_reference").focus();
 
             return false;
         }
@@ -380,48 +358,3 @@ function validateReference() {
 
 </script>
 
-<?php
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-    $auction_item_id = $_POST['auction_item_id'];
-    $amount_due = $_POST['amount_due'];
-    $commission_rate = $_POST['commission_rate'];
-    $settlement_date = !empty($_POST['settlement_date']) ? $_POST['settlement_date'] : null;
-    $status = $_POST['status'];
-    $payment_method = !empty($_POST['payment_method']) ? $_POST['payment_method'] : null;
-    $tx_reference = !empty($_POST['transaction_reference']) ? trim($_POST['transaction_reference']) : null;
-    $staff_id = $_SESSION['user_id'];
-
-    // Calculations
-    $commission_amount = ($commission_rate / 100) * $amount_due;
-    $net_amount = $amount_due - $commission_amount;
-
-    $stmt = $conn->prepare(
-        "INSERT INTO settlements
-        (auction_item_id, amount_due, commission_rate, commission_amount, net_amount,
-         settlement_date, status, processed_by_staff, payment_method, transaction_reference)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"
-    );
-
-    $success = $stmt->execute([
-        $auction_item_id,
-        $amount_due,
-        $commission_rate,
-        $commission_amount,
-        $net_amount,
-        $settlement_date,
-        $status,
-        $staff_id,
-        $payment_method,
-        $tx_reference
-    ]);
-
-    if ($success) {
-        $_SESSION['success'] = "Settlement added successfully";
-        header('Location: settlement_list.php');
-        exit();
-    } else {
-        $_SESSION['error'] = "Failed to add settlement";
-    }
-}
-?>

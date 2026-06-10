@@ -21,10 +21,10 @@ if (!isset($_GET['auction_id'])) {
 
 $auction_id = $_GET['auction_id'];
 
-$stmt = $conn->prepare("SELECT * FROM auctions WHERE auction_id = :id");
-$stmt->bindParam(':id', $auction_id);
-$stmt->execute();
-$auction = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt = mysqli_prepare($conn, "SELECT * FROM auctions WHERE auction_id = ?");
+mysqli_stmt_bind_param($stmt, "i", $auction_id);
+mysqli_stmt_execute($stmt);
+$auction = mysqli_stmt_get_result($stmt)->fetch_assoc();
 
 if (!$auction) {
     $_SESSION['error'] = "Auction not found";
@@ -43,7 +43,7 @@ if (!$auction) {
 
 <body>
 
-<?php if (isset($_SESSION['error'])): ?>
+<?php if (!empty($_SESSION['error'])): ?>
     <div class="flash error">
         <?= $_SESSION['error']; unset($_SESSION['error']); ?>
     </div>
@@ -54,6 +54,8 @@ if (!$auction) {
 <div class="outer_container f_container">
 
 <form action="update_auctions_handler.php" method="post" onsubmit="return validateAuction()">
+    <!-- hidden input to pass auction_id -->
+    <input type="hidden" name="auction_id" value="<?= $auction['auction_id'] ?>">
 
     <label>Auction Name</label>
     <input type="text" name="auction_name" id="auction_name"
@@ -77,9 +79,10 @@ if (!$auction) {
                 FROM evaluated_items ei 
                 JOIN consigner_items i ON ei.item_id = i.item_id";
 
-        $stmt = $conn->prepare($sql);
-        $stmt->execute();
-        $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_execute($stmt);
+        $result= mysqli_stmt_get_result($stmt);
+        $items = mysqli_fetch_all($result, MYSQLI_ASSOC);
 
         foreach ($items as $row) {
             $selected = $row['item_id'] == $auction['item_id'] ? "selected" : "";

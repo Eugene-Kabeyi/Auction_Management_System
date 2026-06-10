@@ -15,24 +15,28 @@ if (isset($_SESSION['user_id']) && $_SESSION['login_type'] === 'admin') {
 
 include __DIR__ . '/../config.php';
 // Fetch total number of users for dashboard stats
-$stmt = $conn->prepare('SELECT COUNT(*) FROM users');
-$stmt -> execute();
-$count_users = $stmt ->fetchColumn();
+$stmt = mysqli_prepare($conn, 'SELECT COUNT(*) FROM users');
+mysqli_stmt_execute($stmt);
+$results = mysqli_stmt_get_result($stmt);
+$count_users = mysqli_fetch_array($results)[0];
 
 // Fetch total number of items for dashboard stats
-$stmt = $conn->prepare('SELECT COUNT(*) FROM evaluated_items WHERE final_decision = "Approved"');
-$stmt -> execute();
-$count_items = $stmt ->fetchColumn();  
+$stmt = mysqli_prepare($conn, 'SELECT COUNT(*) FROM evaluated_items WHERE final_decision = "Approved"');
+mysqli_stmt_execute($stmt);
+$results = mysqli_stmt_get_result($stmt);
+$count_items = mysqli_fetch_array($results)[0]; 
 
 // Fetch live auctions for dashboard display 
-$stmt = $conn->prepare('SELECT * FROM auctions WHERE status = "upcoming" OR status = "ongoing"');
-$stmt -> execute();
-$live_auctions = $stmt ->fetchAll();   
+$stmt = mysqli_prepare($conn, 'SELECT * FROM auctions WHERE status = "upcoming" OR status = "ongoing"');
+mysqli_stmt_execute($stmt);
+$results = mysqli_stmt_get_result($stmt);
+$live_auctions = mysqli_fetch_all($results, MYSQLI_ASSOC);  
 
 // Fetch payments processed
-$stmt = $conn->prepare("SELECT SUM(amount) FROM payment WHERE payment_status =  'completed' ");
-$stmt -> execute();
-$payments = $stmt -> fetchColumn();
+$stmt = mysqli_prepare($conn, "SELECT SUM(amount) FROM payment WHERE payment_status =  'completed' ");
+mysqli_stmt_execute($stmt);
+$results = mysqli_stmt_get_result($stmt);
+$payments = mysqli_fetch_array($results)[0];
 
 
 ?>

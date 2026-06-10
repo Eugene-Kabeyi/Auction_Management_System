@@ -17,9 +17,10 @@ if (!isset($_GET['id']) || empty($_GET['id'])) {
 $admin_id = $_GET['id'];
 
 // Fetch admin details
-$stmt = $conn->prepare("SELECT * FROM admin WHERE admin_id = ? AND admin_level != 'super_admin'");
-$stmt->execute([$admin_id]);
-$admin = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt = mysqli_prepare($conn, "SELECT * FROM admin WHERE admin_id = ? AND admin_level != 'super_admin'");
+mysqli_stmt_bind_param($stmt, "i", $admin_id);
+mysqli_stmt_execute($stmt);
+$admin = mysqli_stmt_get_result($stmt)->fetch_assoc();
 
 if (!$admin) {
     header('Location: admin_list.php');

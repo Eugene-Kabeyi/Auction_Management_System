@@ -35,9 +35,9 @@ include __DIR__ . '/../config.php';
     <?php
     // Fetch all roles from the database, add, edit and delete
     require_once __DIR__ . '/../config.php';
-    $stmt = $conn->prepare("SELECT * FROM roles");
-    $stmt->execute();
-    $roles = $stmt->fetchAll();
+    $stmt = mysqli_prepare($conn, "SELECT * FROM roles");
+    mysqli_stmt_execute($stmt);
+    $roles = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
     ?>
     <div class="outer_container">
         <h2>Roles List</h2>

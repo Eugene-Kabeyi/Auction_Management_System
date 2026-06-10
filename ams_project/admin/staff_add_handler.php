@@ -37,23 +37,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
     // Prepare and execute the insert statement
-    $stmt = $conn->prepare("INSERT INTO staff (firstname, secondname, surname, email, phone_number, job_title, department_id, role_id, employee_id, national_id, username, password_hash, hire_date, employment_status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
-    $success = $stmt->execute([
-        $firstname,
-        $secondname,
-        $surname,
-        $email,
-        $phone_number,
-        $job_title,
-        $department_id,
-        $role_id,
-        $employee_id,
-        $national_id,
-        $username,
-        $password,
-        $hire_date,
-        $employment_status
-    ]);
+    $stmt = mysqli_prepare($conn, "INSERT INTO staff (firstname, secondname, surname, email, phone_number, job_title, department_id, role_id, employee_id, national_id, username, password_hash, hire_date, employment_status) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?)");
+    mysqli_stmt_bind_param($stmt, "ssssssssssssss", $firstname, $secondname, $surname, $email, $phone_number, $job_title, $department_id, $role_id, $employee_id, $national_id, $username, $password, $hire_date, $employment_status);
+    $success = mysqli_stmt_execute($stmt);
+       
     if ($success) {
         $_SESSION['success'] = "Staff member added successfully!";
     } else {

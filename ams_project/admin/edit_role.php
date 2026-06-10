@@ -15,9 +15,10 @@ if (isset($_SESSION['user_id']) && $_SESSION['login_type'] === 'admin') {
 include __DIR__ . '/../config.php';
 $role_id = $_GET['role_id'] ?? null;
 
-$stmt = $conn->prepare("SELECT * FROM roles WHERE role_id = :role_id");
-$stmt->execute(['role_id' => $role_id]);
-$role = $stmt->fetch(PDO::FETCH_ASSOC);
+$stmt = mysqli_prepare($conn, "SELECT * FROM roles WHERE role_id = ?");
+mysqli_stmt_bind_param($stmt, "i", $role_id);
+mysqli_stmt_execute($stmt);
+$role = mysqli_fetch_assoc(mysqli_stmt_get_result($stmt));
 
 if (!$role) {
     die("Role not found");

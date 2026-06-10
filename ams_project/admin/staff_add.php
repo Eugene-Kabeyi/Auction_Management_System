@@ -70,8 +70,9 @@ include __DIR__ . '/../config.php';
 
             <label for="department_id">Department ID:</label>
             <?php
-            $tmt = $conn->query("SELECT * FROM department");
-            $departments = $tmt->fetchAll(PDO::FETCH_ASSOC);
+            $tmt = mysqli_prepare($conn, "SELECT * FROM department");
+            mysqli_stmt_execute($tmt);
+            $departments = mysqli_fetch_all(mysqli_stmt_get_result($tmt), MYSQLI_ASSOC);
             ?>
             <select id="department_id" name="department_id">
                 <option value="">--Select Department--</option>
@@ -82,8 +83,9 @@ include __DIR__ . '/../config.php';
             
             <label for="role_id">Role:</label>
             <?php
-            $stmt = $conn->query("SELECT * FROM roles");
-            $roles = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = mysqli_prepare($conn, "SELECT * FROM roles");
+            mysqli_stmt_execute($stmt);
+            $roles = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
             ?>
             <select id="role_id" name="role_id" required>
                 <?php foreach ($roles as $role): ?>
@@ -117,8 +119,9 @@ include __DIR__ . '/../config.php';
 
             <label for="department">Department:</label>
             <?php
-            $stmt = $conn->query("SELECT * FROM department");
-            $departments = $stmt->fetchAll(PDO::FETCH_ASSOC);
+            $stmt = mysqli_prepare($conn, "SELECT * FROM department");
+            mysqli_stmt_execute($stmt);
+            $departments = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
             ?>
             <select id="department" name="department_id" required>
                 <?php foreach ($departments as $department): ?>

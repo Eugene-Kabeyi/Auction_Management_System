@@ -8,9 +8,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
     exit();
 }
 // Fetch system logs
-$stmt = $conn->prepare("SELECT * FROM activity_logs ORDER BY created_at DESC");
-$stmt->execute();
-$logs = $stmt->fetchAll();
+$stmt = mysqli_prepare($conn, "SELECT * FROM activity_logs ORDER BY created_at DESC");
+mysqli_stmt_execute($stmt);
+$logs = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
 ?>
 <head>
     <title>System Logs</title>

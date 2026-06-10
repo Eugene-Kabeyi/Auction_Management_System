@@ -22,9 +22,9 @@ if (!isset($_GET['payment_id']) || empty($_GET['payment_id'])) {
 $payment_id = intval($_GET['payment_id']);
 
 //  FETCH PAYMENT
-$stmt = $conn->prepare("SELECT * FROM payment WHERE payment_id = ?");
-$stmt->execute([$payment_id]);
-$payment = $stmt->fetch();
+$stmt = mysqli_prepare($conn, "SELECT * FROM payment WHERE payment_id = ?");
+mysqli_stmt_execute($stmt, [$payment_id]);
+$payment = mysqli_stmt_get_result($stmt)->fetch_assoc();
 
 if (!$payment) {
     $_SESSION['error'] = "Payment not found.";
@@ -33,9 +33,9 @@ if (!$payment) {
 }
 
 //  CHECK IF INVOICE EXISTS
-$check_stmt = $conn->prepare("SELECT * FROM invoices WHERE payment_id = ?");
-$check_stmt->execute([$payment_id]);
-$invoice = $check_stmt->fetch();
+$check_stmt = mysqli_prepare($conn, "SELECT * FROM payment WHERE payment_id = ?");
+mysqli_stmt_execute($check_stmt, [$payment_id]);
+$invoice = mysqli_stmt_get_result($check_stmt)->fetch_assoc();
 
 if (!$invoice) {
     $_SESSION['error'] = "No invoice found to update.";
@@ -63,13 +63,13 @@ $due_date = date("Y-m-d", strtotime("+7 days"));
 
 <body>
     <div class="outer_container f_container">
-        <h2>Add New Invoice</h2>
+        <h2>Update Invoice</h2>
         <!-- <a href="invoice_list.php" class="back">Back to Invoice List</a> -->
 
         <form id="invoiceForm" action="update_invoice_handler.php" method="POST" onsubmit="return validateInvoice()">
 
             <label>Invoice Number:</label>
-            <input type="text" id="invoice_number" name="invoice_number" value="<?= htmlspecialchars($invoice_number) ?>">
+            <input type="text" id="invoice_number" name="invoice_number" value="<?= htmlspecialchars($payment['invoice_id']) ?>">
 
             <label>Bidder ID:</label>
             <input type="text" id="bidder_id" name="bidder_id" value="<?= htmlspecialchars($payment['bidder_id']) ?>">
@@ -81,7 +81,7 @@ $due_date = date("Y-m-d", strtotime("+7 days"));
             <input type="text" id="amount" name="amount" value="<?= htmlspecialchars(number_format($amount, 2, '.', '')) ?>">
 
             <label>Tax Amount:</label>
-            <input type="text" id="tax_amount" name="tax_amount" value="0.00" value="<?= htmlspecialchars(number_format($tax_amount, 2, '.', '')) ?>">
+            <input type="text" id="tax_amount" name="tax_amount" value="<?= htmlspecialchars(number_format($tax_amount, 2, '.', '')) ?>">
 
             <label>Total Amount:</label>
             <input type="text" id="total_amount" name="total_amount" value="<?= htmlspecialchars(number_format($total_amount, 2, '.', '')) ?>">
@@ -98,7 +98,7 @@ $due_date = date("Y-m-d", strtotime("+7 days"));
                 <option value="overdue">Overdue</option>
             </select>
 
-            <button type="submit">Add Invoice</button>
+            <button type="submit">Update Invoice</button>
 
         </form>
 
@@ -113,13 +113,22 @@ $due_date = date("Y-m-d", strtotime("+7 days"));
         var bidderId = document.getElementById("bidder_id").value;
         var paymentId = document.getElementById("payment_id").value;
 
+
         // make them readonly since we are auto-calculating them
-        invoiceNum.readOnly = true;
-        amount.readOnly = true;
-        tax.readOnly = true;
-        total.readOnly = true;
-        bidderId.readOnly = true;
-        paymentId.readOnly = true;
+        var invoiceNum1 = document.getElementById("invoice_number");
+        var amount1 = document.getElementById("amount");
+        var tax1 = document.getElementById("tax_amount");
+        var total1 = document.getElementById("total_amount");
+        var dueDate1 = document.getElementById("due_date");
+        var bidderId1 = document.getElementById("bidder_id");
+        var paymentId1 = document.getElementById("payment_id");
+
+        invoiceNum1.readOnly = true;
+        amount1.readOnly = true;
+        tax1.readOnly = true;
+        total1.readOnly = true;
+        bidderId1.readOnly = true;
+        paymentId1.readOnly = true;
 
        
         // MAIN VALIDATION CONTROLLER

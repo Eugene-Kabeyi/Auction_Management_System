@@ -1,44 +1,64 @@
 <?php
+session_start();
+require __DIR__ . '/../config.php';
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     $invoice_id = intval($_POST['invoice_id']);
     $status = $_POST['status'];
     $due_date = $_POST['due_date'];
     $updated_by = $_SESSION['user_id'];
-
+    $amount = $_POST['amount'];
+    $tax_amount = $_POST['tax_amount'];
+    $total_amount = $_POST['total_amount'];
+    
     try {
 
-        $conn->beginTransaction();
+        mysqli_begin_transaction($conn);
 
-        //  UPDATE INVOICE (NOT INSERT)
-        $stmt = $conn->prepare("
+        //  UPDATE INVOICE (INSERT)
+        $stmt = mysqli_prepare($conn, "
             UPDATE invoices
             SET 
                 status = ?,
                 due_date = ?,
+                created_by_staff = ?,
                 updated_at = NOW()
             WHERE invoice_id = ?
         ");
 
-        $stmt->execute([
-            $status,
-            $due_date,
-            $invoice_id
-        ]);
+        mysqli_stmt_bind_param($stmt, "ssii", $status, $due_date, $updated_by, $invoice_id);
+        mysqli_stmt_execute($stmt);
 
         //  UPDATE PAYMENT STATUS 
-        $payment_stmt = $conn->prepare("
+        $payment_stmt = mysqli_prepare($conn, "
             UPDATE payment
-            SET payment_status = ?
-            WHERE payment_id = ?
+            SET 
+                payment_status = ?,
+                amount = ?,
+                processed_by_staff = ?
+            WHERE invoice_id = ?
+            
         ");
+        $payment_status = match ($status) {
 
-        $payment_stmt->execute([
-            $status === 'paid' ? 'completed' : 'pending',
-            $payment_id
-        ]);
+            'paid' => 'completed',
 
-        $conn->commit();
+            'cancelled' => 'failed',
+
+            'overdue' => 'failed',   // optional but more realistic
+
+            'unpaid' => 'pending',
+
+            'draft' => 'pending',
+
+            default => 'pending'
+        };
+        mysqli_stmt_bind_param($payment_stmt, "sdii", $payment_status, $total_amount, $updated_by, $invoice_id);
+        mysqli_stmt_execute($payment_stmt);
+
+
+
+        mysqli_commit($conn);
 
         logActivity(
             $conn,
@@ -51,9 +71,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: invoice_list.php");
         exit();
 
-    } catch (PDOException $e) {
+    } catch (mysqli_sql_exception $e) {
 
-        $conn->rollBack();
+        mysqli_rollback($conn);
 
         logActivity(
             $conn,

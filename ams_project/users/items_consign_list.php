@@ -6,10 +6,11 @@ if (empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user') {
 
 }
 include __DIR__ . ('/../config.php');
-$tmt = $conn->prepare('SELECT * FROM consigner_items WHERE consigner_id = :user_id ');
-$tmt->execute(["user_id" => $_SESSION['user_id']]);
-$items = $tmt->fetchAll()
-    ?>
+$tmt = mysqli_prepare($conn,'SELECT * FROM consigner_items WHERE consigner_id = ?');
+mysqli_stmt_bind_param($tmt, "i", $_SESSION['user_id']);
+mysqli_stmt_execute($tmt);
+$items = mysqli_stmt_get_result($tmt)->fetch_all(MYSQLI_ASSOC);
+?>
 
 <head>
     <title>My Consigned Items</title>

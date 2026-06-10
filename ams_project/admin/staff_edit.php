@@ -39,9 +39,10 @@ include __DIR__ . '/../config.php';
 
         $_GET['id'];
 
-        $stmt = $conn->query("SELECT s.staff_id, s.firstname, s.secondname, s.surname, s.username, s.national_id, s.hire_date, s.employment_status, s.job_title, s.email, s.employee_id, r.role_name AS role, s.phone_number FROM staff s JOIN roles r ON s.role_id = r.role_id WHERE s.staff_id = " . $_GET['id']);
-        $staff_members = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+        $stmt = mysqli_prepare($conn, "SELECT s.staff_id, s.firstname, s.secondname, s.surname, s.username, s.national_id, s.hire_date, s.employment_status, s.job_title, s.email, s.employee_id, r.role_name AS role, s.phone_number FROM staff s JOIN roles r ON s.role_id = r.role_id WHERE s.staff_id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $_GET['id']);
+        mysqli_stmt_execute($stmt);
+        $staff_members = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
 
         ?>
 
@@ -78,9 +79,12 @@ include __DIR__ . '/../config.php';
                 value="<?php echo htmlspecialchars($staff_members[0]['job_title'] ?? ''); ?>">
 
             <label for="role">Role:</label>
-            <?php $stmt = $conn->query("SELECT * FROM roles");
-            $roles = $stmt->fetchAll();
+
+            <?php $stmt = mysqli_prepare($conn, "SELECT * FROM roles");
+            mysqli_stmt_execute($stmt);
+            $roles = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
             ?>
+            
             <select name="role_id" id="role_id">
                 <?php foreach ($roles as $role): ?>
                     <option value="<?php echo $role['role_id']; ?>" <?php echo (isset($staff_members[0]['role_id']) && $staff_members[0]['role_id'] == $role['role_id']) ? 'selected' : ''; ?>>

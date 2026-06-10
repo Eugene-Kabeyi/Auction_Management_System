@@ -23,9 +23,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     try {
 
-        $tmt = $conn->prepare("INSERT INTO admin (firstname, secondname, surname, email, username, phone_number, admin_level, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
-        $success = $tmt->execute([$firstname, $secondname, $surname, $email, $username, $phone_number, $admin_level, $password]);
-    } catch (PDOException $e) {
+        $tmt = mysqli_prepare($conn, "INSERT INTO admin (firstname, secondname, surname, email, username, phone_number, admin_level, password_hash) VALUES (?, ?, ?, ?, ?, ?, ?, ?)");
+        mysqli_stmt_bind_param($tmt, "ssssssss", $firstname, $secondname, $surname, $email, $username, $phone_number, $admin_level, $password);
+        $success = mysqli_stmt_execute($tmt);
+    } catch (Exception $e) {
         $_SESSION['error'] = "Unexpected error occurred. Please contact support if the issue persists.";
         header("Location: add_admin.php?error");
         exit();

@@ -49,7 +49,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         VALUES (?, ?, ?, ?, ?, ?, ?)";
 
     $stmt = mysqli_prepare($conn, $sql);
-    mysqli_stmt_bind_param($stmt, "ssssss", 
+    mysqli_stmt_bind_param($stmt, "ssssssi", 
         $item_name,
         $item_quantity,
         $item_description,
@@ -72,5 +72,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: consign_item.php");
     }
 
-}
+}//echo sys_get_temp_dir();
 ?>

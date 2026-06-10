@@ -23,8 +23,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $employment_status = $_POST['employment_status'];
     // Update the staff member in the database  
     if (isset($_POST['delete_staff'])) {
-        $stmt = $conn->prepare("DELETE FROM staff WHERE staff_id = :staff_id");
-        $success = $stmt->execute(['staff_id' => $staff_id]);
+        $stmt = mysqli_prepare($conn, "DELETE FROM staff WHERE staff_id = ?");
+        $success = mysqli_stmt_execute($stmt, [$staff_id]);
         if ($success) {
             $_SESSION['success'] = "Staff member deleted successfully.";
             logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Deleted staff member with ID: " . $staff_id);
@@ -34,20 +34,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         header("Location: staff_list.php");
         exit();
     } elseif (isset($_POST['update_staff'])) {
-        $stmt = $conn->prepare("UPDATE staff SET employee_id = :employee_id, national_id = :national_id, firstname = :firstname, secondname = :secondname, surname = :surname, email = :email, phone_number = :phone_number, job_title = :job_title, role_id = :role_id, employment_status = :employment_status WHERE staff_id = :staff_id");
-        $success = $stmt->execute([
-            'employee_id' => $employee_id,
-            'national_id' => $national_id,
-            'firstname' => $firstname,
-            'secondname' => $secondname,
-            'surname' => $surname,
-            'email' => $email,
-            'phone_number' => $phone_number,
-            'job_title' => $job_title,
-            'role_id' => $role_id,
-            'employment_status' => $employment_status,
-            'staff_id' => $staff_id
-        ]);
+        
+        $stmt = mysqli_prepare($conn, "UPDATE staff SET employee_id = ?, national_id = ?, firstname = ?, secondname = ?, surname = ?, email = ?, phone_number = ?, job_title = ?, role_id = ?, employment_status = ? WHERE staff_id = ?");
+        mysqli_stmt_bind_param($stmt, "ssssssssssi", $employee_id, $national_id, $firstname, $secondname, $surname, $email, $phone_number, $job_title, $role_id, $employment_status, $staff_id);
+        $success = mysqli_stmt_execute($stmt);
+
         if ($success) {
             $_SESSION['success'] = "Staff member updated successfully.";
             logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Updated staff member with ID: " . $staff_id);

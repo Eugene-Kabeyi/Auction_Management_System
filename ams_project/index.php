@@ -47,6 +47,7 @@ p {
 
 .primary:hover {
     background: #111827;
+    color: white;
 }
 
 .secondary {
@@ -127,7 +128,7 @@ p {
 <p>Manage auctions, users, staff, and payments easily in one system.</p>
 
 <div class="hero-buttons">
-    <a href="login.php" class="btn secondary">Login</a>
+    <a href="login.html" class="btn secondary">Login</a>
     <a href="users/register.php" class="btn primary">Create Account</a>
 </div>
 </section>

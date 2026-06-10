@@ -9,10 +9,9 @@ exit();
 
 include __DIR__ . ('/../config.php');
 
-$tmt = $conn -> query('SELECT firstname, secondname ,surname ,username FROM users');
-$tmt ->execute();
-$users = $tmt -> fetchAll();
-
+$stmt = mysqli_prepare($conn, "SELECT firstname, secondname ,surname ,username FROM users");
+mysqli_stmt_execute($stmt);
+$users = mysqli_fetch_all(mysqli_stmt_get_result($stmt), MYSQLI_ASSOC);
 
 ?>
 <head>

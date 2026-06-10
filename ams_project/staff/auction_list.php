@@ -202,11 +202,10 @@ $auctions = mysqli_fetch_all($result, MYSQLI_ASSOC);
                         <td><?= htmlspecialchars($start_time) ?></td>
                         <td><?= htmlspecialchars($end_time) ?></td>
 
-                        <td><a href="live_auction.php?auction_id=<?= $auction['auction_id'] ?>">View</a></td>
+                        <td><a href="update_auctions.php?auction_id=<?= $auction['auction_id'] ?>">Edit</a></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
         </table>
-
     </div>
     <?php include __DIR__ . '/../footer.php'; ?>

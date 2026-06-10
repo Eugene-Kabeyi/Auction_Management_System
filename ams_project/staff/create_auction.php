@@ -28,6 +28,12 @@ include __DIR__ . '/../log_activity.php';
     <?php endif; ?>
 
     <h2>Create Auction</h2>
+
+    <a href="staff_dashboard.php" style="margin:auto" class="back">
+        Back to Dashboard
+    </a>
+    <br>
+
     <div class="outer_container f_container">
         
             <form action="create_auction_handler.php" method="post" onsubmit="return validateAuction()">
@@ -47,10 +53,10 @@ include __DIR__ . '/../log_activity.php';
                 <select name="item_id" id="item_id" >
                     <!--php fetch for items in evaluate_items-->
                     <?php
-                    $sql = "SELECT ei.item_id, i.item_name, i.consigner_id  FROM evaluated_items ei JOIN consigner_items i ON ei.item_id = i.item_id";
-                    $stmt = $conn->prepare($sql);
-                    $stmt->execute();
-                    $items = $stmt->fetchAll(PDO::FETCH_ASSOC);
+                    $sql = " SELECT ei.item_id, i.item_name, i.consigner_id FROM evaluated_items ei JOIN consigner_items i ON ei.item_id = i.item_id WHERE NOT EXISTS ( SELECT 1 FROM auctions a WHERE a.item_id = ei.item_id ) ";
+                    $stmt = mysqli_prepare($conn, $sql);
+                    mysqli_stmt_execute($stmt);
+                    $items = mysqli_stmt_get_result($stmt)->fetch_all(MYSQLI_ASSOC);
 
 
                     if (count($items) > 0) {

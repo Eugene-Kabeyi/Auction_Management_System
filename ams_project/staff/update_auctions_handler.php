@@ -1,7 +1,10 @@
 <?php
+require_once __DIR__ . '/../config.php';
+include __DIR__ . '/../log_activity.php';
+session_start();
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
+    $auction_id = intval($_POST['auction_id']);
     $auction_name = $_POST['auction_name'];
     $auction_code = $_POST['auction_code'];
     $auction_type = $_POST['auction_type'];
@@ -35,29 +38,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     }
 
     // 3. UPDATE QUERY
-    $stmt = $conn->prepare("
+    $stmt = mysqli_prepare($conn, "
         UPDATE auctions 
         SET 
-            auction_name = :auction_name,
-            auction_code = :auction_code,
-            auction_type = :auction_type,
-            item_id = :item_id,
-            start_time = :start_time,
-            end_time = :end_time,
-            status = :status
-        WHERE auction_id = :auction_id
+            auction_name = ?,
+            auction_code = ?,
+            auction_type = ?,
+            item_id = ?,
+            start_time = ?,
+            end_time = ?,
+            status = ?
+        WHERE auction_id = ?
     ");
 
-    $stmt->bindParam(':auction_name', $auction_name);
-    $stmt->bindParam(':auction_code', $auction_code);
-    $stmt->bindParam(':auction_type', $auction_type);
-    $stmt->bindParam(':item_id', $item_id);
-    $stmt->bindParam(':start_time', $start_datetime);
-    $stmt->bindParam(':end_time', $end_datetime);
-    $stmt->bindParam(':status', $status);
-    $stmt->bindParam(':auction_id', $auction_id);
+    mysqli_stmt_bind_param($stmt, "sssisssi", $auction_name, $auction_code, $auction_type, $item_id, $start_datetime, $end_datetime, $status, $auction_id);
+   $success = mysqli_stmt_execute($stmt);
 
-    if ($stmt->execute()) {
+    if ($success) {
 
         logActivity(
             $conn,

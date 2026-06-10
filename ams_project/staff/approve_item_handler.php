@@ -6,8 +6,12 @@ session_start();
 // Handle form submission
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
-    $item_id = $_POST['item_id'] ?? null;
-    $action = $_POST['action'] ?? null;
+    $item_id = $_POST['item_id'] ;
+    $action = $_POST['action'];
+    $rating = $_POST['rating'] ;
+    $authenticity = $_POST['authenticity'] ;
+    $reserve_price = $_POST['reserved_price'] ;
+    $eval_notes = $_POST['eval_notes'] ;
 
     $date = $_POST['evaluation_date'] ?? date('d/m/Y');
 
@@ -29,23 +33,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
 
         // INSERT EVALUATION 
-        $stmt = $conn->prepare("
+        $stmt = mysqli_prepare($conn, "
             INSERT INTO evaluated_items
             (item_id, evaluator_id, evaluation_date, condition_rating, authenticity_status, reserve_price, evaluation_notes, final_decision)
             VALUES
-            (:item_id, :evaluator_id, :evaluation_date, :condition_rating, :authenticity_status, :reserve_price, :evaluation_notes, :final_decision)
+            (?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
-        $stmt->execute([
-            ':item_id' => $item_id,
-            ':evaluator_id' => $_SESSION['user_id'],
-            ':evaluation_date' => $date,
-            ':condition_rating' => $_POST['rating'] ?? null,
-            ':authenticity_status' => $_POST['authenticity'] ?? null,
-            ':reserve_price' => $_POST['reserved_price'],
-            ':evaluation_notes' => $_POST['eval_notes'],
-            ':final_decision' => $action
-        ]);
+        mysqli_stmt_bind_param($stmt, "iisssdss", $item_id, $_SESSION['user_id'], $date, $rating, $authenticity, $reserve_price, $eval_notes, $action);
+        mysqli_stmt_execute($stmt);
+          
 
 
         // UPDATE ITEM STATUS
@@ -67,9 +64,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
         }
 
-        $stmt = $conn->prepare(" UPDATE consigner_items SET item_status = :status, updated_at = NOW() WHERE item_id = :item_id ");
+        $stmt = mysqli_prepare($conn, " UPDATE consigner_items SET item_status = ?, updated_at = NOW() WHERE item_id = ? ");
 
-        $stmt->execute([':status' => $new_status, ':item_id' => $item_id]);
+        mysqli_stmt_bind_param($stmt, "si", $new_status, $item_id);
+        mysqli_stmt_execute($stmt);
 
 
         // LOG ACTIVITY
@@ -81,10 +79,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
 
     } catch (Exception $e) {
-        logActivity($conn, $_SESSION['user_id'] , $_SESSION['username'] , "Evaluation failed for item ID: $item_id");
+        logActivity($conn, $_SESSION['user_id'] , $_SESSION['username'] , "Evaluation failed for item ID: $item_id". $e->getMessage());
 
-        $_SESSION['error'] = "Error processing evaluation: " . $e->getMessage();
-        header("Location: staff_dashboard.php");
+        $_SESSION['error'] = "Error processing evaluation " ;
+        header("Location: approve_item.php?item_id=" . $item_id);
         exit();
     }
 }

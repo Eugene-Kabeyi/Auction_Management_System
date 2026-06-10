@@ -15,10 +15,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $role_name = $_POST['role_name'];
     $description = $_POST['description'];
     // Insert new role name and description into the database
-    $stmt = $conn->prepare("INSERT INTO roles (role_name, role_description) VALUES (:role_name, :description)");
-    $stmt->bindParam(':role_name', $role_name);
-    $stmt->bindParam(':description', $description);
-    $success = $stmt->execute();
+    $stmt = mysqli_prepare($conn, "INSERT INTO roles (role_name, role_description) VALUES (?, ?)");
+    mysqli_stmt_bind_param($stmt, "ss", $role_name, $description);
+    $success = mysqli_stmt_execute($stmt);
     if ($success) {
         // Role added successfully, redirect to role list page
         header("Location: ../role.php");
@@ -27,7 +26,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     } else {
         // Error occurred while adding role, display error message      
         $_SESSION['error'] = "Error adding role. Please try again.";
-        $_SESSION['error'] = $stmt->errorInfo()[2]; // Get detailed error message from PDO
+       
     }
 }
 ?>

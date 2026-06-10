@@ -1,6 +1,6 @@
 <?php
 session_start();
-$_SESSION['error'] = $_SESSION['error'] ?? '';
+
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -207,15 +207,15 @@ $_SESSION['error'] = $_SESSION['error'] ?? '';
         <form action="../handle_login.php" method="post" class="login_form" onsubmit="return ValidateForm()">
 
             <label for="username">Username:</label>
-            <input type="text" id="username" name="username" required>
+            <input type="text" id="username" name="username">
 
             <label for="password">Password:</label>
             <span class="hide_show" id="togglePassword">Hide/Show</span>
-            <input type="text" id="password" name="password" class="pass_w" required>
+            <input type="text" id="password" name="password" class="pass_w" >
 
             <!-- Choose between Admin and Staff -->
             <label for="login_type">Account Type:</label>
-            <select id="login_type" name="login_type" required>
+            <select id="login_type" name="login_type" >
                 <option value="admin">Admin</option>
                 <option value="staff">Staff</option>
             </select>

@@ -40,9 +40,9 @@ include __DIR__ . ('/../config.php');
                     <th>Actions</th>
                 </tr>
                 <?php
-                $tmt = $conn->prepare("SELECT * FROM department");
-                $tmt->execute();
-                $departments = $tmt->fetchAll();
+                $tmt = mysqli_prepare($conn, "SELECT * FROM department");
+                mysqli_stmt_execute($tmt);
+                $departments = mysqli_stmt_get_result($tmt)->fetch_all(MYSQLI_ASSOC);
 
                 foreach ($departments as $dept) {
 

@@ -18,8 +18,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Update the role in the database
 
     if (isset($_POST['delete_role'])) {
-        $tmt = $conn->prepare("DELETE FROM roles WHERE role_id = :role_id");
-        $success = $tmt->execute(['role_id' => $role_id]);
+
+        $tmt = mysqli_prepare($conn, "DELETE FROM roles WHERE role_id = ?");
+        mysqli_stmt_bind_param($tmt, "i", $role_id);
+        $success = mysqli_stmt_execute($tmt);
+
         if ($success) {
             $_SESSION['success'] = "Role deleted successfully.";
             logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Deleted role with ID: " . $role_id);
@@ -29,9 +32,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         }
         header("Location: role.php");
         exit();
+
     } elseif (isset($_POST['update_role'])) {
-        $stmt = $conn->prepare("UPDATE roles SET role_name = :role_name, role_description = :role_description WHERE role_id = :role_id");
-        $success = $stmt->execute(['role_name' => $role_name, 'role_description' => $role_description, 'role_id' => $role_id]);
+
+        $stmt = mysqli_prepare($conn, "UPDATE roles SET role_name = ?, role_description = ? WHERE role_id = ?");
+        mysqli_stmt_bind_param($stmt, "sssi", $role_name, $role_description, $role_id);
+        $success = mysqli_stmt_execute($stmt);
+        
         if ($success) {
             $_SESSION['success'] = "Role updated successfully.";
             logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Updated role with ID: " . $role_id);

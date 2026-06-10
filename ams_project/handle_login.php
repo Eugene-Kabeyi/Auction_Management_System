@@ -36,7 +36,7 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
 
             if ($user !== null && $password !== $user['password_hash']) {
                 $error = "Invalid password.";
-                $_SESSION['error'] = $error;
+                
             }
 
 
@@ -75,15 +75,18 @@ if ($_SERVER["REQUEST_METHOD"] === "POST") {
                 $_SESSION['error'] = $error;
                 if ($loginType === 'staff') {
                     logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed staff login attempt: " . $error);
-                    header("Location: ../ams_project/staff/staff_login.php?error=1");
+                    $_SESSION['error'] = "Something went wrong. Please try again.";
+                    header("Location: ../ams_project/staff/staff_login.php");
                     exit();
                 } elseif ($loginType === 'admin') {
                     logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed admin login attempt: " . $error);
-                    header("Location: ../ams_project/staff/staff_login.php?error=1");
+                    $_SESSION['error'] = "Something went wrong. Please try again.";
+                    header("Location: ../ams_project/staff/staff_login.php");
                     exit();
                 } else {
                     logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Failed user login attempt: " . $error);
-                    header("Location: ../ams_project/users/login.php?error=1");
+                    $_SESSION['error'] = "Something went wrong. Please try again.";
+                    header("Location: ../ams_project/users/login.php");
                     exit();
                 }
             }

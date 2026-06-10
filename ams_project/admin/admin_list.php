@@ -43,9 +43,9 @@ include __DIR__ . '/../config.php';
 
             <?php
             /* Fetch admin members from the database */
-            $stmt = $conn->query("SELECT a.admin_id, a.firstname, a.secondname,a.admin_level, a.surname, a.email, a.username, a.phone_number, a.role_id, r.role_name FROM admin a JOIN roles r ON a.role_id = r.role_id WHERE a.admin_level != 'super_admin'"); // Exclude super_admins from the list
-            $stmt->execute();
-            $admin_members = $stmt->fetchAll();
+            $stmt = mysqli_prepare($conn, "SELECT a.admin_id, a.firstname, a.secondname,a.admin_level, a.surname, a.email, a.username, a.phone_number, a.role_id, r.role_name FROM admin a JOIN roles r ON a.role_id = r.role_id WHERE a.admin_level != 'super_admin'"); // Exclude super_admins from the list
+            mysqli_stmt_execute($stmt);
+            $admin_members = mysqli_stmt_get_result($stmt)->fetch_all(MYSQLI_ASSOC);
 
             foreach ($admin_members as $admin) {
                 echo "<tr>";

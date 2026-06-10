@@ -9,7 +9,7 @@ if (empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user') {
 
 include __DIR__ . ('/../config.php');
 
-$stmt = $conn->prepare("
+$stmt = mysqli_prepare($conn, "
     SELECT 
         p.payment_id,
         p.bid_id,
@@ -25,20 +25,35 @@ $stmt = $conn->prepare("
     FROM payment p
     LEFT JOIN auction_bids a ON p.bid_id = a.bid_id
     LEFT JOIN auctions auc ON a.auction_id = auc.auction_id
-    WHERE p.bidder_id = :user_id
+    WHERE p.bidder_id = ?
     ORDER BY p.payment_date DESC
 ");
 
-$stmt->execute([
-    ':user_id' => $_SESSION['user_id']
-]);
+mysqli_stmt_bind_param($stmt, "i", $_SESSION['user_id']);
+mysqli_stmt_execute($stmt);
 
-$payments = $stmt->fetchAll();
+$payments = mysqli_stmt_get_result($stmt);
 ?>
 
 <head>
     <title>Payment History</title>
     <link rel="stylesheet" href="../css/form_table_styles.css">
+    <style>
+        .back {
+            display: inline-block;
+           
+            text-decoration:none;
+            padding: 10px 15px;
+            background-color: #2c2d2d;
+            color: #fff;
+            border-radius: 4px;
+            margin: auto;
+        }
+        .back:hover {
+            background-color: #ffffff;
+            color: #2c2d2d;
+        }
+    </style>
 </head>
 
 <body>

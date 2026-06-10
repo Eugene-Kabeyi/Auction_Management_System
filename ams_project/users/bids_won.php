@@ -10,7 +10,7 @@ if (empty($_SESSION['user_id']) && $_SESSION['login_type'] !== 'user') {
 
 include __DIR__ . ('/../config.php');
 
-$stmt = $conn->prepare("
+$stmt = mysqli_prepare($conn, "
     SELECT 
         a.auction_id,
         a.bidder_id,
@@ -20,15 +20,16 @@ $stmt = $conn->prepare("
     FROM auction_bids a
     JOIN users b ON a.bidder_id = b.UID
     JOIN auctions c ON a.auction_id = c.auction_id
-    WHERE a.bidder_id = :user_id && a.result = :result
+    WHERE a.bidder_id = ? AND a.result = ?
 ");
 
-$stmt->execute([
-    ':user_id' => $_SESSION['user_id'],
-    'result' => "won"
-]);
+mysqli_stmt_bind_param($stmt, "is", $_SESSION['user_id'], $result_status);
+$result_status = 'won';
 
-$results = $stmt->fetchAll();
+$result = mysqli_stmt_get_result($stmt);
+$results = mysqli_fetch_all($result, MYSQLI_ASSOC);
+
+mysqli_stmt_close($stmt);
 
 ?>
 
@@ -91,12 +92,27 @@ $results = $stmt->fetchAll();
             color: #000000;
             border: 1px solid #1f2933;
         }
+         .back {
+            display: inline-block;
+           
+            text-decoration:none;
+            padding: 10px 15px;
+            background-color: #2c2d2d;
+            color: #fff;
+            border-radius: 4px;
+            margin: auto;
+        }
+        .back:hover {
+            background-color: #ffffff;
+            color: #2c2d2d;
+        }
     </style>
 
 </head>
 
 <body>
     <h2>Auctions Participated</h2>
+    <a href="user_dashboard.php" class="back">Back to Dashboard</a>
     <div class="outer_container">
         <table>
             <tr>

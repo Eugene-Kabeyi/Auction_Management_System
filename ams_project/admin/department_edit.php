@@ -15,9 +15,9 @@ if (!isset($_SESSION['user_id']) || $_SESSION['login_type'] !== 'admin') {
 $dept_id = $_GET['department_id'];
 
 // Fetch admin details
-$stmt = $conn->prepare("SELECT * FROM department WHERE department_id = ?");
-$stmt->execute([$dept_id]);
-$dept = $stmt->fetch();
+$stmt = mysqli_prepare($conn, "SELECT * FROM department WHERE department_id = ?");
+mysqli_stmt_execute($stmt, [$dept_id]);
+$dept = mysqli_stmt_get_result($stmt)->fetch_assoc();
 if (!$dept) {
     header('Location: department_list.php');
     $_SESSION['error'] = "Department not found.";

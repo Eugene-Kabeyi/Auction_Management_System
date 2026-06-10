@@ -23,8 +23,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     // Update admin details
     if(isset($_POST['update'])) {
-        $stmt = $conn->prepare("UPDATE admin SET firstname = ?, secondname = ?, surname = ?, email = ?, username = ?, phone_number = ?, admin_level = ? WHERE admin_id = ?");
-        $success = $stmt->execute([$firstname, $secondname, $surname, $email, $username, $phone_number, $admin_level, $admin_id]);
+        $stmt = mysqli_prepare($conn, "UPDATE admin SET firstname = ?, secondname = ?, surname = ?, email = ?, username = ?, phone_number = ?, admin_level = ? WHERE admin_id = ?");
+        mysqli_stmt_bind_param($stmt, "sssssssi", $firstname, $secondname, $surname, $email, $username, $phone_number, $admin_level, $admin_id);
+        $success = mysqli_stmt_execute($stmt);
         if ($success) {
             $_SESSION['success'] = "Admin details updated successfully.";
             logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Updated admin with ID: " . $admin_id);
@@ -36,8 +37,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             exit();
     }
     else if (isset($_POST['delete'])) {
-        $stmt = $conn->prepare("DELETE FROM admin WHERE admin_id = ?");
-        $success = $stmt->execute([$admin_id]);
+
+        $stmt = mysqli_prepare($conn, "DELETE FROM admin WHERE admin_id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $admin_id);
+        $success = mysqli_stmt_execute($stmt);
+        
         if ($success) {
             $_SESSION['success'] = "Admin deleted successfully.";
             logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Deleted admin with ID: " . $admin_id);

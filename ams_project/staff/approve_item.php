@@ -23,110 +23,32 @@ include __DIR__ . '/../log_activity.php';
 
 <head>
     <title>Approve Item</title>
-    <style>
-        .outer_container {
-            display: flex;
-            flex-direction: column;
-            gap: 20px;
-            max-width: 640px;
-            margin: 0 auto;
-            justify-content: center;
-        }
-
-        .f_inner_container {
-            max-width: 400px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            text-align: center;
-            flex: 1;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            margin-left: 120px;
-        }
-
-        .new_form_container {
-            flex: 1;
-            padding: 20px;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-        }
-
-        .form_data {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-
-        .form_data label {
-            font-weight: bold;
-        }
-
-        .form_data input,
-        .form_data textarea,
-        .form_data select {
-            padding: 8px;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-        }
-
-
-
-        .f_inner_container h3 {
-            margin: 0;
-        }
-
-        .f_inner_container p {
-            margin: 5px 0;
-
-        }
-
-        .f_inner_container img {
-            margin-top: 10px;
-            height: auto;
-            width: 100%;
-        }
-
-        .form_data .submit {
-            padding: 10px;
-            border: none;
-            border-radius: 4px;
-            background-color: #1f2933;
-            color: #ffffff;
-            cursor: pointer;
-            width: 100%;
-            font-size: 16px;
-            font-weight: 600;
-        }
-
-        .form_data .submit:hover {
-            background-color: #ffffff;
-            color: #000000;
-            border: 1px solid #1f2933;
-        }
-
-        h2 {
-            text-align: center;
-            margin-bottom: 20px;
-        }
-    </style>
+    <link rel="stylesheet" href="../css/form_table_styles.css">
 </head>
 
 <body>
+    <?php if (!empty($_SESSION['error'])): ?>
+        <div class="flash error">
+            <?= $_SESSION['error']; unset($_SESSION['error']); ?>
+        </div>
+    <?php endif; ?>
     <h2>Approve Item</h2>
     <!-- Form for approve_item.php goes here -->
-    <div class="outer_container">
+      <a href="staff_dashboard.php" style="margin:auto" class="back">
+        Back to Dashboard
+    </a>
+    <div class="n_outer_container">
         <!-- Display item details make items be seen and unseen -->
         <div class="f_inner_container">
             <?php
             // Fetch item details from the database based on item_id
             
-            $item_id = $_GET['item_id'] ?? null;
+            $item_id = $_GET['item_id'] ;
             if ($item_id) {
-                $stmt = $conn->prepare("SELECT * FROM consigner_items WHERE item_id = :item_id ");
-                $stmt->execute([':item_id' => $item_id]);
-                $item = $stmt->fetch();
+                $stmt = mysqli_prepare($conn, "SELECT * FROM consigner_items WHERE item_id = ?");
+                mysqli_stmt_bind_param($stmt, "i", $item_id);
+                mysqli_stmt_execute($stmt);
+                $item = mysqli_stmt_get_result($stmt)->fetch_assoc();
                 if ($item) {
                     echo "<h3>Item ID: " . htmlspecialchars($item['item_id']) . "</h3>";
                     echo "<h3>Item Name: " . htmlspecialchars($item['item_name']) . "</h3>";

@@ -44,38 +44,29 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // =========================
         // 1. INSERT AUCTION
         // =========================
-        $stmt = $conn->prepare("
+        $stmt = mysqli_prepare($conn, "
             INSERT INTO auctions 
             (auction_name, auction_code, auction_type, item_id, created_by_staff, start_time, end_time, status)
             VALUES 
-            (:auction_name, :auction_code, :auction_type, :item_id, :created_by_staff, :start_time, :end_time, :status)
+            (?, ?, ?, ?, ?, ?, ?, ?)
         ");
 
-        $stmt->execute([
-            ':auction_name' => $auction_name,
-            ':auction_code' => $auction_code,
-            ':auction_type' => $auction_type,
-            ':item_id' => $item_id,
-            ':created_by_staff' => $created_by_staff,
-            ':start_time' => $start_datetime,
-            ':end_time' => $end_datetime,
-            ':status' => $status
-        ]);
+        mysqli_stmt_bind_param($stmt, "ssssssss", $auction_name, $auction_code, $auction_type, $item_id, $created_by_staff, $start_datetime, $end_datetime, $status);
+            
 
         // =========================
         // 2. UPDATE CONSIGNER ITEM
         // =========================
-        $stmt = $conn->prepare("
+        $stmt = mysqli_prepare($conn, "
             UPDATE consigner_items
             SET 
                 item_status = 'auctioned',
                 updated_at = NOW()
-            WHERE item_id = :item_id
+            WHERE item_id = ?
         ");
 
-        $stmt->execute([
-            ':item_id' => $item_id
-        ]);
+        mysqli_stmt_bind_param($stmt, "i", $item_id);
+        mysqli_stmt_execute($stmt);
 
         // =========================
         // 3. LOG ACTIVITY
@@ -95,8 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
         logActivity(
             $conn,
-            $_SESSION['user_id'] ?? null,
-            $_SESSION['username'] ?? 'Unknown',
+            $_SESSION['user_id'] ,
+            $_SESSION['username'] ,
             "Failed to create auction: $auction_name"
         );
 

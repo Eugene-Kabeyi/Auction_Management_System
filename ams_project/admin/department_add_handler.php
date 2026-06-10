@@ -14,8 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST'){
     $dept_name = $_POST['department_name'];
     $dept_desc = $_POST['department_description'];
 
-    $tmt =$conn-> prepare("INSERT INTO department (department_name, department_description) VALUES(?, ?)");
-    $success = $tmt-> execute([$dept_name,$dept_desc]);
+    $tmt = mysqli_prepare($conn, "INSERT INTO department (department_name, department_description) VALUES (?, ?)");
+    mysqli_stmt_bind_param($tmt, "ss", $dept_name, $dept_desc);
+    $success = mysqli_stmt_execute($tmt);
 
     if($success){
         $_SESSION['success'] = "Successfully added $dept_name department";

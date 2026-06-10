@@ -21,22 +21,20 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
     // Insert bid into database with transaction to ensure data integrity
-    $conn->beginTransaction();
+    mysqli_begin_transaction($conn);
 
     try {
         // 1. Mark exisying winning bid as outbid
-        $stmt = $conn->prepare("UPDATE auction_bids SET bid_status = 'outbid' WHERE auction_id = :auction_id AND bid_status = 'winning'");
-        $stmt->execute(['auction_id' => $auction_id]);
+        $stmt = mysqli_prepare($conn, "UPDATE auction_bids SET bid_status = 'outbid' WHERE auction_id = ? AND bid_status = 'winning'");
+        mysqli_stmt_bind_param($stmt, "i", $auction_id);
+        mysqli_stmt_execute($stmt);
 
         // 2. Insert new bid as winning
-        $stmt = $conn->prepare("INSERT INTO auction_bids (auction_id, bidder_id, amount_bidded, bid_status) VALUES (:auction_id, :user_id, :amount_bidded, 'winning')");
-        $stmt->execute([
-            'auction_id' => $auction_id,
-            'user_id' => $user_id,
-            'amount_bidded' => $bid_amount
-        ]);
+        $stmt = mysqli_prepare($conn, "INSERT INTO auction_bids (auction_id, bidder_id, amount_bidded, bid_status) VALUES (?, ?, ?, 'winning')");
+        mysqli_stmt_bind_param($stmt, "iiid", $auction_id, $user_id, $bid_amount);
+        mysqli_stmt_execute($stmt);
 
-        $conn->commit();
+        mysqli_commit($conn);
         logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Placed a bid of Ksh " . number_format($bid_amount, 2) . " on auction ID: " . $auction_id);
 
         // Redirect
@@ -44,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
 
     } catch (Exception $e) {
-        $conn->rollBack();
+        mysqli_rollback($conn);
         $_SESSION['error'] = "Error placing bid.";
         logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Error placing bid on auction ID: " . $auction_id . " - " . $e->getMessage());
         header("Location: live_auction.php?auction_id=" . $auction_id);

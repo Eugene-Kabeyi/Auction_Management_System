@@ -8,7 +8,7 @@ if (!isset($_SESSION['user_id']) || ($_SESSION['login_type'] !== 'admin' && $_SE
     exit();
 }
 
-$stmt = $conn->prepare("
+$stmt = mysqli_prepare($conn, "
     SELECT 
         ei.eval_id,
         ei.item_id,
@@ -34,9 +34,8 @@ $stmt = $conn->prepare("
     ORDER BY ei.created_at DESC
 ");
 
-$stmt->execute();
-
-$evaluations = $stmt->fetchAll();
+mysqli_stmt_execute($stmt);
+$evaluations = mysqli_stmt_get_result($stmt)->fetch_all(MYSQLI_ASSOC);
 
 ?>
 
@@ -46,9 +45,16 @@ $evaluations = $stmt->fetchAll();
 </head>
 
 <body>
+    <h2 style="text-align: center;">Evaluated Items List</h2>
+        <a href="staff_dashboard.php" style="margin:auto" class="back">
+            Back to Dashboard
+        </a>
+    
+        <a href="list_items.php" style="margin:4px auto" class="back">
+            To Consigned Items
+        </a>
 
-
-    <div class="outer_container">
+    <div class="outer_container"style="margin-top: 20px;">
         <div class="inner_container">
 
             <table>

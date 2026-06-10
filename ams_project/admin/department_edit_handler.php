@@ -1,5 +1,6 @@
 <?php
-require '../config.php';
+require __DIR__ . '/../config.php';
+include __DIR__ . '/../log_activity.php';
 if (session_status() == PHP_SESSION_NONE) {
     session_start();
 }
@@ -17,8 +18,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     if (isset($_POST['update'])) {
 
-        $stmt = $conn->prepare("UPDATE department SET department_name = ?, department_description = ? WHERE department_id = ?");
-        $success = $stmt->execute([$dept_name, $dept_desc, $dept_id]);
+        $stmt = mysqli_prepare($conn, "UPDATE department SET department_name = ?, department_description = ? WHERE department_id = ?");
+        mysqli_stmt_bind_param($stmt, "sssi", $dept_name, $dept_desc, $dept_id);
+        $success = mysqli_stmt_execute($stmt);
 
         if ($success) {
             $_SESSION['success'] = "Department updated successfully!";
@@ -33,9 +35,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     } elseif (isset($_POST['delete'])) {
 
-        $stmt = $conn->prepare("DELETE FROM department WHERE department_id = ?");
-
-        $success = $stmt->execute([$dept_id]);
+        $stmt = mysqli_prepare($conn, "DELETE FROM department WHERE department_id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $dept_id);
+        $success = mysqli_stmt_execute($stmt);
 
         if ($success) {
             $_SESSION['success'] = "Department deleted successfully!";

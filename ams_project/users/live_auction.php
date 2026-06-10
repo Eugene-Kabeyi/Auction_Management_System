@@ -13,7 +13,7 @@ if (!isset($_SESSION['user_id']) || empty($_SESSION['user_id'])) {
 }
 
 include __DIR__ . '/../config.php';
-$stmt = $conn->prepare("
+$stmt = mysqli_prepare($conn, "
     UPDATE auctions
     SET status = CASE
 
@@ -30,7 +30,7 @@ $stmt = $conn->prepare("
 
     WHERE status != 'cancelled'
 ");
-$stmt->execute();
+mysqli_stmt_execute($stmt);
 
 $auction_id = $_GET['auction_id'] ?? null;
 //Ensure the consiger does not bid on their own item
@@ -38,7 +38,10 @@ $sql = "SELECT i.consigner_id FROM  auctions a JOIN  consigner_items i ON a.item
 $stmt = mysqli_prepare($conn, $sql);
 mysqli_stmt_bind_param($stmt, "i", $auction_id);
 mysqli_stmt_execute($stmt);
-$consigner_id = mysqli_stmt_get_result($stmt)->fetch_column();
+$result = mysqli_stmt_get_result($stmt);
+$row = mysqli_fetch_assoc($result);
+$consigner_id = $row['consigner_id'] ?? null;
+
 if ($consigner_id == $_SESSION['user_id']) {
     $_SESSION['error'] = "You cannot bid on your own item.";
     $_SESSION['person'] = "consigner";
@@ -46,11 +49,14 @@ if ($consigner_id == $_SESSION['user_id']) {
 
 
 // GET AUCTION TIME
-$stmt = $conn->prepare("
-    SELECT end_time FROM auctions WHERE auction_id = :auction_id
+$stmt = mysqli_prepare($conn, "
+    SELECT end_time FROM auctions WHERE auction_id = ?
 ");
-$stmt->execute(['auction_id' => $auction_id]);
-$auctionData = $stmt->fetch();
+mysqli_stmt_bind_param($stmt, "i", $auction_id);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$row = mysqli_fetch_assoc($result);
+$auction_end_time = $row['end_time'] ?? null;
 
 $current_time = date("Y-m-d H:i:s");
 
@@ -58,32 +64,45 @@ $current_time = date("Y-m-d H:i:s");
 
 //CHECK IF ALREADY DONE
 
-$stmt = $conn->prepare("
+$stmt = mysqli_prepare($conn, "
     SELECT COUNT(*) as c 
     FROM auction_bids 
-    WHERE auction_id = :auction_id AND result != 'pending'
+    WHERE auction_id = ? AND result != ?
 ");
-$stmt->execute(['auction_id' => $auction_id]);
-$alreadyFinalized = $stmt->fetch()['c'];
+$pending = 'pending';
+mysqli_stmt_bind_param($stmt, "is", $auction_id, $pending);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
+$row = mysqli_fetch_assoc($result);
+$alreadyFinalized = $row['c'] ?? 0;
 
 
 // FINALIZE AUCTION
 
 if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
+    // START TRANSACTION
+    mysqli_begin_transaction($conn);
 
-    $conn->beginTransaction();
 
     try {
 
         // MARK WINNER + LOSERS
-        $stmt = $conn->prepare("UPDATE auction_bids SET result = CASE WHEN bid_status = 'winning' THEN 'won' ELSE 'lost' END WHERE auction_id = :auction_id");
-        $stmt->execute(['auction_id' => $auction_id]);
+        $sql = ("UPDATE auction_bids SET result = CASE WHEN bid_status = 'winning' THEN 'won' ELSE 'lost' END WHERE auction_id = ?");
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $auction_id);
+        mysqli_stmt_execute($stmt);
+        mysqli_stmt_close($stmt);
+
 
 
         // FETCH WINNING BID
-        $winner_stmt = $conn->prepare("SELECT * FROM auction_bids WHERE auction_id = ? AND bid_status = 'winning' LIMIT 1");
-        $winner_stmt->execute([$auction_id]);
-        $winner = $winner_stmt->fetch();
+        $sql = ("SELECT * FROM auction_bids WHERE auction_id = ? AND bid_status = 'winning' LIMIT 1");
+        $stmt = mysqli_prepare($conn, $sql);
+        mysqli_stmt_bind_param($stmt, "i", $auction_id);
+        mysqli_stmt_execute($stmt);
+        $winner = mysqli_stmt_get_result($stmt);
+        $winner = mysqli_fetch_assoc($winner);
+        mysqli_stmt_close($stmt);
 
 
 
@@ -93,38 +112,38 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
             $bidder_id = $winner['bidder_id'];
             $amount = $winner['amount_bidded'];
 
-
-
             // CALCULATE TAX + TOTAL
-            $tax_amount = $amount * 0.16;
+            $sql = "SELECT * FROM auction_settings";
+            $result = mysqli_query($conn, $sql);
+            $settings = mysqli_fetch_assoc($result);
+
+            $tax_rate = $settings['tax_rate'];
+            $tax_amount = ($tax_rate / 100) * $amount;
             $total_amount = $amount + $tax_amount;
+
 
             // GENERATE INVOICE NUMBER
             $invoice_number = "INV-" . date("Ymd") . "-" . rand(1000, 9999);
 
             // STEP 4: CREATE INVOICE
-            $invoice_stmt = $conn->prepare("INSERT INTO invoices( invoice_number, bid_id, bidder_id, amount, tax_amount, total_amount, due_date, status, created_by_staff ) VALUES ( ?, ?, ?, ?, ?, ?, DATE_ADD(CURDATE(), INTERVAL 7 DAY), 'unpaid', ? ) ");
+            $invoice_stmt = mysqli_prepare($conn, "INSERT INTO invoices( invoice_number, bid_id, bidder_id, amount, tax_amount, total_amount, due_date, status, created_by_staff ) VALUES ( ?, ?, ?, ?, ?, ?, DATE_ADD(CURDATE(), INTERVAL 7 DAY), 'unpaid', ? ) ");
 
-            $invoice_stmt->execute([
-                $invoice_number,
-                $bid_id,
-                $bidder_id,
-                $amount,
-                $tax_amount,
-                $total_amount,
-                $_SESSION['user_id']
-            ]);
+            $staff_id = null; // Set to null for now, can be updated later when staff views the invoice
+            mysqli_stmt_bind_param($invoice_stmt, "siidddi", $invoice_number, $bid_id, $bidder_id, $amount, $tax_amount, $total_amount, $staff_id);
+            mysqli_stmt_execute($invoice_stmt);
+            $invoice_id = mysqli_stmt_insert_id($invoice_stmt);
+            mysqli_stmt_close($invoice_stmt);
         }
 
         // STEP 7: COMMIT EVERYTHING
-        $conn->commit();
+        mysqli_commit($conn);
 
         // STEP 8: LOG ACTIVITY
-      logActivity( $conn, $_SESSION['user_id'], $_SESSION['username'], "Auction finalized for auction ID: " . $auction_id );
+        logActivity($conn, $_SESSION['user_id'], $_SESSION['username'], "Auction finalized for auction ID: " . $auction_id);
 
     } catch (Exception $e) {
         // ROLLBACK EVERYTHING
-        $conn->rollBack();
+        mysqli_rollback($conn);
         if ($loginType === 'admin' || $loginType === 'staff') {
             $_SESSION['error'] = "Error finalizing auction.";
         }
@@ -341,9 +360,10 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
     // Fetch auction and item details from the database
     $auction_id = $_GET['auction_id'] ?? null; // Get auction ID from URL
     if ($auction_id) {
-        $stmt = $conn->prepare("SELECT a.item_id, a.auction_name, a.auction_code, a.start_time, a.end_time, i.item_name, i.item_description, e.reserve_price, i.image_path FROM auctions a JOIN consigner_items i ON a.item_id = i.item_id JOIN evaluated_items e ON i.item_id = e.item_id WHERE a.auction_id = :auction_id");
-        $stmt->execute(['auction_id' => $auction_id]);
-        $auction = $stmt->fetch();
+        $stmt = mysqli_prepare($conn, "SELECT a.item_id, a.auction_name, a.auction_code, a.start_time, a.end_time, i.item_name, i.item_description, e.reserve_price, i.image_path FROM auctions a JOIN consigner_items i ON a.item_id = i.item_id JOIN evaluated_items e ON i.item_id = e.item_id WHERE a.auction_id = ?");
+        mysqli_stmt_bind_param($stmt, "i", $auction_id);
+        mysqli_stmt_execute($stmt);
+        $auction = mysqli_stmt_get_result($stmt)->fetch_assoc();
         if ($auction) {
             $auction_name = $auction['auction_name'];
             $auction_code = $auction['auction_code'];
@@ -363,9 +383,10 @@ if ($current_time > $auctionData['end_time'] && $alreadyFinalized == 0) {
         exit();
     }
     // Fetch current highest bid
-    $stmt = $conn->prepare("SELECT MAX(amount_bidded) AS highest_bid FROM auction_bids WHERE auction_id = :auction_id");
-    $stmt->execute(['auction_id' => $auction_id]);
-    $bid_result = $stmt->fetch();
+    $stmt = mysqli_prepare($conn, "SELECT MAX(amount_bidded) AS highest_bid FROM auction_bids WHERE auction_id = ?");
+    mysqli_stmt_bind_param($stmt, "i", $auction_id);
+    mysqli_stmt_execute($stmt);
+    $bid_result = mysqli_stmt_get_result($stmt)->fetch_assoc();
 
     $current_highest_bid = $bid_result['highest_bid'] ?? 0;
     $minimum_bid = ($current_highest_bid > 0) ? $current_highest_bid + 1 : $starting_bid; // Minimum bid must be at least 1 unit higher than current highest
